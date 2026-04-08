@@ -3,12 +3,29 @@ import AuthenticationServices
 
 struct LoginView: View {
     @Bindable var authViewModel: AuthViewModel
+    var onBack: (() -> Void)? = nil
 
     var body: some View {
         GeometryReader { proxy in
             VStack(spacing: 0) {
+                if let onBack {
+                    HStack {
+                        Button {
+                            onBack()
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.64))
+                                .frame(width: 36, height: 36)
+                                .background(.white.opacity(0.08), in: .circle)
+                        }
+                        Spacer()
+                    }
+                    .padding(.top, 12)
+                }
+
                 Color.clear
-                    .frame(height: max(120, proxy.size.height * 0.34))
+                    .frame(height: max(onBack != nil ? 80 : 120, proxy.size.height * (onBack != nil ? 0.24 : 0.34)))
 
                 WordmarkView()
 

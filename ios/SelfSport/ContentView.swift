@@ -11,7 +11,11 @@ struct ContentView: View {
             } else if authViewModel.isAuthenticated {
                 DashboardRootView(authViewModel: authViewModel)
             } else if hasSeenWelcomeOnboarding {
-                LoginView(authViewModel: authViewModel)
+                LoginView(authViewModel: authViewModel, onBack: {
+                    withAnimation(.snappy(duration: 0.42, extraBounce: 0.02)) {
+                        hasSeenWelcomeOnboarding = false
+                    }
+                })
             } else {
                 WelcomeOnboardingView(
                     onComplete: {

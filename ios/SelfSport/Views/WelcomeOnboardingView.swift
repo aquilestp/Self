@@ -41,8 +41,30 @@ struct WelcomeOnboardingView: View {
             onboardingBackground
 
             VStack(spacing: 0) {
+                HStack {
+                    if currentStep != .intro {
+                        Button {
+                            withAnimation(.snappy(duration: 0.42, extraBounce: 0.02)) {
+                                if let prev = WelcomeOnboardingStep(rawValue: currentStep.rawValue - 1) {
+                                    currentStep = prev
+                                }
+                            }
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.body.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.64))
+                                .frame(width: 36, height: 36)
+                                .background(.white.opacity(0.08), in: .circle)
+                        }
+                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                    }
+                    Spacer()
+                }
+                .frame(height: 36)
+                .animation(.snappy(duration: 0.32), value: currentStep)
+                .padding(.top, 10)
+
                 progressHeader
-                    .padding(.top, 10)
 
                 Spacer(minLength: 28)
 
