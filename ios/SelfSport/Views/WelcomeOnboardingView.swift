@@ -64,11 +64,13 @@ struct WelcomeOnboardingView: View {
                 .animation(.snappy(duration: 0.32), value: currentStep)
                 .padding(.top, 10)
 
-                progressHeader
-
                 Spacer(minLength: 28)
 
                 ZStack {
+                    centeredProgressHeader
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                        .padding(.bottom, 98)
+
                     if currentStep == .intro {
                         WelcomeIntroStepView()
                             .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
@@ -138,8 +140,8 @@ struct WelcomeOnboardingView: View {
             }
     }
 
-    private var progressHeader: some View {
-        HStack(spacing: 12) {
+    private var centeredProgressHeader: some View {
+        VStack(spacing: 10) {
             HStack(spacing: 6) {
                 ForEach(WelcomeOnboardingStep.allCases) { step in
                     Capsule(style: .continuous)
@@ -148,13 +150,12 @@ struct WelcomeOnboardingView: View {
                 }
             }
 
-            Spacer()
-
             Text("\(currentStep.rawValue + 1)/\(WelcomeOnboardingStep.allCases.count)")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.48))
                 .monospacedDigit()
         }
+        .frame(maxWidth: .infinity)
     }
 
     private func advance() {
@@ -168,71 +169,24 @@ struct WelcomeOnboardingView: View {
 
 private struct WelcomeIntroStepView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            Text("self")
-                .font(.system(.title, design: .serif, weight: .bold).width(.compressed))
+        VStack(alignment: .leading, spacing: 12) {
+            Spacer(minLength: 0)
+
+            Text("Your were never meant to stay hidden")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(.white.opacity(0.64))
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("Reveal yourself")
+                .font(.system(.largeTitle, design: .serif, weight: .bold).width(.compressed))
                 .italic()
-                .foregroundStyle(.white.opacity(0.96))
-
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Turn every workout into a designed story.")
-                    .font(.system(size: 42, weight: .regular, design: .serif).italic())
-                    .foregroundStyle(.white)
-                    .lineSpacing(-4)
-                    .minimumScaleFactor(0.85)
-
-                Text("Build shareable layouts with bold stats, quiet detail and motion that feels intentional.")
-                    .font(.body)
-                    .foregroundStyle(.white.opacity(0.64))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: "square.on.square")
-                        .font(.title3)
-                        .foregroundStyle(.white.opacity(0.82))
-                        .frame(width: 28)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Compose with real workout data")
-                            .font(.headline)
-                            .foregroundStyle(.white.opacity(0.94))
-
-                        Text("Distance, pace, time and effort become design elements — not screenshots.")
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.54))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-
-                HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: "sparkles")
-                        .font(.title3)
-                        .foregroundStyle(.white.opacity(0.82))
-                        .frame(width: 28)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Made for premium-looking shares")
-                            .font(.headline)
-                            .foregroundStyle(.white.opacity(0.94))
-
-                        Text("A restrained dark canvas, elegant type and flexible stat cards give every export a cleaner finish.")
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.54))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-            .padding(22)
-            .background(Color.white.opacity(0.06), in: .rect(cornerRadius: 28))
-            .overlay {
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
-            }
+                .foregroundStyle(.white)
+                .lineSpacing(-4)
+                .minimumScaleFactor(0.85)
 
             Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
