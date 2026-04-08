@@ -77,15 +77,36 @@ final class OnboardingVideoCoordinator: NSObject {
     private var statusObservation: NSKeyValueObservation?
     var isReady: Bool = false
     private var onReady: (() -> Void)?
+    private var downloadTask: Task<Void, Never>?
+
+    private static let remoteURL = URL(string: "https://r2-pub.rork.com/attachments/d1hbppe43o59ckb7fvhvb.mov")!
+
+    private static var cachedFileURL: URL {
+        FileManager.default.temporaryDirectory.appendingPathComponent("onboarding_demo.mov")
+    }
 
     func preload() {
-        guard queuePlayer == nil else { return }
+        guard queuePlayer == nil, downloadTask == nil else { return }
 
-        guard let url = Bundle.main.url(forResource: "OnboardingConnectDemo", withExtension: "mov") else {
+        if FileManager.default.fileExists(atPath: Self.cachedFileURL.path) {
+            setupPlayer(with: Self.cachedFileURL)
             return
         }
 
-        let asset = AVURLAsset(url: url)
+        downloadTask = Task {
+            do {
+                let (tempURL, _) = try await URLSession.shared.download(from: Self.remoteURL)
+                try? FileManager.default.removeItem(at: Self.cachedFileURL)
+                try FileManager.default.moveItem(at: tempURL, to: Self.cachedFileURL)
+                setupPlayer(with: Self.cachedFileURL)
+            } catch {
+                // Silent fail — frame stays with spinner
+            }
+        }
+    }
+
+    private func setupPlayer(with fileURL: URL) {
+        let asset = AVURLAsset(url: fileURL)
         let item = AVPlayerItem(asset: asset)
         item.preferredForwardBufferDuration = 0
 
@@ -126,6 +147,7 @@ final class OnboardingVideoCoordinator: NSObject {
         queuePlayer?.pause()
         playerLooper?.disableLooping()
         statusObservation?.invalidate()
+        downloadTask?.cancel()
     }
 }
 
