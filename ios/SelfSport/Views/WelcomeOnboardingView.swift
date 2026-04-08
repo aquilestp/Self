@@ -95,11 +95,16 @@ struct WelcomeOnboardingView: View {
                         Image(systemName: currentStep == .connect ? "arrow.right.circle.fill" : "arrow.right")
                             .font(.headline)
                     }
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.white.opacity(0.82))
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)
-                    .background(.white, in: .capsule)
+                    .background(.white.opacity(0.08), in: .capsule)
+                    .overlay {
+                        Capsule(style: .continuous)
+                            .stroke(.white.opacity(0.12), lineWidth: 1)
+                    }
                 }
+                .contentShape(.capsule)
                 .buttonStyle(.plain)
                 .padding(.bottom, 12)
             }
@@ -143,14 +148,14 @@ struct WelcomeOnboardingView: View {
             HStack(spacing: 6) {
                 ForEach(WelcomeOnboardingStep.allCases) { step in
                     Capsule(style: .continuous)
-                        .fill(step == currentStep ? Color.white.opacity(0.94) : Color.white.opacity(0.14))
-                        .frame(width: step == currentStep ? 28 : 8, height: 8)
+                        .fill(step == currentStep ? Color.white.opacity(0.52) : Color.white.opacity(0.14))
+                        .frame(width: step == currentStep ? 24 : 8, height: 8)
                 }
             }
 
             Text("\(currentStep.rawValue + 1)/\(WelcomeOnboardingStep.allCases.count)")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.48))
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.white.opacity(0.34))
                 .monospacedDigit()
         }
         .frame(maxWidth: .infinity)
