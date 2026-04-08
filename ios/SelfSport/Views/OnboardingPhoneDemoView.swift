@@ -4,11 +4,13 @@ import UIKit
 
 struct OnboardingPhoneDemoView: View {
     let maxWidth: CGFloat
+    let preloadedCoordinator: OnboardingVideoCoordinator?
 
     @State private var isVideoReady: Bool = false
 
-    init(maxWidth: CGFloat = 300) {
+    init(maxWidth: CGFloat = 300, preloadedCoordinator: OnboardingVideoCoordinator? = nil) {
         self.maxWidth = maxWidth
+        self.preloadedCoordinator = preloadedCoordinator
     }
 
     var body: some View {
@@ -44,8 +46,7 @@ struct OnboardingPhoneDemoView: View {
             .overlay {
                 OnboardingLoopingVideoPlayer(
                     isReady: $isVideoReady,
-                    resourceName: "OnboardingConnectDemo",
-                    fileExtension: "mov"
+                    preloadedCoordinator: preloadedCoordinator
                 )
                 .opacity(isVideoReady ? 1 : 0.01)
                 .clipShape(.rect(cornerRadius: 38))
@@ -69,93 +70,83 @@ struct OnboardingPhoneDemoView: View {
     }
 }
 
-struct OnboardingLoopingVideoPlayer: UIViewRepresentable {
-    @Binding var isReady: Bool
-    let resourceName: String
-    let fileExtension: String
+@MainActor
+final class OnboardingVideoCoordinator: NSObject {
+    var queuePlayer: AVQueuePlayer?
+    private var playerLooper: AVPlayerLooper?
+    private var statusObservation: NSKeyValueObservation?
+    var isReady: Bool = false
+    private var onReady: (() -> Void)?
 
-    func makeCoordinator() -> Coordinator {
-        Coordinator(isReady: $isReady)
-    }
+    func preload() {
+        guard queuePlayer == nil else { return }
 
-    func makeUIView(context: Context) -> OnboardingPlayerView {
-        let view = OnboardingPlayerView()
-        context.coordinator.attach(
-            to: view,
-            resourceName: resourceName,
-            fileExtension: fileExtension
-        )
-        return view
-    }
-
-    func updateUIView(_ uiView: OnboardingPlayerView, context: Context) {
-    }
-
-    @MainActor
-    final class Coordinator: NSObject {
-        private let isReady: Binding<Bool>
-        private weak var playerView: OnboardingPlayerView?
-        private var queuePlayer: AVQueuePlayer?
-        private var playerLooper: AVPlayerLooper?
-        private var statusObservation: NSKeyValueObservation?
-
-        init(isReady: Binding<Bool>) {
-            self.isReady = isReady
+        guard let url = Bundle.main.url(forResource: "OnboardingConnectDemo", withExtension: "mov") else {
+            return
         }
 
-        deinit {
-            queuePlayer?.pause()
-            playerLooper?.disableLooping()
-            statusObservation?.invalidate()
-        }
+        let asset = AVURLAsset(url: url)
+        let item = AVPlayerItem(asset: asset)
+        item.preferredForwardBufferDuration = 0
 
-        func attach(to view: OnboardingPlayerView, resourceName: String, fileExtension: String) {
-            guard queuePlayer == nil else { return }
+        let player = AVQueuePlayer()
+        player.isMuted = true
+        player.actionAtItemEnd = .none
+        player.automaticallyWaitsToMinimizeStalling = false
 
-            playerView = view
-            isReady.wrappedValue = false
-            view.playerLayer.videoGravity = .resizeAspectFill
-
-            guard let url = Bundle.main.url(forResource: resourceName, withExtension: fileExtension) else {
-                return
-            }
-
-            let asset = AVURLAsset(url: url)
-            let item = AVPlayerItem(asset: asset)
-            item.preferredForwardBufferDuration = 0
-
-            let player = AVQueuePlayer()
-            player.isMuted = true
-            player.actionAtItemEnd = .none
-            player.automaticallyWaitsToMinimizeStalling = false
-            view.playerLayer.player = player
-
-            statusObservation = item.observe(\.status, options: [.initial, .new]) { [weak self] observedItem, _ in
-                guard let self else { return }
-
-                Task { @MainActor in
-                    switch observedItem.status {
-                    case .readyToPlay:
-                        self.isReady.wrappedValue = true
-                        self.queuePlayer?.playImmediately(atRate: 1)
-                    case .failed:
-                        self.isReady.wrappedValue = false
-                    case .unknown:
-                        break
-                    @unknown default:
-                        break
-                    }
+        statusObservation = item.observe(\.status, options: [.initial, .new]) { [weak self] observedItem, _ in
+            guard let self else { return }
+            Task { @MainActor in
+                if observedItem.status == .readyToPlay {
+                    self.isReady = true
+                    self.onReady?()
                 }
             }
-
-            queuePlayer = player
-            playerLooper = AVPlayerLooper(player: player, templateItem: item)
-            player.play()
         }
+
+        queuePlayer = player
+        playerLooper = AVPlayerLooper(player: player, templateItem: item)
+    }
+
+    func attachAndPlay(to view: OnboardingPlayerUIView, onReady: @escaping () -> Void) {
+        view.playerLayer.videoGravity = .resizeAspectFill
+        view.playerLayer.player = queuePlayer
+        self.onReady = onReady
+
+        if isReady {
+            onReady()
+            queuePlayer?.playImmediately(atRate: 1)
+        } else {
+            queuePlayer?.play()
+        }
+    }
+
+    func stop() {
+        queuePlayer?.pause()
+        playerLooper?.disableLooping()
+        statusObservation?.invalidate()
     }
 }
 
-final class OnboardingPlayerView: UIView {
+struct OnboardingLoopingVideoPlayer: UIViewRepresentable {
+    @Binding var isReady: Bool
+    let preloadedCoordinator: OnboardingVideoCoordinator?
+
+    func makeUIView(context: Context) -> OnboardingPlayerUIView {
+        let view = OnboardingPlayerUIView()
+        if let coordinator = preloadedCoordinator {
+            coordinator.attachAndPlay(to: view) {
+                isReady = true
+            }
+        }
+        return view
+    }
+
+    func updateUIView(_ uiView: OnboardingPlayerUIView, context: Context) {
+    }
+}
+
+final class OnboardingPlayerUIView: UIView {
     nonisolated override class var layerClass: AnyClass {
         AVPlayerLayer.self
     }
