@@ -229,20 +229,14 @@ private struct WelcomeIntroStepView: View {
 
 private struct WelcomeCanvasStepView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text("Stats settle into the canvas.")
-                .font(.system(size: 40, weight: .regular, design: .serif).italic())
+        VStack(alignment: .leading, spacing: 22) {
+            Text("Connect via Strava, Coros or Garmin and choose your activity")
+                .font(.system(size: 36, weight: .semibold, design: .default).width(.compressed))
                 .foregroundStyle(.white)
-                .lineSpacing(-4)
-                .minimumScaleFactor(0.85)
-
-            Text("Drop in distance, pace and effort cards, then move them until the composition feels right.")
-                .font(.body)
-                .foregroundStyle(.white.opacity(0.64))
                 .fixedSize(horizontal: false, vertical: true)
 
-            WelcomeCanvasAnimationView()
-                .padding(.top, 10)
+            OnboardingPhoneDemoView(maxWidth: 296)
+                .frame(maxWidth: .infinity)
 
             Spacer(minLength: 0)
         }
