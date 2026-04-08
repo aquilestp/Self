@@ -33,7 +33,7 @@ struct OnboardingPhoneDemoView: View {
                 }
         }
         .frame(maxWidth: maxWidth)
-        .aspectRatio(0.60, contentMode: .fit)
+        .aspectRatio(9.0 / 19.5, contentMode: .fit)
         .shadow(color: .black.opacity(0.42), radius: 30, x: 0, y: 22)
         .animation(.easeOut(duration: 0.18), value: isVideoReady)
         .accessibilityElement(children: .ignore)
@@ -89,10 +89,12 @@ final class OnboardingVideoCoordinator: NSObject {
         let item = AVPlayerItem(asset: asset)
         item.preferredForwardBufferDuration = 0
 
-        let player = AVQueuePlayer()
+        let player = AVQueuePlayer(items: [item])
         player.isMuted = true
-        player.actionAtItemEnd = .none
+        player.actionAtItemEnd = .advance
         player.automaticallyWaitsToMinimizeStalling = false
+
+        let looper = AVPlayerLooper(player: player, templateItem: AVPlayerItem(asset: asset))
 
         statusObservation = item.observe(\.status, options: [.initial, .new]) { [weak self] observedItem, _ in
             guard let self else { return }
@@ -105,7 +107,8 @@ final class OnboardingVideoCoordinator: NSObject {
         }
 
         queuePlayer = player
-        playerLooper = AVPlayerLooper(player: player, templateItem: item)
+        playerLooper = looper
+        player.play()
     }
 
     func attachAndPlay(to view: OnboardingPlayerUIView, onReady: @escaping () -> Void) {
@@ -115,10 +118,8 @@ final class OnboardingVideoCoordinator: NSObject {
 
         if isReady {
             onReady()
-            queuePlayer?.playImmediately(atRate: 1)
-        } else {
-            queuePlayer?.play()
         }
+        queuePlayer?.play()
     }
 
     func stop() {
