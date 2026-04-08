@@ -44,11 +44,7 @@ struct WelcomeOnboardingView: View {
                 HStack {
                     if currentStep != .intro {
                         Button {
-                            withAnimation(.snappy(duration: 0.42, extraBounce: 0.02)) {
-                                if let prev = WelcomeOnboardingStep(rawValue: currentStep.rawValue - 1) {
-                                    currentStep = prev
-                                }
-                            }
+                            retreat()
                         } label: {
                             Image(systemName: "chevron.left")
                                 .font(.body.weight(.semibold))
@@ -62,7 +58,7 @@ struct WelcomeOnboardingView: View {
                 }
                 .frame(height: 36)
                 .animation(.snappy(duration: 0.32), value: currentStep)
-                .padding(.top, 10)
+                .padding(.top, 56)
 
                 Spacer(minLength: 28)
 
@@ -109,6 +105,8 @@ struct WelcomeOnboardingView: View {
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 22)
+            .contentShape(Rectangle())
+            .simultaneousGesture(stepSwipeGesture)
         }
         .background(.black)
         .ignoresSafeArea()
@@ -158,9 +156,43 @@ struct WelcomeOnboardingView: View {
         .frame(maxWidth: .infinity)
     }
 
+    private var stepSwipeGesture: some Gesture {
+        DragGesture(minimumDistance: 24)
+            .onEnded { value in
+                handleSwipe(value)
+            }
+    }
+
+    private func handleSwipe(_ value: DragGesture.Value) {
+        let horizontalTranslation = value.translation.width
+        let verticalTranslation = value.translation.height
+
+        guard abs(horizontalTranslation) > abs(verticalTranslation), abs(horizontalTranslation) > 64 else {
+            return
+        }
+
+        if horizontalTranslation < 0 {
+            advance()
+        } else {
+            retreat()
+        }
+    }
+
+    private func retreat() {
+        guard let previousStep = WelcomeOnboardingStep(rawValue: currentStep.rawValue - 1) else {
+            return
+        }
+
+        withAnimation(.snappy(duration: 0.42, extraBounce: 0.02)) {
+            currentStep = previousStep
+        }
+    }
+
     private func advance() {
         if let nextStep = WelcomeOnboardingStep(rawValue: currentStep.rawValue + 1) {
-            currentStep = nextStep
+            withAnimation(.snappy(duration: 0.42, extraBounce: 0.02)) {
+                currentStep = nextStep
+            }
         } else {
             onComplete()
         }
