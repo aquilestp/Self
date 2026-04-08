@@ -1,0 +1,849 @@
+import SwiftUI
+
+extension PhotoEditorView {
+
+    @ViewBuilder
+    func miniWidgetPreview(type: StatWidgetType) -> some View {
+        switch type {
+        case .distance:
+            VStack(alignment: .leading, spacing: 2) {
+                Text(activity.primaryLabel)
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1)
+                    .foregroundStyle(.white.opacity(0.5))
+                Text(activity.primaryStat)
+                    .font(.custom("InstrumentSerif-Italic", size: 16))
+                    .foregroundStyle(.white)
+            }
+        case .distPace:
+            HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(activity.primaryLabelShort)
+                        .font(.custom("InstrumentSerif-Regular", size: 7))
+                        .tracking(0.8)
+                        .foregroundStyle(.white.opacity(0.45))
+                    Text(activity.primaryStat)
+                        .font(.custom("InstrumentSerif-Italic", size: 12))
+                        .foregroundStyle(.white)
+                }
+                Rectangle()
+                    .fill(.white.opacity(0.15))
+                    .frame(width: 0.5, height: 18)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(activity.hasDistance ? "PACE" : "TIME")
+                        .font(.custom("InstrumentSerif-Regular", size: 7))
+                        .tracking(0.8)
+                        .foregroundStyle(.white.opacity(0.45))
+                    Text(activity.hasDistance ? activity.pace : activity.duration)
+                        .font(.custom("InstrumentSerif-Italic", size: 12))
+                        .foregroundStyle(.white)
+                }
+            }
+        case .threeStats:
+            HStack(spacing: 6) {
+                if activity.hasDistance {
+                    miniStat(label: "DIST", value: activity.distance)
+                    miniStat(label: "PACE", value: activity.pace)
+                    miniStat(label: "TIME", value: activity.duration)
+                } else {
+                    miniStat(label: "TIME", value: activity.duration)
+                    miniStat(label: "TYPE", value: activity.title)
+                }
+            }
+        case .fullStats:
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 3) {
+                    Image(systemName: activity.systemImage)
+                        .font(.system(size: 7, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.6))
+                    Text(activity.title.uppercased())
+                        .font(.system(size: 6, weight: .semibold))
+                        .tracking(0.8)
+                        .foregroundStyle(.white.opacity(0.5))
+                        .lineLimit(1)
+                }
+                HStack(spacing: 6) {
+                    if activity.hasDistance {
+                        miniStat(label: "DIST", value: activity.distance)
+                        miniStat(label: "PACE", value: activity.pace)
+                    } else {
+                        miniStat(label: "TIME", value: activity.duration)
+                    }
+                }
+            }
+        case .titleCard:
+            VStack(alignment: .leading, spacing: 2) {
+                Text(activity.title)
+                    .font(.system(size: 8, weight: .black, design: .default).width(.expanded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text("\(activity.primaryStat) · \(activity.date)")
+                    .font(.system(size: 5, weight: .bold, design: .default).width(.expanded))
+                    .foregroundStyle(.white.opacity(0.5))
+                    .lineLimit(1)
+            }
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
+        case .stack:
+            VStack(spacing: 2) {
+                ForEach(
+                    activity.hasDistance
+                        ? [("Dist", activity.distance), ("Pace", activity.pace), ("Time", activity.duration)]
+                        : [("Duration", activity.duration), ("Activity", activity.title)],
+                    id: \.0
+                ) { label, value in
+                    HStack {
+                        Text(label)
+                            .font(.system(size: 6, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.45))
+                        Spacer()
+                        Text(value)
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                    }
+                }
+            }
+            .padding(.horizontal, 6)
+        case .bold:
+            VStack(alignment: .leading, spacing: 0) {
+                Text(activity.title.uppercased())
+                    .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
+                    .tracking(1.5)
+                    .foregroundStyle(.white.opacity(0.5))
+                    .lineLimit(1)
+                Text(activity.primaryStat.uppercased())
+                    .font(.system(size: 15, weight: .black, design: .default).width(.expanded))
+                    .tracking(-1)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                HStack(spacing: 4) {
+                    if activity.hasDistance {
+                        Text(activity.pace)
+                            .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
+                            .foregroundStyle(.white)
+                        Text(activity.duration.uppercased())
+                            .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
+                            .foregroundStyle(.white)
+                    } else {
+                        Text(activity.title.uppercased())
+                            .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
+                            .foregroundStyle(.white)
+                    }
+                }
+            }
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
+        case .impact:
+            VStack(alignment: .leading, spacing: -2) {
+                Text(activity.title.uppercased())
+                    .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
+                    .tracking(1.5)
+                    .foregroundStyle(.white.opacity(0.45))
+                    .lineLimit(1)
+                Text(activity.primaryStat.uppercased())
+                    .font(.system(size: 16, weight: .black, design: .default).width(.expanded))
+                    .tracking(-1.5)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
+                    .shadow(color: Color.white.opacity(0.5), radius: 6, x: 0, y: 0)
+                HStack(spacing: 3) {
+                    if activity.hasDistance {
+                        Text(activity.pace)
+                            .font(.system(size: 5, weight: .black, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.8))
+                        Rectangle()
+                            .fill(Color.white.opacity(0.4))
+                            .frame(width: 1, height: 6)
+                        Text(activity.duration.uppercased())
+                            .font(.system(size: 5, weight: .black, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.8))
+                    } else {
+                        Text(activity.title.uppercased())
+                            .font(.system(size: 5, weight: .black, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+                }
+            }
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
+        case .poster:
+            VStack(alignment: .leading, spacing: 1) {
+                Text(activity.title.uppercased())
+                    .font(.system(size: 5, weight: .heavy, design: .default).width(.expanded))
+                    .tracking(1.5)
+                    .foregroundStyle(.white.opacity(0.45))
+                    .lineLimit(1)
+                Text(activity.primaryStat.uppercased())
+                    .font(.system(size: 18, weight: .black, design: .default).width(.expanded))
+                    .tracking(-0.5)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
+                    .shadow(color: .white.opacity(0.25), radius: 4, x: 0, y: 0)
+                HStack(spacing: 6) {
+                    if activity.hasDistance {
+                        Text("PACE \(activity.pace)")
+                            .font(.system(size: 6, weight: .bold, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.6))
+                        Text("TIME \(activity.duration)")
+                            .font(.system(size: 6, weight: .bold, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.6))
+                    } else {
+                        Text(activity.date.uppercased())
+                            .font(.system(size: 6, weight: .bold, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.6))
+                    }
+                }
+            }
+        case .routeClean:
+            ZStack {
+                if activity.linePoints.count >= 2 {
+                    RouteTraceShape(normalizedPoints: activity.linePoints)
+                        .stroke(Color.white.opacity(0.9), style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                } else {
+                    Image(systemName: "point.topleft.down.to.point.bottomright.curvepath.fill")
+                        .font(.system(size: 20, weight: .light))
+                        .foregroundStyle(.white.opacity(0.3))
+                }
+            }
+            .frame(width: 65, height: 65)
+        case .heroStat:
+            VStack(alignment: .leading, spacing: 2) {
+                Text(activity.primaryStat.uppercased())
+                    .font(.system(size: 18, weight: .black))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                HStack(spacing: 8) {
+                    if activity.hasDistance {
+                        Text("PACE \(activity.pace)")
+                            .font(.system(size: 6, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.5))
+                        Text("TIME \(activity.duration)")
+                            .font(.system(size: 6, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.5))
+                    } else {
+                        Text(activity.date.uppercased())
+                            .font(.system(size: 6, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.5))
+                    }
+                }
+            }
+        case .wide:
+            VStack(alignment: .leading, spacing: 1) {
+                Text(activity.primaryLabel)
+                    .font(.system(size: 5, weight: .bold, design: .default).width(.expanded))
+                    .tracking(2)
+                    .foregroundStyle(.white.opacity(0.45))
+                Text(activity.primaryStat.uppercased())
+                    .font(.system(size: 14, weight: .black, design: .default).width(.expanded))
+                    .tracking(-0.5)
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
+            }
+        case .tower:
+            VStack(alignment: .leading, spacing: 1) {
+                Text(activity.primaryLabel)
+                    .font(.system(size: 5, weight: .bold, design: .default).width(.condensed))
+                    .tracking(1)
+                    .foregroundStyle(.white.opacity(0.4))
+                Text(activity.primaryStat.uppercased())
+                    .font(.system(size: 14, weight: .black, design: .default).width(.compressed))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.3)
+                    .scaleEffect(x: 1.0, y: 2.5, anchor: .top)
+                    .padding(.bottom, 20)
+            }
+        case .movingTimeClean:
+            miniTimeArcClean(
+                value: activity.duration,
+                label: "MOVING",
+                subLabel: String(format: "%.0f%%", miniEfficiencyRatio * 100),
+                icon: "timer",
+                progress: miniEfficiencyRatio
+            )
+        case .elapsedTimeClean:
+            let paused = activity.elapsedTimeRaw - activity.movingTimeRaw
+            miniTimeArcClean(
+                value: activity.elapsedTime,
+                label: "ELAPSED",
+                subLabel: paused > 0 ? miniFormatDuration(paused) + " p" : "",
+                icon: "clock",
+                progress: 1.0
+            )
+        case .avgHeartRate:
+            let bpm = miniHeartRateBPM
+            let progress = bpm > 0 ? min(1.0, max(0.15, Double(bpm - 60) / 140.0)) : 0.2
+            miniTimeArcClean(
+                value: bpm > 0 ? "\(bpm)" : "--",
+                label: "AVG HR",
+                subLabel: bpm > 0 ? miniHeartRateZoneShort : "",
+                icon: "heart.fill",
+                progress: progress
+            )
+        case .hrPulseDots:
+            miniHRPulseDots
+        case .weeklyKm:
+            miniWeeklyKm
+        case .lastWeekKm:
+            miniLastWeekKm
+        case .monthlyKm:
+            miniMonthlyKm
+        case .lastMonthKm:
+            miniLastMonthKm
+        case .elevationGain:
+            miniElevationGain
+        case .splits:
+            miniSplits
+        case .splitsTable:
+            miniSplitsTable
+        case .splitsFastest:
+            miniSplitsFastest
+        case .splitsBars:
+            miniSplitsBars
+        case .bestEfforts:
+            miniBestEfforts
+        case .distanceWords:
+            miniDistanceWords
+        case .fullBanner:
+            miniFullBanner
+        case .fullBannerBottom:
+            miniFullBannerBottom
+        }
+    }
+
+    func miniStat(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(label)
+                .font(.custom("InstrumentSerif-Regular", size: 7))
+                .tracking(0.8)
+                .foregroundStyle(.white.opacity(0.45))
+            Text(value)
+                .font(.custom("InstrumentSerif-Italic", size: 9))
+                .foregroundStyle(.white)
+                .minimumScaleFactor(0.7)
+        }
+    }
+
+    var miniEfficiencyRatio: Double {
+        guard activity.elapsedTimeRaw > 0 else { return 1.0 }
+        return min(1.0, Double(activity.movingTimeRaw) / Double(activity.elapsedTimeRaw))
+    }
+
+    func miniFormatDuration(_ seconds: Int) -> String {
+        let h = seconds / 3600
+        let m = (seconds % 3600) / 60
+        let s = seconds % 60
+        if h > 0 { return String(format: "%d:%02d:%02d", h, m, s) }
+        return String(format: "%d:%02d", m, s)
+    }
+
+    var miniHeartRateBPM: Int {
+        guard let hrString = activity.averageHeartrate else { return 0 }
+        let digits = hrString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        return Int(digits) ?? 0
+    }
+
+    var miniHeartRateZoneShort: String {
+        let bpm = miniHeartRateBPM
+        switch bpm {
+        case ..<100: return "Z1"
+        case 100..<120: return "Z2"
+        case 120..<140: return "Z3"
+        case 140..<160: return "Z4"
+        default: return "Z5"
+        }
+    }
+
+    var miniWeeklyKm: some View {
+        let data = weeklyKmData
+        let maxDaily = max(data.dailyKm.max() ?? 1.0, 0.1)
+        return VStack(spacing: 3) {
+            Text(String(format: "%.1f", data.totalKm))
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+            HStack(alignment: .bottom, spacing: 2.5) {
+                ForEach(0..<7, id: \.self) { i in
+                    let km = data.dailyKm[i]
+                    let ratio = km / maxDaily
+                    let isToday = i == data.todayIndex
+                    let barH = max(2, CGFloat(ratio) * 18)
+                    VStack(spacing: 1.5) {
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(Color.white.opacity(isToday ? 0.9 : (km > 0 ? 0.45 : 0.1)))
+                            .frame(width: 6, height: barH)
+                        Text(WeeklyKmData.dayLabels[i])
+                            .font(.system(size: 4.5, weight: isToday ? .bold : .medium))
+                            .foregroundStyle(.white.opacity(isToday ? 0.8 : 0.35))
+                    }
+                }
+            }
+            Text("THIS WEEK")
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniLastWeekKm: some View {
+        let data = lastWeekKmData
+        let maxDaily = max(data.dailyKm.max() ?? 1.0, 0.1)
+        return VStack(spacing: 3) {
+            Text(String(format: "%.1f", data.totalKm))
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+            HStack(alignment: .bottom, spacing: 2.5) {
+                ForEach(0..<7, id: \.self) { i in
+                    let km = data.dailyKm[i]
+                    let ratio = km / maxDaily
+                    let barH = max(2, CGFloat(ratio) * 18)
+                    VStack(spacing: 1.5) {
+                        RoundedRectangle(cornerRadius: 1)
+                            .fill(Color.white.opacity(km > 0 ? 0.55 : 0.1))
+                            .frame(width: 6, height: barH)
+                        Text(WeeklyKmData.dayLabels[i])
+                            .font(.system(size: 4.5, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.35))
+                    }
+                }
+            }
+            Text("LAST WEEK")
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniMonthlyKm: some View {
+        let data = monthlyKmData
+        let maxDaily = max(data.dailyKm.prefix(data.daysInMonth).max() ?? 1.0, 0.1)
+        return VStack(spacing: 3) {
+            Text(String(format: "%.1f", data.totalKm))
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+            HStack(alignment: .bottom, spacing: 1) {
+                ForEach(0..<data.daysInMonth, id: \.self) { i in
+                    let km = data.dailyKm[i]
+                    let ratio = km / maxDaily
+                    let isToday = i == data.todayIndex
+                    let barH = max(1.5, CGFloat(ratio) * 18)
+                    RoundedRectangle(cornerRadius: 0.5)
+                        .fill(Color.white.opacity(isToday ? 0.9 : (km > 0 ? 0.45 : 0.1)))
+                        .frame(width: 2, height: barH)
+                }
+            }
+            Text(data.monthLabel.isEmpty ? "THIS MONTH" : data.monthLabel)
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniLastMonthKm: some View {
+        let data = lastMonthKmData
+        let maxDaily = max(data.dailyKm.prefix(data.daysInMonth).max() ?? 1.0, 0.1)
+        return VStack(spacing: 3) {
+            Text(String(format: "%.1f", data.totalKm))
+                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+            HStack(alignment: .bottom, spacing: 1) {
+                ForEach(0..<data.daysInMonth, id: \.self) { i in
+                    let km = data.dailyKm[i]
+                    let ratio = km / maxDaily
+                    let barH = max(1.5, CGFloat(ratio) * 18)
+                    RoundedRectangle(cornerRadius: 0.5)
+                        .fill(Color.white.opacity(km > 0 ? 0.55 : 0.1))
+                        .frame(width: 2, height: barH)
+                }
+            }
+            Text(data.monthLabel.isEmpty ? "LAST MONTH" : data.monthLabel)
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniElevationGain: some View {
+        let digits = activity.elevationGain.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        let elev = digits.isEmpty ? "--" : digits
+        return VStack(spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 1) {
+                Text(elev)
+                    .font(.system(size: 14, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Text("m")
+                    .font(.system(size: 7, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.45))
+            }
+            MountainRidgeShape()
+                .fill(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.45), Color.white.opacity(0.05)],
+                        startPoint: .bottom,
+                        endPoint: .top
+                    )
+                )
+                .frame(width: 70, height: 28)
+            Text("ELEVATION")
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.5)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniSplits: some View {
+        VStack(spacing: 3) {
+            HStack(alignment: .bottom, spacing: 2) {
+                ForEach(0..<6, id: \.self) { i in
+                    let heights: [CGFloat] = [12, 18, 10, 16, 14, 8]
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(Color.white.opacity(i == 1 ? 0.9 : 0.4))
+                        .frame(width: 5, height: heights[i])
+                }
+            }
+            .frame(height: 22, alignment: .bottom)
+            Text("SPLITS")
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.2)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniSplitsFastest: some View {
+        VStack(spacing: 2) {
+            ForEach(0..<5, id: \.self) { i in
+                let widths: [CGFloat] = [48, 55, 32, 44, 38]
+                let isFastest = i == 1
+                HStack(spacing: 2) {
+                    if isFastest {
+                        Image(systemName: "bolt.fill")
+                            .font(.system(size: 4, weight: .black))
+                            .foregroundStyle(.white.opacity(0.9))
+                    }
+                    Text("\(i + 1)")
+                        .font(.system(size: 4.5, weight: isFastest ? .black : .medium, design: .monospaced))
+                        .foregroundStyle(.white.opacity(isFastest ? 0.9 : 0.25))
+                        .frame(width: isFastest ? 6 : 8, alignment: .trailing)
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(Color.white.opacity(isFastest ? 0.95 : 0.12))
+                        .frame(width: widths[i], height: isFastest ? 6 : 3)
+                        .shadow(color: isFastest ? .white.opacity(0.5) : .clear, radius: 3, x: 0, y: 0)
+                    Spacer()
+                    if isFastest {
+                        Text("4'12\"")
+                            .font(.system(size: 7, weight: .black, design: .default).width(.compressed))
+                            .foregroundStyle(.white.opacity(0.9))
+                    }
+                }
+            }
+            Text("FASTEST")
+                .font(.system(size: 4.5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+        .padding(.horizontal, 6)
+    }
+
+    var miniSplitsBars: some View {
+        VStack(spacing: 2) {
+            ForEach(0..<5, id: \.self) { i in
+                let widths: [CGFloat] = [42, 55, 28, 48, 35]
+                let opacities: [Double] = [0.35, 0.9, 0.15, 0.5, 0.25]
+                let isFastest = i == 1
+                HStack(spacing: 2) {
+                    Text("\(i + 1)")
+                        .font(.system(size: 4.5, weight: isFastest ? .black : .medium, design: .monospaced))
+                        .foregroundStyle(.white.opacity(isFastest ? 0.9 : 0.3))
+                        .frame(width: 8, alignment: .trailing)
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(Color.white.opacity(opacities[i]))
+                        .frame(width: widths[i], height: isFastest ? 5.5 : 3)
+                        .shadow(color: isFastest ? .white.opacity(0.4) : .clear, radius: 2, x: 0, y: 0)
+                    Spacer()
+                    Text(isFastest ? "4'12\"" : "\(4 + i)'\(10 + i * 7)\"")
+                        .font(.system(size: isFastest ? 6.5 : 5, weight: .black, design: .default).width(.compressed))
+                        .foregroundStyle(.white.opacity(isFastest ? 0.9 : 0.4))
+                }
+            }
+            Text("SPLITS")
+                .font(.system(size: 4.5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+        .padding(.horizontal, 6)
+    }
+
+    var miniSplitsTable: some View {
+        VStack(spacing: 2) {
+            ForEach(0..<4, id: \.self) { i in
+                let widths: [CGFloat] = [50, 38, 45, 30]
+                let isFastest = i == 0
+                HStack(spacing: 3) {
+                    Text("\(i + 1)")
+                        .font(.system(size: 5, weight: .medium, design: .monospaced))
+                        .foregroundStyle(.white.opacity(0.35))
+                        .frame(width: 8, alignment: .trailing)
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(Color.white.opacity(isFastest ? 0.85 : 0.3))
+                        .frame(width: widths[i], height: isFastest ? 5 : 3.5)
+                    Spacer()
+                    Text(isFastest ? "4'12\"" : "--")
+                        .font(.system(size: isFastest ? 7 : 5, weight: .black, design: .default).width(.compressed))
+                        .foregroundStyle(.white.opacity(isFastest ? 0.9 : 0.4))
+                }
+            }
+            Text("ALL SPLITS")
+                .font(.system(size: 4.5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+        .padding(.horizontal, 8)
+    }
+
+    var miniDistanceWords: some View {
+        let result = DistanceToWords.convert(distanceMeters: activity.distanceRaw, unit: .km)
+        let words = result.numberText.lowercased()
+        return VStack(alignment: .leading, spacing: 1) {
+            Text(words)
+                .font(.system(size: 10, weight: .light, design: .monospaced))
+                .foregroundStyle(.white)
+                .lineLimit(3)
+                .minimumScaleFactor(0.5)
+            Text(result.unitText.uppercased())
+                .font(.system(size: 5, weight: .bold, design: .monospaced))
+                .tracking(1.5)
+                .foregroundStyle(.white.opacity(0.45))
+        }
+    }
+
+    var miniBestEfforts: some View {
+        VStack(spacing: 3) {
+            Image(systemName: "medal.fill")
+                .font(.system(size: 12, weight: .light))
+                .foregroundStyle(.white.opacity(0.7))
+            VStack(spacing: 1.5) {
+                ForEach(["1K", "5K"], id: \.self) { label in
+                    HStack(spacing: 4) {
+                        Text(label)
+                            .font(.system(size: 6, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.6))
+                        Text("--:--")
+                            .font(.system(size: 6, weight: .semibold, design: .monospaced))
+                            .foregroundStyle(.white)
+                    }
+                }
+            }
+            Text("BEST EFFORTS")
+                .font(.system(size: 4.5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniHRPulseDots: some View {
+        let bpm = miniHeartRateBPM
+        let zoneIndex: Int = {
+            switch bpm {
+            case ..<100: return 1
+            case 100..<120: return 2
+            case 120..<140: return 3
+            case 140..<160: return 4
+            default: return bpm > 0 ? 5 : 0
+            }
+        }()
+        return HStack(spacing: 6) {
+            HStack(spacing: 3) {
+                ForEach(0..<5, id: \.self) { i in
+                    let isActive = (i + 1) == zoneIndex
+                    let isPast = (i + 1) < zoneIndex
+                    Circle()
+                        .fill(Color.white.opacity(isActive ? 0.9 : (isPast ? 0.35 : 0.12)))
+                        .frame(width: isActive ? 5 : 3.5, height: isActive ? 5 : 3.5)
+                }
+            }
+            VStack(spacing: 0) {
+                Text(bpm > 0 ? "\(bpm)" : "--")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                Text("BPM")
+                    .font(.system(size: 4, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+        }
+    }
+
+    func miniTimeArcClean(value: String, label: String, subLabel: String, icon: String, progress: Double) -> some View {
+        VStack(spacing: 2) {
+            ZStack {
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(Color.white.opacity(0.08), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 28, height: 28)
+                Circle()
+                    .trim(from: 0, to: progress * 0.75)
+                    .stroke(Color.white.opacity(0.85), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 28, height: 28)
+                Image(systemName: icon)
+                    .font(.system(size: 8, weight: .light))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+            if !subLabel.isEmpty {
+                Text(subLabel)
+                    .font(.system(size: 6, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.5))
+            }
+            Text(value)
+                .font(.system(size: 10, weight: .semibold, design: .serif))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(label)
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniFullBanner: some View {
+        HStack(spacing: 0) {
+            VStack(spacing: 3) {
+                Text("TIME")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+                Text(activity.duration)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity)
+            VStack(spacing: 3) {
+                Text("DIST")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+                Text(activity.distance)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity)
+            VStack(spacing: 3) {
+                Text("PACE")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+                Text(activity.pace)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity)
+            VStack(spacing: 3) {
+                Text("ELEV")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+                Text(activity.elevationGain)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 12)
+    }
+
+    var miniFullBannerBottom: some View {
+        HStack(spacing: 0) {
+            VStack(spacing: 3) {
+                Text(activity.duration)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Text("TIME")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+            .frame(maxWidth: .infinity)
+            VStack(spacing: 3) {
+                Text(activity.distance)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Text("DIST")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+            .frame(maxWidth: .infinity)
+            VStack(spacing: 3) {
+                Text(activity.pace)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Text("PACE")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+            .frame(maxWidth: .infinity)
+            VStack(spacing: 3) {
+                Text(activity.elevationGain)
+                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Text("ELEV")
+                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .tracking(1.2)
+                    .foregroundStyle(.white.opacity(0.4))
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 12)
+    }
+
+    func miniTimeArc(value: String, label: String, icon: String, progress: Double) -> some View {
+        VStack(spacing: 4) {
+            ZStack {
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(Color.white.opacity(0.08), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 30, height: 30)
+                Circle()
+                    .trim(from: 0, to: progress * 0.75)
+                    .stroke(Color.white.opacity(0.85), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 30, height: 30)
+                Image(systemName: icon)
+                    .font(.system(size: 9, weight: .light))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+            Text(value)
+                .font(.system(size: 10, weight: .semibold, design: .serif))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(label)
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+}
