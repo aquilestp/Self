@@ -606,7 +606,7 @@ struct PhotoEditorView: View {
         }
         .statusBarHidden()
         .task {
-            try? await Task.sleep(for: .seconds(1))
+            try? await Task.sleep(for: .seconds(0.7))
             guard drawerState == .collapsed else { return }
             withAnimation(.snappy(duration: 0.18)) {
                 drawerState = .open
