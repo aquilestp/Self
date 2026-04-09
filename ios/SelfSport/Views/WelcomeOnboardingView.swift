@@ -300,7 +300,7 @@ private struct WelcomeConnectStepView: View {
 private struct WelcomeShareStepView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            Text("Select your picture, play with stats and share yourself")
+            Text("Select your pic, play with stats and show yourself...")
                 .font(.system(.largeTitle, design: .serif, weight: .regular).width(.compressed))
                 .italic()
                 .foregroundStyle(.white)
