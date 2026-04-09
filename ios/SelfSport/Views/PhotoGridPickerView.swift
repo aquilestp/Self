@@ -31,7 +31,7 @@ struct PhotoGridPickerView: View {
             Text("Select your picture")
                 .font(.system(size: 22, weight: .regular, design: .serif).italic())
                 .foregroundStyle(.white.opacity(0.90))
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.horizontal, 16)
                 .padding(.top, 14)
                 .padding(.bottom, 10)
