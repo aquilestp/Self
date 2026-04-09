@@ -35,7 +35,6 @@ struct WelcomeOnboardingView: View {
     let onComplete: () -> Void
 
     @State private var currentStep: WelcomeOnboardingStep = .intro
-    @State private var videoCoordinator = OnboardingVideoCoordinator()
 
     var body: some View {
         ZStack {
@@ -74,7 +73,7 @@ struct WelcomeOnboardingView: View {
                     }
 
                     if currentStep == .canvas {
-                        WelcomeCanvasStepView(videoCoordinator: videoCoordinator)
+                        WelcomeCanvasStepView()
                             .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
                     }
 
@@ -116,9 +115,6 @@ struct WelcomeOnboardingView: View {
         }
         .background(.black)
         .ignoresSafeArea()
-        .task {
-            videoCoordinator.preload()
-        }
     }
 
     private var onboardingBackground: some View {
@@ -232,8 +228,6 @@ private struct WelcomeIntroStepView: View {
 }
 
 private struct WelcomeCanvasStepView: View {
-    let videoCoordinator: OnboardingVideoCoordinator
-
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
             Text("Connect via Strava, Coros or Garmin and choose your activity")
@@ -242,7 +236,7 @@ private struct WelcomeCanvasStepView: View {
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
 
-            OnboardingPhoneDemoView(maxWidth: 296, preloadedCoordinator: videoCoordinator)
+            OnboardingPhoneDemoView(maxWidth: 296)
                 .frame(maxWidth: .infinity)
 
             Spacer(minLength: 0)
