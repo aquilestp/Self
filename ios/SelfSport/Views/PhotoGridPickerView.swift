@@ -28,6 +28,14 @@ struct PhotoGridPickerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            Text("Select your picture")
+                .font(.system(size: 22, weight: .regular, design: .serif).italic())
+                .foregroundStyle(.white.opacity(0.90))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.top, 14)
+                .padding(.bottom, 10)
+
             Group {
                 if photoService.needsPermission {
                     permissionPrompt
