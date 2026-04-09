@@ -1,13 +1,15 @@
-# Arreglar el video del onboarding con streaming directo
+# Add a 4th onboarding screen: "Share yourself"
 
-## Problema
-El video en el paso 2 del onboarding no carga porque la app intenta descargar el archivo completo antes de reproducirlo, y eso falla en el simulador.
+**What changes**
 
-## Solución
-Cambiar la estrategia de reproducción: en vez de descargar el archivo completo primero, reproducir el video directamente desde la URL (streaming). Esto es como cuando ves un video en una web — empieza a reproducir mientras se descarga en segundo plano.
+- A new **4th and final** onboarding step is added after the current "Connect" screen
+- Title: **"Select your picture, play with stats and share yourself"** — same serif italic style as the step 2 title
+- A phone frame with a GIF inside (same style as step 2), but using a **second GIF** you'll provide later
+- The "Continue" button and arrow icon move to this last screen; previous screens show "Next"
+- Progress dots update to show 4 steps instead of 3
+- Swiping and back button work across all 4 steps
 
-## Cambios
-- **Streaming directo**: El video empezará a reproducir apenas tenga suficiente buffer, sin esperar a que se descargue completo
-- **Precarga mejorada**: Se empezará a preparar el video desde que la app se abre (antes de que llegues al paso 2)
-- **Fallback con reintentos**: Si el streaming falla, se reintentará automáticamente hasta 3 veces
-- **Misma apariencia**: El frame del iPhone con su diseño actual se mantiene exactamente igual — solo cambia cómo se carga el video por debajo
+**What you need to do**
+
+- Send me the second GIF file (as an attachment) so I can add it to the project as `onboarding_share.gif`
+- Until the GIF is provided, a placeholder will appear inside the phone frame

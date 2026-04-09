@@ -3,9 +3,11 @@ import UIKit
 
 struct OnboardingPhoneDemoView: View {
     let maxWidth: CGFloat
+    let gifName: String
 
-    init(maxWidth: CGFloat = 300) {
+    init(maxWidth: CGFloat = 300, gifName: String = "onboarding_demo") {
         self.maxWidth = maxWidth
+        self.gifName = gifName
     }
 
     var body: some View {
@@ -38,7 +40,7 @@ struct OnboardingPhoneDemoView: View {
         RoundedRectangle(cornerRadius: 38, style: .continuous)
             .fill(Color(white: 0.04))
             .overlay {
-                AnimatedGIFView()
+                AnimatedGIFView(gifName: gifName)
                     .clipShape(.rect(cornerRadius: 38))
             }
             .clipShape(.rect(cornerRadius: 38))
@@ -46,6 +48,12 @@ struct OnboardingPhoneDemoView: View {
 }
 
 struct AnimatedGIFView: UIViewRepresentable {
+    let gifName: String
+
+    init(gifName: String = "onboarding_demo") {
+        self.gifName = gifName
+    }
+
     func makeUIView(context: Context) -> UIView {
         let container = UIView()
         container.backgroundColor = .clear
@@ -65,7 +73,7 @@ struct AnimatedGIFView: UIViewRepresentable {
             imageView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
         ])
 
-        if let gifURL = Bundle.main.url(forResource: "onboarding_demo", withExtension: "gif"),
+        if let gifURL = Bundle.main.url(forResource: gifName, withExtension: "gif"),
            let gifData = try? Data(contentsOf: gifURL),
            let source = CGImageSourceCreateWithData(gifData as CFData, nil) {
             let frameCount = CGImageSourceGetCount(source)

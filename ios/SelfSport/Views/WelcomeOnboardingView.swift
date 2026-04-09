@@ -4,12 +4,13 @@ private enum WelcomeOnboardingStep: Int, CaseIterable, Identifiable {
     case intro
     case canvas
     case connect
+    case share
 
     var id: Int { rawValue }
 
     var buttonTitle: String {
         switch self {
-        case .connect:
+        case .share:
             return "Continue"
         default:
             return "Next"
@@ -81,6 +82,11 @@ struct WelcomeOnboardingView: View {
                         WelcomeConnectStepView()
                             .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
                     }
+
+                    if currentStep == .share {
+                        WelcomeShareStepView()
+                            .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
+                    }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .animation(.snappy(duration: 0.42, extraBounce: 0.02), value: currentStep)
@@ -92,7 +98,7 @@ struct WelcomeOnboardingView: View {
                         Text(currentStep.buttonTitle)
                             .font(.headline)
 
-                        Image(systemName: currentStep == .connect ? "arrow.right.circle.fill" : "arrow.right")
+                        Image(systemName: currentStep == .share ? "arrow.right.circle.fill" : "arrow.right")
                             .font(.headline)
                     }
                     .foregroundStyle(.white.opacity(0.82))
@@ -291,6 +297,23 @@ private struct WelcomeConnectStepView: View {
                     .foregroundStyle(.white.opacity(0.54))
             }
             .padding(.top, 6)
+
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+private struct WelcomeShareStepView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            Text("Select your picture, play with stats and share yourself")
+                .font(.system(.largeTitle, design: .serif, weight: .regular).width(.compressed))
+                .italic()
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+
+            OnboardingPhoneDemoView(maxWidth: 296, gifName: "onboarding_share")
+                .frame(maxWidth: .infinity)
 
             Spacer(minLength: 0)
         }
