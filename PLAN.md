@@ -1,23 +1,13 @@
-# Barra inferior fija con Atrás y Continue en el grid de fotos
+# Fix drawer to extend to the bottom edge of the screen
 
-## Cambios
+**Problem**
 
-### Barra inferior fija
+- When the drawer is open, it stops at the canvas boundary (90% of screen height), leaving a visible black empty space at the very bottom of the screen.
 
-- Se reemplaza el botón "Continue" flotante actual y el nav bar superior por una **barra inferior fija** que siempre está visible
-- Dos botones lado a lado:
+**Fix**
 
-### Botón "Atrás" (izquierda)
-
-- Icono `chevron.left` con el mismo estilo visual del editor: 18pt semibold, blanco, fondo `white 12%`, esquinas redondeadas (cornerRadius 18), tamaño 56×56
-
-### Botón "Continue" (derecha)
-
-- Ocupa el espacio restante, mismo alto (56pt), fondo blanco con texto negro, esquinas redondeadas (cornerRadius 18)
-- **Cuando no hay foto seleccionada**: opacidad reducida (~0.35), deshabilitado — se ve "apagado"
-- **Cuando hay foto seleccionada**: se activa con opacidad completa y es clickeable
-
-### Se elimina
-
-- El nav bar superior actual (título "Select your pic" + botón Back) se elimina ya que la navegación ahora vive en la barra inferior
+- When the drawer is in the open or expanded state, extend it so its background reaches all the way to the bottom edge of the screen (past the safe area).
+- The drawer content (stat widgets grid) stays in the same position — only the background material fills the gap below.
+- This is achieved by adding bottom padding to the drawer's inner content and removing the canvas height constraint on the drawer's background, so the material visually bleeds to the screen edge.
+- No changes to collapsed state or bottom share bar behavior.
 

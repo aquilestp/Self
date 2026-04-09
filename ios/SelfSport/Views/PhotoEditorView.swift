@@ -509,6 +509,12 @@ struct PhotoEditorView: View {
                                 .padding(.top, 1)
                                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                                 .animation(.snappy(duration: 0.32), value: drawerState)
+                        } else if drawerState == .open || drawerState == .expanded {
+                            Rectangle()
+                                .fill(.black.opacity(0.55))
+                                .background(.ultraThinMaterial)
+                                .transition(.opacity)
+                                .animation(.snappy(duration: 0.32), value: drawerState)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .top)
