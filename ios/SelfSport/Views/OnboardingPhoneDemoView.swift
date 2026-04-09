@@ -75,54 +75,60 @@ final class OnboardingVideoCoordinator: NSObject {
     var queuePlayer: AVQueuePlayer?
     private var playerLooper: AVPlayerLooper?
     private var statusObservation: NSKeyValueObservation?
+    private var errorObservation: NSKeyValueObservation?
     var isReady: Bool = false
     private var onReady: (() -> Void)?
-    private var downloadTask: Task<Void, Never>?
+    private var retryCount: Int = 0
+    private let maxRetries: Int = 3
 
     private static let remoteURL = URL(string: "https://r2-pub.rork.com/attachments/d1hbppe43o59ckb7fvhvb.mov")!
 
-    private static var cachedFileURL: URL {
-        FileManager.default.temporaryDirectory.appendingPathComponent("onboarding_demo.mov")
-    }
-
     func preload() {
-        guard queuePlayer == nil, downloadTask == nil else { return }
-
-        if FileManager.default.fileExists(atPath: Self.cachedFileURL.path) {
-            setupPlayer(with: Self.cachedFileURL)
-            return
-        }
-
-        downloadTask = Task {
-            do {
-                let (tempURL, _) = try await URLSession.shared.download(from: Self.remoteURL)
-                try? FileManager.default.removeItem(at: Self.cachedFileURL)
-                try FileManager.default.moveItem(at: tempURL, to: Self.cachedFileURL)
-                setupPlayer(with: Self.cachedFileURL)
-            } catch {
-                // Silent fail — frame stays with spinner
-            }
-        }
+        guard queuePlayer == nil else { return }
+        setupStreamingPlayer()
     }
 
-    private func setupPlayer(with fileURL: URL) {
-        let asset = AVURLAsset(url: fileURL)
-        let item = AVPlayerItem(asset: asset)
-        item.preferredForwardBufferDuration = 0
+    private func setupStreamingPlayer() {
+        statusObservation?.invalidate()
+        errorObservation?.invalidate()
+        queuePlayer?.pause()
+        playerLooper?.disableLooping()
 
-        let player = AVQueuePlayer(items: [item])
+        let asset = AVURLAsset(url: Self.remoteURL, options: [
+            "AVURLAssetHTTPHeaderFieldsKey": ["Accept": "*/*"],
+            AVURLAssetPreferPreciseDurationAndTimingKey: false
+        ])
+
+        let templateItem = AVPlayerItem(asset: asset)
+        templateItem.preferredForwardBufferDuration = 2
+
+        let player = AVQueuePlayer(items: [templateItem])
         player.isMuted = true
         player.actionAtItemEnd = .advance
-        player.automaticallyWaitsToMinimizeStalling = false
+        player.automaticallyWaitsToMinimizeStalling = true
 
         let looper = AVPlayerLooper(player: player, templateItem: AVPlayerItem(asset: asset))
 
-        statusObservation = item.observe(\.status, options: [.initial, .new]) { [weak self] observedItem, _ in
+        statusObservation = templateItem.observe(\.status, options: [.initial, .new]) { [weak self] observedItem, _ in
             guard let self else { return }
             Task { @MainActor in
-                if observedItem.status == .readyToPlay {
+                switch observedItem.status {
+                case .readyToPlay:
                     self.isReady = true
                     self.onReady?()
+                case .failed:
+                    self.handlePlaybackError()
+                default:
+                    break
+                }
+            }
+        }
+
+        errorObservation = player.observe(\.status, options: [.new]) { [weak self] observedPlayer, _ in
+            guard let self else { return }
+            Task { @MainActor in
+                if observedPlayer.status == .failed {
+                    self.handlePlaybackError()
                 }
             }
         }
@@ -130,6 +136,16 @@ final class OnboardingVideoCoordinator: NSObject {
         queuePlayer = player
         playerLooper = looper
         player.play()
+    }
+
+    private func handlePlaybackError() {
+        guard retryCount < maxRetries else { return }
+        retryCount += 1
+        let delay = retryCount
+        Task {
+            try? await Task.sleep(for: .seconds(delay))
+            setupStreamingPlayer()
+        }
     }
 
     func attachAndPlay(to view: OnboardingPlayerUIView, onReady: @escaping () -> Void) {
@@ -147,7 +163,7 @@ final class OnboardingVideoCoordinator: NSObject {
         queuePlayer?.pause()
         playerLooper?.disableLooping()
         statusObservation?.invalidate()
-        downloadTask?.cancel()
+        errorObservation?.invalidate()
     }
 }
 
