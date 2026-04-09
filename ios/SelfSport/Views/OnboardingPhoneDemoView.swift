@@ -38,7 +38,7 @@ struct OnboardingPhoneDemoView: View {
 
     private var screenSurface: some View {
         RoundedRectangle(cornerRadius: 38, style: .continuous)
-            .fill(Color(white: 0.04))
+            .fill(.black)
             .overlay {
                 AnimatedGIFView(gifName: gifName)
                     .clipShape(.rect(cornerRadius: 38))

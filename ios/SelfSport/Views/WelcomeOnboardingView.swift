@@ -3,7 +3,6 @@ import SwiftUI
 private enum WelcomeOnboardingStep: Int, CaseIterable, Identifiable {
     case intro
     case canvas
-    case connect
     case share
 
     var id: Int { rawValue }
@@ -75,11 +74,6 @@ struct WelcomeOnboardingView: View {
 
                     if currentStep == .canvas {
                         WelcomeCanvasStepView()
-                            .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
-                    }
-
-                    if currentStep == .connect {
-                        WelcomeConnectStepView()
                             .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
                     }
 
