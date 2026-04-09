@@ -6,7 +6,7 @@ struct WordmarkView: View {
 
     var body: some View {
         Text("self")
-            .font(.system(.largeTitle, design: .serif, weight: .bold).width(.compressed))
+            .font(.system(.largeTitle, design: .serif, weight: .regular).width(.compressed))
             .italic()
             .tracking(-1.2)
             .foregroundStyle(.white.opacity(0.96))
