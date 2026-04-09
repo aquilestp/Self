@@ -1,9 +1,23 @@
-# Ajustar pantallas de onboarding y font de elevación
+# Barra inferior fija con Atrás y Continue en el grid de fotos
 
-**Cambios**
+## Cambios
 
-1. **Fondo negro en las pantallas con GIF** — Las pantallas "Connect via Strava…" (paso 2) y "Select your picture…" (paso 3) tendrán fondo completamente negro en el frame del teléfono, para que los GIFs se integren sin verse cortados
+### Barra inferior fija
 
-2. **Eliminar la pantalla 3 (Connect)** — Se remueve el paso "Next, bring in your activities" con las tarjetas de Strava/Garmin/COROS. El onboarding queda en 3 pasos: Intro → GIF demo → GIF share
+- Se reemplaza el botón "Continue" flotante actual y el nav bar superior por una **barra inferior fija** que siempre está visible
+- Dos botones lado a lado:
 
-3. **Font estilo "wide/expanded" en el número de elevación** — El número del stat de elevación usará el mismo estilo de fuente alargada/expandida que usa el widget "Wide" (el que ocupa 3 posiciones del grid). Es decir, fuente `.black` con `.width(.expanded)` y tracking negativo, dándole ese look estirado y bold
+### Botón "Atrás" (izquierda)
+
+- Icono `chevron.left` con el mismo estilo visual del editor: 18pt semibold, blanco, fondo `white 12%`, esquinas redondeadas (cornerRadius 18), tamaño 56×56
+
+### Botón "Continue" (derecha)
+
+- Ocupa el espacio restante, mismo alto (56pt), fondo blanco con texto negro, esquinas redondeadas (cornerRadius 18)
+- **Cuando no hay foto seleccionada**: opacidad reducida (~0.35), deshabilitado — se ve "apagado"
+- **Cuando hay foto seleccionada**: se activa con opacidad completa y es clickeable
+
+### Se elimina
+
+- El nav bar superior actual (título "Select your pic" + botón Back) se elimina ya que la navegación ahora vive en la barra inferior
+

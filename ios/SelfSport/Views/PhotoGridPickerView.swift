@@ -28,8 +28,6 @@ struct PhotoGridPickerView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            navBar
-
             Group {
                 if photoService.needsPermission {
                     permissionPrompt
@@ -43,10 +41,7 @@ struct PhotoGridPickerView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            if selectedAsset != nil {
-                continueButton
-                    .transition(.opacity)
-            }
+            bottomBar
         }
         .background(Color.black)
         .offset(x: dragOffset)
@@ -78,32 +73,58 @@ struct PhotoGridPickerView: View {
         }
     }
 
-    // MARK: - Nav Bar
+    // MARK: - Bottom Bar
 
-    private var navBar: some View {
-        ZStack {
-            Text("Select your pic")
-                .font(.system(size: 17, weight: .bold))
-                .foregroundStyle(Color.white)
-                .frame(maxWidth: .infinity)
+    private var bottomBar: some View {
+        let hasSelection = selectedAsset != nil
 
-            HStack {
-                Button(action: onGoBack) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 17, weight: .semibold))
-                        Text("Back")
-                            .font(.system(size: 17))
-                    }
-                    .foregroundStyle(Color.white.opacity(0.85))
-                }
-                .buttonStyle(.plain)
-                Spacer()
+        return HStack(spacing: 10) {
+            Button(action: onGoBack) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 56, height: 56)
+                    .background(Color.white.opacity(0.12))
+                    .clipShape(.rect(cornerRadius: 18))
             }
+            .buttonStyle(.plain)
+
+            Button {
+                guard let asset = selectedAsset, !isLoadingFullImage else { return }
+                isLoadingFullImage = true
+                HapticService.medium.impactOccurred()
+                Task {
+                    if let image = await photoService.loadFullImage(for: asset) {
+                        onPhotoPicked(image)
+                    }
+                    isLoadingFullImage = false
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    if isLoadingFullImage {
+                        ProgressView()
+                            .tint(.black)
+                            .scaleEffect(0.85)
+                    } else {
+                        Text("Continue")
+                            .font(.system(size: 17, weight: .semibold))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 14, weight: .bold))
+                    }
+                }
+                .foregroundStyle(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(.white.opacity(hasSelection ? 1 : 0.35))
+                .clipShape(.rect(cornerRadius: 18))
+            }
+            .buttonStyle(.plain)
+            .disabled(!hasSelection || isLoadingFullImage)
         }
         .padding(.horizontal, 16)
+        .padding(.bottom, 34)
         .padding(.top, 8)
-        .padding(.bottom, 12)
+        .animation(.spring(response: 0.35, dampingFraction: 0.85), value: hasSelection)
     }
 
     // MARK: - Permission Prompt
@@ -250,46 +271,11 @@ struct PhotoGridPickerView: View {
                     )
                 }
             }
-            .padding(.bottom, selectedAsset != nil ? 90 : 0)
+            .padding(.bottom, 8)
         }
     }
 
-    // MARK: - Continue Button
 
-    private var continueButton: some View {
-        Button {
-            guard let asset = selectedAsset, !isLoadingFullImage else { return }
-            isLoadingFullImage = true
-            HapticService.medium.impactOccurred()
-            Task {
-                if let image = await photoService.loadFullImage(for: asset) {
-                    onPhotoPicked(image)
-                }
-                isLoadingFullImage = false
-            }
-        } label: {
-            HStack(spacing: 10) {
-                if isLoadingFullImage {
-                    ProgressView()
-                        .tint(.black)
-                        .scaleEffect(0.85)
-                } else {
-                    Text("Continue")
-                        .font(.system(size: 17, weight: .semibold))
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 14, weight: .bold))
-                }
-            }
-            .foregroundStyle(.black)
-            .frame(maxWidth: .infinity)
-            .frame(height: 56)
-            .background(.white, in: .capsule)
-            .padding(.horizontal, 20)
-        }
-        .buttonStyle(.plain)
-        .disabled(isLoadingFullImage)
-        .padding(.bottom, 34)
-    }
 }
 
 // MARK: - Thumbnail Cell
