@@ -52,7 +52,7 @@ struct AnimatedGIFView: UIViewRepresentable {
         container.clipsToBounds = true
 
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.backgroundColor = .clear
         imageView.translatesAutoresizingMaskIntoConstraints = false
