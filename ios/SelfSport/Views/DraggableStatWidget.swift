@@ -467,28 +467,44 @@ struct StatWidgetContentView: View {
     }
 
     private var posterWidget: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 0) {
             Text(activity.title.uppercased())
                 .font(.system(size: 13, weight: .heavy, design: .default).width(.expanded))
                 .tracking(4)
                 .foregroundStyle(secondaryColor)
+                .lineLimit(1)
             Text(activity.hasDistance ? activity.distance.uppercased() : activity.duration.uppercased())
-                .font(.system(size: 78, weight: .black, design: .default).width(.expanded))
-                .tracking(-1)
+                .font(.system(size: 52, weight: .black, design: .default).width(.expanded))
+                .tracking(-1.2)
                 .foregroundStyle(primaryColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.3)
-                .shadow(color: primaryColor.opacity(0.3), radius: 16, x: 0, y: 0)
-            HStack(spacing: 20) {
+                .shadow(color: primaryColor.opacity(0.28), radius: 12, x: 0, y: 0)
+            HStack(spacing: 12) {
                 if activity.hasDistance {
-                    posterStat(label: "PACE", value: activity.pace)
-                    posterStat(label: "TIME", value: activity.duration)
-                    posterStat(label: "ELEV", value: activity.elevationGain)
+                    Text(activity.pace)
+                        .font(.system(size: 18, weight: .heavy, design: .default).width(.expanded))
+                        .foregroundStyle(primaryColor.opacity(0.88))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    Rectangle()
+                        .fill(primaryColor.opacity(0.35))
+                        .frame(width: 1, height: 18)
+                    Text(activity.duration.uppercased())
+                        .font(.system(size: 18, weight: .heavy, design: .default).width(.expanded))
+                        .foregroundStyle(primaryColor.opacity(0.88))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 } else {
-                    posterStat(label: "DATE", value: activity.date)
+                    Text(activity.date.uppercased())
+                        .font(.system(size: 18, weight: .heavy, design: .default).width(.expanded))
+                        .foregroundStyle(primaryColor.opacity(0.88))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
         }
+        .horizontalStretch(1.5)
     }
 
     private var heroStatWidget: some View {
@@ -1826,18 +1842,6 @@ struct StatWidgetContentView: View {
         .padding(.vertical, 10)
         .frame(width: 300)
         .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
-    }
-
-    private func posterStat(label: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
-            Text(label)
-                .font(.system(size: 9, weight: .bold, design: .default).width(.expanded))
-                .tracking(2.5)
-                .foregroundStyle(dimColor)
-            Text(value.uppercased())
-                .font(.system(size: 20, weight: .black, design: .default).width(.expanded))
-                .foregroundStyle(primaryColor.opacity(0.9))
-        }
     }
 
     private func topRowStatColumn(label: String, value: String) -> some View {
