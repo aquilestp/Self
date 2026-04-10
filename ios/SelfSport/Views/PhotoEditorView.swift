@@ -1231,6 +1231,11 @@ struct PhotoEditorView: View {
                         isOverDeleteZone = false
                         draggingWidgetId = nil
                     }
+                    if !shouldDelete {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            showPaletteSelectorFor(widgetId: widgetId)
+                        }
+                    }
                     return shouldDelete
                 },
                 onWidgetTapped: { widgetId in
