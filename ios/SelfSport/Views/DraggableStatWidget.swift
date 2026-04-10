@@ -194,11 +194,11 @@ struct StatWidgetContentView: View {
             }
             if let primaryMetric = basicPrimaryMetric {
                 Text(primaryMetric.label)
-                    .font(.custom("InstrumentSerif-Regular", size: 10))
-                    .tracking(1.5)
+                    .font(.custom("InstrumentSerif-Regular", size: 9))
+                    .tracking(1.2)
                     .foregroundStyle(tertiaryColor)
                 Text(primaryMetric.value)
-                    .font(.custom("InstrumentSerif-Italic", size: 28))
+                    .font(.custom("InstrumentSerif-Italic", size: 22))
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
