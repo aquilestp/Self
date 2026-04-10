@@ -1233,12 +1233,10 @@ struct PhotoEditorView: View {
                     }
                     if !shouldDelete {
                         paletteTargetWidgetId = widgetId
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.78)) {
-                                showPaletteSelector = true
-                            }
-                            resetPaletteHideTimer()
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.78)) {
+                            showPaletteSelector = true
                         }
+                        resetPaletteHideTimer()
                     }
                     return shouldDelete
                 },
