@@ -166,34 +166,38 @@ extension PhotoEditorView {
             }
             .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
         case .poster:
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 0) {
                 Text(activity.title.uppercased())
-                    .font(.system(size: 5, weight: .heavy, design: .default).width(.expanded))
+                    .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
                     .tracking(1.5)
                     .foregroundStyle(.white.opacity(0.45))
                     .lineLimit(1)
                 Text(activity.primaryStat.uppercased())
-                    .font(.system(size: 18, weight: .black, design: .default).width(.expanded))
-                    .tracking(-0.5)
+                    .font(.system(size: 16, weight: .black, design: .default).width(.expanded))
+                    .tracking(-1.2)
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.3)
-                    .shadow(color: .white.opacity(0.25), radius: 4, x: 0, y: 0)
-                HStack(spacing: 6) {
+                    .shadow(color: .white.opacity(0.28), radius: 4, x: 0, y: 0)
+                HStack(spacing: 4) {
                     if activity.hasDistance {
-                        Text("PACE \(activity.pace)")
-                            .font(.system(size: 6, weight: .bold, design: .default).width(.expanded))
-                            .foregroundStyle(.white.opacity(0.6))
-                        Text("TIME \(activity.duration)")
-                            .font(.system(size: 6, weight: .bold, design: .default).width(.expanded))
-                            .foregroundStyle(.white.opacity(0.6))
+                        Text(activity.pace)
+                            .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.88))
+                        Rectangle()
+                            .fill(Color.white.opacity(0.35))
+                            .frame(width: 1, height: 6)
+                        Text(activity.duration.uppercased())
+                            .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.88))
                     } else {
                         Text(activity.date.uppercased())
-                            .font(.system(size: 6, weight: .bold, design: .default).width(.expanded))
-                            .foregroundStyle(.white.opacity(0.6))
+                            .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
+                            .foregroundStyle(.white.opacity(0.88))
                     }
                 }
             }
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
         case .routeClean:
             ZStack {
                 if activity.linePoints.count >= 2 {

@@ -1,12 +1,16 @@
-# Mantener Self AI, Location y Add Text ocultos al soltar un stat
+# Igualar visualmente el stat superior derecho con los otros dos
 
-**Problema actual:**
-Cuando sueltas un stat después de arrastrarlo, hay un breve flash (0.3 segundos) donde los botones de "Self AI", "Location" y el botón de agregar texto aparecen antes de que se abra el editor circular.
+**Features**
+- [x] El stat superior derecho tendrá el mismo estilo visual que el izquierdo y el del centro.
+- [x] El número principal usará el mismo peso, proporción y presencia visual que los otros dos.
+- [x] La línea inferior tendrá la misma jerarquía, espaciado y lectura compacta que ya funciona en los otros cards.
+- [x] Se eliminará la sensación de que el card derecho pertenece a otro diseño.
 
-**Solución:**
+**Design**
+- [x] Mantener el look actual oscuro y deportivo, sin cambiar el concepto general.
+- [x] Igualar ancho visual del número, separación entre caracteres y balance del bloque tipográfico.
+- [x] Hacer que la parte inferior se vea tan sólida y compacta como en los otros dos stats.
+- [x] Conservar alineación, contraste y ritmo visual para que los tres se lean como una misma familia.
 
-- **Ocultar inmediatamente al soltar:** Al momento de soltar el stat, se marca de inmediato cuál widget se va a editar, evitando que los 3 botones parpadeen
-- **Unificar la lógica:** Usar una sola condición (`paletteTargetWidgetId != nil`) para controlar la visibilidad de los 3 elementos (Self AI, Location, Add Text), eliminando duplicación
-- **Simplificar el flujo:** El delay de 0.3s solo aplica a la animación de entrada de los botones circulares, pero la ocultación de los otros elementos es instantánea
-
-**Resultado:** Transición limpia — al soltar el stat, Self AI, Location y Add Text se mantienen ocultos mientras los controles de edición aparecen suavemente
+**Pages / Screens**
+- [x] Editor de stats: ajuste puntual del stat superior derecho para que coincida con los otros dos en estilo y composición.
