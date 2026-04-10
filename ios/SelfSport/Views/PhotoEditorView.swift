@@ -1232,8 +1232,12 @@ struct PhotoEditorView: View {
                         draggingWidgetId = nil
                     }
                     if !shouldDelete {
+                        paletteTargetWidgetId = widgetId
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            showPaletteSelectorFor(widgetId: widgetId)
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.78)) {
+                                showPaletteSelector = true
+                            }
+                            resetPaletteHideTimer()
                         }
                     }
                     return shouldDelete
@@ -1419,7 +1423,7 @@ struct PhotoEditorView: View {
 
     private var topBar: some View {
         HStack(spacing: 8) {
-            if !showPaletteSelector {
+            if paletteTargetWidgetId == nil {
                 Button { showAIAnimateOptions = true } label: {
                     HStack(spacing: 5) {
                         Image(systemName: "sparkles")
