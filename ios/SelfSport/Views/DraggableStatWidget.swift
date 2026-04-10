@@ -39,6 +39,7 @@ struct StatWidgetContentView: View {
     var showPace: Bool = true
     var showTime: Bool = true
     var showElevation: Bool = true
+    var basicUnitFilter: SplitsUnitFilter = .km
     var fullBannerUnitFilter: SplitsUnitFilter = .km
     var fullBannerShowDistance: Bool = true
     var fullBannerShowPace: Bool = true
@@ -114,13 +115,39 @@ struct StatWidgetContentView: View {
         basicMetadataValues.joined(separator: " · ")
     }
 
+    private var isBasicMiles: Bool { basicUnitFilter == .miles }
+
+    private var basicDistanceText: String {
+        if isBasicMiles {
+            let mi = activity.distanceRaw / 1609.34
+            return String(format: "%.2f mi", mi)
+        }
+        return activity.distance
+    }
+
+    private var basicPaceText: String {
+        guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
+        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
+        if isBasicMiles {
+            let secPerMile = 1609.34 / speed
+            let m = Int(secPerMile) / 60
+            let s = Int(secPerMile) % 60
+            return String(format: "%d:%02d /mi", m, s)
+        } else {
+            let secPerKm = 1000.0 / speed
+            let m = Int(secPerKm) / 60
+            let s = Int(secPerKm) % 60
+            return String(format: "%d:%02d /km", m, s)
+        }
+    }
+
     private var basicMetricItems: [StatDisplayItem] {
         var items: [StatDisplayItem] = []
         if activity.hasDistance, showDistance {
-            items.append(StatDisplayItem(id: "distance", label: "DIST", value: activity.distance))
+            items.append(StatDisplayItem(id: "distance", label: "DIST", value: basicDistanceText))
         }
         if showPace, activity.pace != "--" {
-            items.append(StatDisplayItem(id: "pace", label: "PACE", value: activity.pace))
+            items.append(StatDisplayItem(id: "pace", label: "PACE", value: basicPaceText))
         }
         if showTime {
             items.append(StatDisplayItem(id: "time", label: "TIME", value: activity.duration))
@@ -1982,7 +2009,7 @@ struct DraggableStatWidget: View {
     }
 
     private var widgetContent: some View {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
     }
 }
 

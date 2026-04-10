@@ -267,6 +267,7 @@ struct PlacedWidget: Identifiable {
     var showPace: Bool = true
     var showTime: Bool = true
     var showElevation: Bool = true
+    var basicUnitFilter: SplitsUnitFilter = .km
     var fullBannerUnitFilter: SplitsUnitFilter = .km
     var fullBannerShowDistance: Bool = true
     var fullBannerShowPace: Bool = true

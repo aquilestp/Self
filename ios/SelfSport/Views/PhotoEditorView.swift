@@ -770,6 +770,7 @@ struct PhotoEditorView: View {
         let targetSupportsFontStyle = targetWidget?.type.supportsFontStyle ?? false
         let targetFontStyle = targetWidget?.fontStyle ?? .system
         let targetSupportsBasicFieldVisibility = targetWidget?.type.supportsBasicFieldVisibility ?? false
+        let targetBasicUnitFilter = targetWidget?.basicUnitFilter ?? .km
         let targetIsBoldOrImpact = targetWidget?.type == .bold || targetWidget?.type == .impact
         let targetIsFullBanner = targetWidget?.type == .fullBanner || targetWidget?.type == .fullBannerBottom
         let targetShowTitle = targetWidget?.showTitle ?? true
@@ -1067,6 +1068,8 @@ struct PhotoEditorView: View {
                     hapticLight.impactOccurred()
                     resetPaletteHideTimer()
                 }
+
+                basicUnitFilterSection(currentFilter: targetBasicUnitFilter, paletteCount: paletteCount)
             }
 
             if targetIsBoldOrImpact {
@@ -1361,6 +1364,51 @@ struct PhotoEditorView: View {
         guard showStatTapHint else { return }
         withAnimation(.easeInOut(duration: 0.2)) {
             showStatTapHint = false
+        }
+    }
+
+    @ViewBuilder
+    private func basicUnitFilterSection(currentFilter: SplitsUnitFilter, paletteCount: Int) -> some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.12))
+            .frame(width: 20, height: 1)
+            .scaleEffect(showPaletteSelector ? 1 : 0.3)
+            .opacity(showPaletteSelector ? 1 : 0)
+            .animation(
+                .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.20),
+                value: showPaletteSelector
+            )
+
+        ForEach(Array(SplitsUnitFilter.allCases.enumerated()), id: \.element.id) { filterIdx, filter in
+            let isFilterActive = currentFilter == filter
+            Button {
+                guard let id = paletteTargetWidgetId,
+                      let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                    placedWidgets[idx].basicUnitFilter = filter
+                }
+                hapticLight.impactOccurred()
+                resetPaletteHideTimer()
+            } label: {
+                Text(filter.label)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(isFilterActive ? .white.opacity(0.9) : .white.opacity(0.5))
+                    .frame(width: 36, height: 36)
+                    .background(isFilterActive ? Color.white.opacity(0.25) : Color.black.opacity(0.45), in: Circle())
+                    .overlay(
+                        Circle().stroke(
+                            isFilterActive ? Color.white.opacity(0.6) : Color.white.opacity(0.15),
+                            lineWidth: isFilterActive ? 1.5 : 0.5
+                        )
+                    )
+            }
+            .buttonStyle(.plain)
+            .scaleEffect(showPaletteSelector ? 1 : 0.3)
+            .opacity(showPaletteSelector ? 1 : 0)
+            .animation(
+                .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.22 + Double(filterIdx) * 0.03),
+                value: showPaletteSelector
+            )
         }
     }
 
@@ -2203,7 +2251,7 @@ struct PhotoEditorView: View {
             activeFilterOverlay(size: canvasSize)
 
             ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
+                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
                     .scaleEffect(widget.scale)
                     .rotationEffect(widget.rotation)
                     .offset(x: widget.position.width, y: widget.position.height)
