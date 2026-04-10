@@ -194,11 +194,11 @@ struct StatWidgetContentView: View {
             }
             if let primaryMetric = basicPrimaryMetric {
                 Text(primaryMetric.label)
-                    .font(.custom("InstrumentSerif-Regular", size: 9))
-                    .tracking(1.2)
+                    .font(.custom("InstrumentSerif-Regular", size: 10))
+                    .tracking(1.5)
                     .foregroundStyle(tertiaryColor)
                 Text(primaryMetric.value)
-                    .font(.custom("InstrumentSerif-Italic", size: 22))
+                    .font(.custom("InstrumentSerif-Italic", size: 28))
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -268,7 +268,7 @@ struct StatWidgetContentView: View {
             }
             HStack(spacing: 14) {
                 ForEach(metrics) { metric in
-                    statColumn(label: metric.label, value: metric.value)
+                    topRowStatColumn(label: metric.label, value: metric.value)
                 }
             }
         }
@@ -1837,6 +1837,20 @@ struct StatWidgetContentView: View {
             Text(value.uppercased())
                 .font(.system(size: 20, weight: .black, design: .default).width(.expanded))
                 .foregroundStyle(primaryColor.opacity(0.9))
+        }
+    }
+
+    private func topRowStatColumn(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.custom("InstrumentSerif-Regular", size: 9))
+                .tracking(1.2)
+                .foregroundStyle(secondaryColor)
+            Text(value)
+                .font(.custom("InstrumentSerif-Italic", size: 22))
+                .foregroundStyle(primaryColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
     }
 
