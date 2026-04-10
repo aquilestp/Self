@@ -11,6 +11,12 @@ extension EnvironmentValues {
     }
 }
 
+nonisolated private struct StatDisplayItem: Identifiable, Sendable {
+    let id: String
+    let label: String
+    let value: String
+}
+
 struct StatWidgetContentView: View {
     let type: StatWidgetType
     let activity: ActivityHighlight
@@ -27,6 +33,9 @@ struct StatWidgetContentView: View {
     var distanceWordsFilter: SplitsUnitFilter = .km
     var fontStyle: WidgetFontStyle = .system
     var showTitle: Bool = true
+    var showActivityName: Bool = true
+    var showDate: Bool = true
+    var showDistance: Bool = true
     var showPace: Bool = true
     var showTime: Bool = true
     var showElevation: Bool = true
@@ -90,15 +99,83 @@ struct StatWidgetContentView: View {
         }
     }
 
+    private var basicMetadataValues: [String] {
+        var values: [String] = []
+        if showActivityName {
+            values.append(activity.title)
+        }
+        if showDate {
+            values.append(activity.date)
+        }
+        return values
+    }
+
+    private var basicMetadataText: String {
+        basicMetadataValues.joined(separator: " · ")
+    }
+
+    private var basicMetricItems: [StatDisplayItem] {
+        var items: [StatDisplayItem] = []
+        if activity.hasDistance, showDistance {
+            items.append(StatDisplayItem(id: "distance", label: "DIST", value: activity.distance))
+        }
+        if showPace, activity.pace != "--" {
+            items.append(StatDisplayItem(id: "pace", label: "PACE", value: activity.pace))
+        }
+        if showTime {
+            items.append(StatDisplayItem(id: "time", label: "TIME", value: activity.duration))
+        }
+        return items
+    }
+
+    private var basicPrimaryMetric: StatDisplayItem? {
+        basicMetricItems.first
+    }
+
+    private var titleCardPrimaryText: String? {
+        if let primaryMetric = basicPrimaryMetric {
+            return primaryMetric.value
+        }
+        if showDate {
+            return activity.date
+        }
+        if showActivityName {
+            return activity.title
+        }
+        return nil
+    }
+
+    private var titleCardSecondaryText: String {
+        var parts: [String] = []
+        if showDate, titleCardPrimaryText != activity.date {
+            parts.append(activity.date)
+        }
+        for metric in basicMetricItems.dropFirst() {
+            parts.append(metric.value)
+        }
+        return parts.joined(separator: " · ")
+    }
+
     private var distanceWidget: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(activity.primaryLabel)
-                .font(.custom("InstrumentSerif-Regular", size: 10))
-                .tracking(1.5)
-                .foregroundStyle(tertiaryColor)
-            Text(activity.primaryStat)
-                .font(.custom("InstrumentSerif-Italic", size: 28))
-                .foregroundStyle(primaryColor)
+        VStack(alignment: .leading, spacing: 4) {
+            if !basicMetadataText.isEmpty {
+                Text(basicMetadataText)
+                    .font(.custom("InstrumentSerif-Regular", size: 9))
+                    .foregroundStyle(secondaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            if let primaryMetric = basicPrimaryMetric {
+                Text(primaryMetric.label)
+                    .font(.custom("InstrumentSerif-Regular", size: 10))
+                    .tracking(1.5)
+                    .foregroundStyle(tertiaryColor)
+                Text(primaryMetric.value)
+                    .font(.custom("InstrumentSerif-Italic", size: 28))
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -106,27 +183,45 @@ struct StatWidgetContentView: View {
     }
 
     private var distPaceWidget: some View {
-        HStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(activity.primaryLabel)
+        let metrics = Array(basicMetricItems.prefix(2))
+        return VStack(alignment: .leading, spacing: 8) {
+            if !basicMetadataText.isEmpty {
+                Text(basicMetadataText)
                     .font(.custom("InstrumentSerif-Regular", size: 9))
-                    .tracking(1.2)
                     .foregroundStyle(secondaryColor)
-                Text(activity.primaryStat)
-                    .font(.custom("InstrumentSerif-Italic", size: 22))
-                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
-            Rectangle()
-                .fill(dividerColor)
-                .frame(width: 1, height: 32)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(activity.hasDistance ? "PACE" : "TIME")
-                    .font(.custom("InstrumentSerif-Regular", size: 9))
-                    .tracking(1.2)
-                    .foregroundStyle(secondaryColor)
-                Text(activity.hasDistance ? activity.pace : activity.duration)
-                    .font(.custom("InstrumentSerif-Italic", size: 22))
-                    .foregroundStyle(primaryColor)
+            if let firstMetric = metrics.first {
+                HStack(spacing: 16) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(firstMetric.label)
+                            .font(.custom("InstrumentSerif-Regular", size: 9))
+                            .tracking(1.2)
+                            .foregroundStyle(secondaryColor)
+                        Text(firstMetric.value)
+                            .font(.custom("InstrumentSerif-Italic", size: 22))
+                            .foregroundStyle(primaryColor)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    if metrics.count > 1 {
+                        Rectangle()
+                            .fill(dividerColor)
+                            .frame(width: 1, height: 32)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(metrics[1].label)
+                                .font(.custom("InstrumentSerif-Regular", size: 9))
+                                .tracking(1.2)
+                                .foregroundStyle(secondaryColor)
+                            Text(metrics[1].value)
+                                .font(.custom("InstrumentSerif-Italic", size: 22))
+                                .foregroundStyle(primaryColor)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                        }
+                    }
+                }
             }
         }
         .padding(.horizontal, 16)
@@ -135,14 +230,19 @@ struct StatWidgetContentView: View {
     }
 
     private var threeStatsWidget: some View {
-        HStack(spacing: 14) {
-            if activity.hasDistance {
-                statColumn(label: "DIST", value: activity.distance)
-                statColumn(label: "PACE", value: activity.pace)
-                statColumn(label: "TIME", value: activity.duration)
-            } else {
-                statColumn(label: "TIME", value: activity.duration)
-                statColumn(label: "TYPE", value: activity.title)
+        let metrics = Array(basicMetricItems.prefix(3))
+        return VStack(alignment: .leading, spacing: 8) {
+            if !basicMetadataText.isEmpty {
+                Text(basicMetadataText)
+                    .font(.custom("InstrumentSerif-Regular", size: 9))
+                    .foregroundStyle(secondaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            HStack(spacing: 14) {
+                ForEach(metrics) { metric in
+                    statColumn(label: metric.label, value: metric.value)
+                }
             }
         }
         .padding(.horizontal, 16)
@@ -152,28 +252,31 @@ struct StatWidgetContentView: View {
 
     private var fullStatsWidget: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 6) {
-                Image(systemName: activity.systemImage)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(primaryColor.opacity(0.7))
-                Text(activity.title.uppercased())
-                    .font(.system(size: 10, weight: .semibold))
-                    .tracking(1.5)
-                    .foregroundStyle(tertiaryColor)
-            }
-            HStack(spacing: 14) {
-                if activity.hasDistance {
-                    statColumn(label: "DIST", value: activity.distance)
-                    statColumn(label: "PACE", value: activity.pace)
-                    statColumn(label: "TIME", value: activity.duration)
-                } else {
-                    statColumn(label: "TIME", value: activity.duration)
-                    statColumn(label: "TYPE", value: activity.title)
+            if showActivityName {
+                HStack(spacing: 6) {
+                    Image(systemName: activity.systemImage)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(primaryColor.opacity(0.7))
+                    Text(activity.title.uppercased())
+                        .font(.system(size: 10, weight: .semibold))
+                        .tracking(1.5)
+                        .foregroundStyle(tertiaryColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
             }
-            Text(activity.date)
-                .font(.system(size: 10, weight: .regular))
-                .foregroundStyle(dimColor)
+            HStack(spacing: 14) {
+                ForEach(basicMetricItems) { metric in
+                    statColumn(label: metric.label, value: metric.value)
+                }
+            }
+            if showDate {
+                Text(activity.date)
+                    .font(.system(size: 10, weight: .regular))
+                    .foregroundStyle(dimColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
@@ -182,12 +285,27 @@ struct StatWidgetContentView: View {
 
     private var titleCardWidget: some View {
         return VStack(alignment: .leading, spacing: 4) {
-            Text(activity.title)
-                .font(.system(size: 20, weight: .black, design: .default).width(.expanded))
-                .foregroundStyle(primaryColor)
-            Text("\(activity.primaryStat) · \(activity.date)")
-                .font(.system(size: 12, weight: .bold, design: .default).width(.expanded))
-                .foregroundStyle(tertiaryColor)
+            if showActivityName {
+                Text(activity.title)
+                    .font(.system(size: 20, weight: .black, design: .default).width(.expanded))
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            if let primaryText = titleCardPrimaryText {
+                Text(primaryText)
+                    .font(.system(size: 12, weight: .bold, design: .default).width(.expanded))
+                    .foregroundStyle(tertiaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            if !titleCardSecondaryText.isEmpty {
+                Text(titleCardSecondaryText)
+                    .font(.system(size: 12, weight: .bold, design: .default).width(.expanded))
+                    .foregroundStyle(tertiaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
         .horizontalStretch(1.5)
         .padding(.horizontal, 16)
@@ -196,19 +314,28 @@ struct StatWidgetContentView: View {
     }
 
     private var stackWidget: some View {
-        let rows: [(String, String)] = activity.hasDistance
-            ? [("Distance", activity.distance), ("Pace", activity.pace), ("Duration", activity.duration)]
-            : [("Duration", activity.duration), ("Activity", activity.title)]
+        let rows: [StatDisplayItem] = {
+            var items: [StatDisplayItem] = []
+            if showActivityName {
+                items.append(StatDisplayItem(id: "activityName", label: "Activity", value: activity.title))
+            }
+            if showDate {
+                items.append(StatDisplayItem(id: "date", label: "Date", value: activity.date))
+            }
+            items.append(contentsOf: basicMetricItems)
+            return items
+        }()
         return VStack(spacing: 6) {
-            ForEach(rows, id: \.0) { label, value in
+            ForEach(rows) { row in
                 HStack {
-                    Text(label)
+                    Text(row.label)
                         .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(secondaryColor)
                     Spacer()
-                    Text(value)
+                    Text(row.value)
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(primaryColor)
+                        .multilineTextAlignment(.trailing)
                 }
             }
         }
@@ -1855,7 +1982,7 @@ struct DraggableStatWidget: View {
     }
 
     private var widgetContent: some View {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
     }
 }
 

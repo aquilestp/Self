@@ -116,6 +116,15 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         default: return false
         }
     }
+
+    var supportsBasicFieldVisibility: Bool {
+        switch self {
+        case .distance, .distPace, .threeStats, .fullStats, .titleCard, .stack:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 nonisolated enum CityFilter: Int, CaseIterable, Identifiable {
@@ -252,6 +261,9 @@ struct PlacedWidget: Identifiable {
     var distanceWordsFilter: SplitsUnitFilter = .km
     var fontStyle: WidgetFontStyle = .system
     var showTitle: Bool = true
+    var showActivityName: Bool = true
+    var showDate: Bool = true
+    var showDistance: Bool = true
     var showPace: Bool = true
     var showTime: Bool = true
     var showElevation: Bool = true

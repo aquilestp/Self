@@ -1,13 +1,20 @@
-# Fix drawer to extend to the bottom edge of the screen
+# Permitir editar los 6 primeros stats desde el canvas
 
-**Problem**
+**Features**
 
-- When the drawer is open, it stops at the canvas boundary (90% of screen height), leaving a visible black empty space at the very bottom of the screen.
+- [x] Al seleccionar cualquiera de los primeros 6 stats ya colocados en el canvas, aparecerán controles para mostrar u ocultar sus indicadores.
+- [x] Podrás activar o desactivar estos datos: distancia, pace, tiempo, fecha y nombre de la actividad.
+- [x] Cada cambio se reflejará al instante sobre el stat seleccionado, sin salir del editor.
+- [x] Los controles solo aparecerán en los stats que correspondan a este grupo de 6, manteniendo el resto del editor como está.
 
-**Fix**
+**Design**
 
-- When the drawer is in the open or expanded state, extend it so its background reaches all the way to the bottom edge of the screen (past the safe area).
-- The drawer content (stat widgets grid) stays in the same position — only the background material fills the gap below.
-- This is achieved by adding bottom padding to the drawer's inner content and removing the canvas height constraint on the drawer's background, so the material visually bleeds to the screen edge.
-- No changes to collapsed state or bottom share bar behavior.
+- [x] Se reutilizará el mismo panel flotante que ya existe para editar stats, para que la experiencia siga siendo consistente.
+- [x] Los nuevos controles mantendrán el estilo visual actual del editor, con una lectura rápida y clara.
+- [x] La interacción será directa y compacta, pensada para ajustar el contenido sin tapar demasiado la foto.
+
+**Pages / Screens**
+
+- [x] Editor de foto: los primeros 6 stats colocados en el canvas tendrán opciones para personalizar qué indicadores muestran.
+- [x] Panel flotante de edición: añadirá las opciones de nombre de actividad, fecha, distancia, pace y tiempo para esos 6 diseños.
 

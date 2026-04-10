@@ -769,9 +769,13 @@ struct PhotoEditorView: View {
         let targetDistanceWordsFilter = targetWidget?.distanceWordsFilter ?? .km
         let targetSupportsFontStyle = targetWidget?.type.supportsFontStyle ?? false
         let targetFontStyle = targetWidget?.fontStyle ?? .system
+        let targetSupportsBasicFieldVisibility = targetWidget?.type.supportsBasicFieldVisibility ?? false
         let targetIsBoldOrImpact = targetWidget?.type == .bold || targetWidget?.type == .impact
         let targetIsFullBanner = targetWidget?.type == .fullBanner || targetWidget?.type == .fullBannerBottom
         let targetShowTitle = targetWidget?.showTitle ?? true
+        let targetShowActivityName = targetWidget?.showActivityName ?? true
+        let targetShowDate = targetWidget?.showDate ?? true
+        let targetShowDistance = targetWidget?.showDistance ?? true
         let targetShowPace = targetWidget?.showPace ?? true
         let targetShowTime = targetWidget?.showTime ?? true
         let targetShowElevation = targetWidget?.showElevation ?? true
@@ -783,6 +787,7 @@ struct PhotoEditorView: View {
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
         } ?? "5:30"
+        let fontPreviewLabel = String(fontPreviewText.prefix(4)).uppercased()
 
         let paletteCount = WidgetPalette.allCases.count
 
@@ -1002,6 +1007,68 @@ struct PhotoEditorView: View {
                 }
             }
 
+            if targetSupportsBasicFieldVisibility {
+                Rectangle()
+                    .fill(Color.white.opacity(0.12))
+                    .frame(width: 20, height: 1)
+                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                    .opacity(showPaletteSelector ? 1 : 0)
+                    .animation(
+                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04),
+                        value: showPaletteSelector
+                    )
+
+                visibilityToggleButton(icon: "textformat", isOn: targetShowActivityName, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].showActivityName.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "calendar", isOn: targetShowDate, delay: Double(paletteCount) * 0.04 + 0.09) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].showDate.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "ruler", isOn: targetShowDistance, delay: Double(paletteCount) * 0.04 + 0.12) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].showDistance.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "speedometer", isOn: targetShowPace, delay: Double(paletteCount) * 0.04 + 0.15) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].showPace.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "clock", isOn: targetShowTime, delay: Double(paletteCount) * 0.04 + 0.18) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].showTime.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+            }
+
             if targetIsBoldOrImpact {
                 Rectangle()
                     .fill(Color.white.opacity(0.12))
@@ -1170,22 +1237,7 @@ struct PhotoEditorView: View {
                         hapticLight.impactOccurred()
                         resetPaletteHideTimer()
                     } label: {
-                        Text(fontPreviewText.prefix(4).uppercased())
-                            .font(style.font(size: 13))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.5)
-                            .foregroundStyle(isFontActive ? .white.opacity(0.95) : .white.opacity(0.5))
-                            .frame(width: 40, height: 48)
-                            .background(
-                                isFontActive ? Color.white.opacity(0.25) : Color.black.opacity(0.45),
-                                in: RoundedRectangle(cornerRadius: 10)
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10).stroke(
-                                    isFontActive ? Color.white.opacity(0.6) : Color.white.opacity(0.15),
-                                    lineWidth: isFontActive ? 1.5 : 0.5
-                                )
-                            )
+                        fontStyleButtonLabel(text: fontPreviewLabel, style: style, isActive: isFontActive)
                     }
                     .buttonStyle(.plain)
                     .scaleEffect(showPaletteSelector ? 1 : 0.3)
@@ -1341,6 +1393,25 @@ struct PhotoEditorView: View {
             .spring(response: 0.35, dampingFraction: 0.7).delay(delay),
             value: showPaletteSelector
         )
+    }
+
+    private func fontStyleButtonLabel(text: String, style: WidgetFontStyle, isActive: Bool) -> some View {
+        let foregroundColor: Color = isActive ? .white.opacity(0.95) : .white.opacity(0.5)
+        let backgroundColor: Color = isActive ? .white.opacity(0.25) : .black.opacity(0.45)
+        let strokeColor: Color = isActive ? .white.opacity(0.6) : .white.opacity(0.15)
+        let strokeWidth: CGFloat = isActive ? 1.5 : 0.5
+
+        return Text(text)
+            .font(style.font(size: 13))
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .foregroundStyle(foregroundColor)
+            .frame(width: 40, height: 48)
+            .background(backgroundColor, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(strokeColor, lineWidth: strokeWidth)
+            )
     }
 
     private func resetPaletteHideTimer() {
@@ -1676,36 +1747,46 @@ struct PhotoEditorView: View {
 
 
     private var deleteDropZone: some View {
+        deleteDropZoneContent
+            .background(deleteZoneMeasurementView)
+    }
+
+    private var deleteDropZoneContent: some View {
         Image(systemName: "trash.fill")
             .font(.system(size: 17, weight: .semibold))
             .foregroundStyle(.white)
             .frame(width: 48, height: 48)
-        .background(
-            isOverDeleteZone
-                ? Color.red.opacity(0.85)
-                : Color.red.opacity(0.45),
-            in: .capsule
-        )
-        .background(.ultraThinMaterial, in: .capsule)
-        .overlay(
-            Capsule().stroke(
-                isOverDeleteZone ? Color.red.opacity(0.9) : Color.red.opacity(0.3),
-                lineWidth: 1
+            .background(
+                isOverDeleteZone
+                    ? Color.red.opacity(0.85)
+                    : Color.red.opacity(0.45),
+                in: .capsule
             )
-        )
-        .scaleEffect(isOverDeleteZone ? 1.15 : 1.0)
-        .shadow(color: isOverDeleteZone ? .red.opacity(0.5) : .black.opacity(0.3), radius: isOverDeleteZone ? 16 : 10, x: 0, y: 4)
-        .animation(.spring(response: 0.28, dampingFraction: 0.7), value: isOverDeleteZone)
-        .sensoryFeedback(.success, trigger: didDeleteWidget)
-        .padding(.bottom, 60)
-        .background(
-            GeometryReader { geo in
-                Color.clear
-                    .onAppear {
-                        deleteZoneFrame = geo.frame(in: .global)
-                    }
-            }
-        )
+            .background(.ultraThinMaterial, in: .capsule)
+            .overlay(
+                Capsule().stroke(
+                    isOverDeleteZone ? Color.red.opacity(0.9) : Color.red.opacity(0.3),
+                    lineWidth: 1
+                )
+            )
+            .scaleEffect(isOverDeleteZone ? 1.15 : 1.0)
+            .shadow(color: isOverDeleteZone ? .red.opacity(0.5) : .black.opacity(0.3), radius: isOverDeleteZone ? 16 : 10, x: 0, y: 4)
+            .animation(.spring(response: 0.28, dampingFraction: 0.7), value: isOverDeleteZone)
+            .sensoryFeedback(.success, trigger: didDeleteWidget)
+            .padding(.bottom, 60)
+    }
+
+    private var deleteZoneMeasurementView: some View {
+        GeometryReader { geo in
+            let frame = geo.frame(in: .global)
+            Color.clear
+                .onAppear {
+                    deleteZoneFrame = frame
+                }
+                .onChange(of: frame) { _, newValue in
+                    deleteZoneFrame = newValue
+                }
+        }
     }
 
     private var collapsedDrawer: some View {
@@ -2122,7 +2203,7 @@ struct PhotoEditorView: View {
             activeFilterOverlay(size: canvasSize)
 
             ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
+                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
                     .scaleEffect(widget.scale)
                     .rotationEffect(widget.rotation)
                     .offset(x: widget.position.width, y: widget.position.height)
