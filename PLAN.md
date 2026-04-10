@@ -1,20 +1,32 @@
-# Permitir editar los 6 primeros stats desde el canvas
+# Unificar toggles KM/MI en un solo botón
 
-**Features**
+## Cambio
 
-- [x] Al seleccionar cualquiera de los primeros 6 stats ya colocados en el canvas, aparecerán controles para mostrar u ocultar sus indicadores.
-- [x] Podrás activar o desactivar estos datos: distancia, pace, tiempo, fecha y nombre de la actividad.
-- [x] Cada cambio se reflejará al instante sobre el stat seleccionado, sin salir del editor.
-- [x] Los controles solo aparecerán en los stats que correspondan a este grupo de 6, manteniendo el resto del editor como está.
+Reemplazar todos los pares de botones KM / MI por **un único botón toggle** que alterna entre ambos al hacer tap. Por defecto siempre muestra **KM**.
 
-**Design**
+---
 
-- [x] Se reutilizará el mismo panel flotante que ya existe para editar stats, para que la experiencia siga siendo consistente.
-- [x] Los nuevos controles mantendrán el estilo visual actual del editor, con una lectura rápida y clara.
-- [x] La interacción será directa y compacta, pensada para ajustar el contenido sin tapar demasiado la foto.
+### **Qué cambia**
 
-**Pages / Screens**
+- Se crea un componente único reutilizable: un botón circular que muestra "KM" o "MI" y cambia al hacer tap
+- Se usa en **5 secciones** del editor que usan la unidad KM/MI:
+  - Splits
+  - Distance Words
+  - Basic Unit (los 6 stats principales del drawer)
+  - Full Banner
+  - Full Banner Bottom
+- Se mantiene el mismo estilo visual (círculo con borde, texto bold, animación spring)
+- **Best Efforts se mantiene igual** porque tiene 3 opciones (KM, MI, Both) — reducirlo a un toggle rompería funcionalidad
 
-- [x] Editor de foto: los primeros 6 stats colocados en el canvas tendrán opciones para personalizar qué indicadores muestran.
-- [x] Panel flotante de edición: añadirá las opciones de nombre de actividad, fecha, distancia, pace y tiempo para esos 6 diseños.
+### **Cómo funciona**
 
+- Un solo botón circular que muestra el estado actual ("KM" o "MI")
+- Al hacer tap, alterna al otro valor con animación
+- Haptic feedback al cambiar
+- Valor por defecto: **KM**
+
+### **Diseño**
+
+- Mismo tamaño y estilo que los botones actuales (36×36, texto 12pt bold)
+- Siempre muestra el estado activo (fondo claro, borde visible)
+- Transición suave al cambiar el texto

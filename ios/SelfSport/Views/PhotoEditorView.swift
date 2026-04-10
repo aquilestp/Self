@@ -931,36 +931,14 @@ struct PhotoEditorView: View {
                         value: showPaletteSelector
                     )
 
-                ForEach(Array(SplitsUnitFilter.allCases.enumerated()), id: \.element.id) { filterIdx, filter in
-                    let isFilterActive = targetSplitsFilter == filter
-                    Button {
-                        guard let id = paletteTargetWidgetId,
-                              let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            placedWidgets[idx].splitsFilter = filter
-                        }
-                        hapticLight.impactOccurred()
-                        resetPaletteHideTimer()
-                    } label: {
-                        Text(filter.label)
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(isFilterActive ? .white.opacity(0.9) : .white.opacity(0.5))
-                            .frame(width: 36, height: 36)
-                            .background(isFilterActive ? Color.white.opacity(0.25) : Color.black.opacity(0.45), in: Circle())
-                            .overlay(
-                                Circle().stroke(
-                                    isFilterActive ? Color.white.opacity(0.6) : Color.white.opacity(0.15),
-                                    lineWidth: isFilterActive ? 1.5 : 0.5
-                                )
-                            )
+                unitToggleButton(currentFilter: targetSplitsFilter, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].splitsFilter = placedWidgets[idx].splitsFilter == .km ? .miles : .km
                     }
-                    .buttonStyle(.plain)
-                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
-                    .opacity(showPaletteSelector ? 1 : 0)
-                    .animation(
-                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.06 + Double(filterIdx) * 0.03),
-                        value: showPaletteSelector
-                    )
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
                 }
             }
 
@@ -975,36 +953,14 @@ struct PhotoEditorView: View {
                         value: showPaletteSelector
                     )
 
-                ForEach(Array(SplitsUnitFilter.allCases.enumerated()), id: \.element.id) { filterIdx, filter in
-                    let isFilterActive = targetDistanceWordsFilter == filter
-                    Button {
-                        guard let id = paletteTargetWidgetId,
-                              let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            placedWidgets[idx].distanceWordsFilter = filter
-                        }
-                        hapticLight.impactOccurred()
-                        resetPaletteHideTimer()
-                    } label: {
-                        Text(filter.label)
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(isFilterActive ? .white.opacity(0.9) : .white.opacity(0.5))
-                            .frame(width: 36, height: 36)
-                            .background(isFilterActive ? Color.white.opacity(0.25) : Color.black.opacity(0.45), in: Circle())
-                            .overlay(
-                                Circle().stroke(
-                                    isFilterActive ? Color.white.opacity(0.6) : Color.white.opacity(0.15),
-                                    lineWidth: isFilterActive ? 1.5 : 0.5
-                                )
-                            )
+                unitToggleButton(currentFilter: targetDistanceWordsFilter, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].distanceWordsFilter = placedWidgets[idx].distanceWordsFilter == .km ? .miles : .km
                     }
-                    .buttonStyle(.plain)
-                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
-                    .opacity(showPaletteSelector ? 1 : 0)
-                    .animation(
-                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.06 + Double(filterIdx) * 0.03),
-                        value: showPaletteSelector
-                    )
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
                 }
             }
 
@@ -1135,36 +1091,14 @@ struct PhotoEditorView: View {
                         value: showPaletteSelector
                     )
 
-                ForEach(Array(SplitsUnitFilter.allCases.enumerated()), id: \.element.id) { filterIdx, filter in
-                    let isFilterActive = targetFullBannerUnit == filter
-                    Button {
-                        guard let id = paletteTargetWidgetId,
-                              let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            placedWidgets[idx].fullBannerUnitFilter = filter
-                        }
-                        hapticLight.impactOccurred()
-                        resetPaletteHideTimer()
-                    } label: {
-                        Text(filter.label)
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundStyle(isFilterActive ? .white.opacity(0.9) : .white.opacity(0.5))
-                            .frame(width: 36, height: 36)
-                            .background(isFilterActive ? Color.white.opacity(0.25) : Color.black.opacity(0.45), in: Circle())
-                            .overlay(
-                                Circle().stroke(
-                                    isFilterActive ? Color.white.opacity(0.6) : Color.white.opacity(0.15),
-                                    lineWidth: isFilterActive ? 1.5 : 0.5
-                                )
-                            )
+                unitToggleButton(currentFilter: targetFullBannerUnit, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].fullBannerUnitFilter = placedWidgets[idx].fullBannerUnitFilter == .km ? .miles : .km
                     }
-                    .buttonStyle(.plain)
-                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
-                    .opacity(showPaletteSelector ? 1 : 0)
-                    .animation(
-                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.06 + Double(filterIdx) * 0.03),
-                        value: showPaletteSelector
-                    )
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
                 }
 
                 Rectangle()
@@ -1379,37 +1313,36 @@ struct PhotoEditorView: View {
                 value: showPaletteSelector
             )
 
-        ForEach(Array(SplitsUnitFilter.allCases.enumerated()), id: \.element.id) { filterIdx, filter in
-            let isFilterActive = currentFilter == filter
-            Button {
-                guard let id = paletteTargetWidgetId,
-                      let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                    placedWidgets[idx].basicUnitFilter = filter
-                }
-                hapticLight.impactOccurred()
-                resetPaletteHideTimer()
-            } label: {
-                Text(filter.label)
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(isFilterActive ? .white.opacity(0.9) : .white.opacity(0.5))
-                    .frame(width: 36, height: 36)
-                    .background(isFilterActive ? Color.white.opacity(0.25) : Color.black.opacity(0.45), in: Circle())
-                    .overlay(
-                        Circle().stroke(
-                            isFilterActive ? Color.white.opacity(0.6) : Color.white.opacity(0.15),
-                            lineWidth: isFilterActive ? 1.5 : 0.5
-                        )
-                    )
+        unitToggleButton(currentFilter: currentFilter, delay: Double(paletteCount) * 0.04 + 0.22) {
+            guard let id = paletteTargetWidgetId,
+                  let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                placedWidgets[idx].basicUnitFilter = placedWidgets[idx].basicUnitFilter == .km ? .miles : .km
             }
-            .buttonStyle(.plain)
-            .scaleEffect(showPaletteSelector ? 1 : 0.3)
-            .opacity(showPaletteSelector ? 1 : 0)
-            .animation(
-                .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.22 + Double(filterIdx) * 0.03),
-                value: showPaletteSelector
-            )
+            hapticLight.impactOccurred()
+            resetPaletteHideTimer()
         }
+    }
+
+    private func unitToggleButton(currentFilter: SplitsUnitFilter, delay: Double, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(currentFilter.label)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(.white.opacity(0.9))
+                .contentTransition(.numericText())
+                .frame(width: 36, height: 36)
+                .background(Color.white.opacity(0.25), in: Circle())
+                .overlay(
+                    Circle().stroke(Color.white.opacity(0.6), lineWidth: 1.5)
+                )
+        }
+        .buttonStyle(.plain)
+        .scaleEffect(showPaletteSelector ? 1 : 0.3)
+        .opacity(showPaletteSelector ? 1 : 0)
+        .animation(
+            .spring(response: 0.35, dampingFraction: 0.7).delay(delay),
+            value: showPaletteSelector
+        )
     }
 
     private func visibilityToggleButton(icon: String, isOn: Bool, delay: Double, action: @escaping () -> Void) -> some View {
