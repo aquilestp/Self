@@ -106,8 +106,6 @@ struct PhotoEditorView: View {
     @State private var activityDetail: StravaActivityDetail? = nil
     @State private var isLoadingDetail: Bool = false
     @State private var detailFetchTask: Task<Void, Never>? = nil
-    @State private var showWhatsappTextEdit: Bool = false
-    @State private var whatsappEditingText: String = ""
     let grokService = GrokImageEditService()
     private let cityFilterService = CityFilterService()
     private let weeklyKmService = WeeklyKmService()
@@ -676,20 +674,6 @@ struct PhotoEditorView: View {
             Button("Continue editing", role: .cancel) { }
         } message: {
             Text("Your editing progress will be lost.")
-        }
-        .alert("Edit Message", isPresented: $showWhatsappTextEdit) {
-            TextField("Message", text: $whatsappEditingText)
-            Button("Save") {
-                guard let id = paletteTargetWidgetId,
-                      let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                let trimmed = whatsappEditingText.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmed.isEmpty {
-                    placedWidgets[idx].whatsappText = trimmed
-                }
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("Type your WhatsApp message")
         }
         .alert("Photo Saved!", isPresented: $showSavedAlert) {
             Button("View in Photos") {
@@ -1372,13 +1356,6 @@ struct PhotoEditorView: View {
                         placedWidgets[idx].whatsappText = preset
                         resetPaletteHideTimer()
                     },
-                    onEditTapped: {
-                        guard let id = paletteTargetWidgetId,
-                              let widget = placedWidgets.first(where: { $0.id == id }) else { return }
-                        whatsappEditingText = widget.whatsappText
-                        showWhatsappTextEdit = true
-                        resetPaletteHideTimer()
-                    }
                 )
                 .scaleEffect(showPaletteSelector ? 1 : 0.3)
                 .opacity(showPaletteSelector ? 1 : 0)

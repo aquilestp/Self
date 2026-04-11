@@ -4,7 +4,6 @@ struct WhatsAppTextScrollPicker: View {
     let presets: [String]
     let currentText: String
     let onSelectPreset: (String) -> Void
-    let onEditTapped: () -> Void
 
     private let itemHeight: CGFloat = 36
     private let visibleItems: Int = 5
@@ -62,23 +61,6 @@ struct WhatsAppTextScrollPicker: View {
                 onSelectPreset(newValue)
             }
 
-            Button {
-                onEditTapped()
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "pencil")
-                        .font(.system(size: 11, weight: .semibold))
-                    Text("Edit")
-                        .font(.system(size: 11, weight: .semibold))
-                }
-                .foregroundStyle(.white.opacity(0.6))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(Color.white.opacity(0.12))
-                )
-            }
         }
     }
 
