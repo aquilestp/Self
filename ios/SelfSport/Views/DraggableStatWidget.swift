@@ -112,7 +112,7 @@ struct StatWidgetContentView: View, Equatable {
     var bvtShowCalories: Bool = true
     var bvtShowBPM: Bool = true
     var bvtUnitFilter: SplitsUnitFilter = .km
-    var bvtEffect: BVTEffect = .blur
+    var bvtEffect: BVTEffect = .glow
     var whatsappText: String = "My coach would be proud"
 
     private var primaryColor: Color {
@@ -1971,24 +1971,19 @@ struct StatWidgetContentView: View, Equatable {
         .fixedSize(horizontal: true, vertical: true)
         .drawingGroup()
 
+        let stretchMultiplier: CGFloat = bvtEffect == .stretch ? 1.6 : 1.0
+
         let gestureAnchor = textContent
             .hidden()
-            .padding(20)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 20 * stretchMultiplier)
+            .scaleEffect(x: 1.0, y: stretchMultiplier, anchor: .top)
 
         return ZStack {
             gestureAnchor
 
             Group {
                 switch bvtEffect {
-                case .blur:
-                    textContent
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
-                        .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(.ultraThinMaterial)
-                            .opacity(0.85)
-                    )
             case .glow:
                 textContent
                     .shadow(color: primaryColor.opacity(0.7), radius: 8, x: 0, y: 0)

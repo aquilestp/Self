@@ -285,13 +285,12 @@ struct PlacedWidget: Identifiable {
     var bvtShowCalories: Bool = true
     var bvtShowBPM: Bool = true
     var bvtUnitFilter: SplitsUnitFilter = .km
-    var bvtEffect: BVTEffect = .blur
+    var bvtEffect: BVTEffect = .glow
     var whatsappText: String = "My coach would be proud"
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
-    case blur = 0
-    case glow
+    case glow = 0
     case stroke
     case gradient
     case glitch
@@ -309,7 +308,6 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .blur: return "Blur"
         case .glow: return "Glow"
         case .stroke: return "Stroke"
         case .gradient: return "Gradient"
@@ -328,7 +326,6 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
-        case .blur: return "aqi.medium"
         case .glow: return "sparkle"
         case .stroke: return "character.textbox"
         case .gradient: return "paintbrush.fill"

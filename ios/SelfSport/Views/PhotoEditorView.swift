@@ -810,7 +810,7 @@ struct PhotoEditorView: View {
         let targetBvtShowCalories = targetWidget?.bvtShowCalories ?? true
         let targetBvtShowBPM = targetWidget?.bvtShowBPM ?? true
         let targetBvtUnitFilter = targetWidget?.bvtUnitFilter ?? .km
-        let targetBvtEffect = targetWidget?.bvtEffect ?? .blur
+        let targetBvtEffect = targetWidget?.bvtEffect ?? .glow
         let targetIsWhatsapp = targetWidget?.type == .whatsappMessage
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
