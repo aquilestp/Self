@@ -1,22 +1,7 @@
-# Scroll vertical para cambiar texto del mensaje WhatsApp
+# Fix WhatsApp scroll picker: Edit button behavior & bubble width
 
-## Cambios
+**Changes:**
 
-Reemplazar los botones actuales de texto preset del stat WhatsApp en el panel lateral derecho con una experiencia de scroll vertical tipo "rueda/picker":
+1. **Edit option only activates on tap** — Currently, scrolling to "Edit" triggers the edit action automatically. The fix will make "Edit" a tappable button instead — scrolling past it won't trigger anything, only an explicit tap will open the text editor.
 
-**Experiencia de selección por scroll:**
-- Lista vertical de textos preset que se puede deslizar con el dedo
-- El texto centrado/más cercano al centro se selecciona automáticamente al hacer scroll (sin necesidad de tocar)
-- El primer texto viene seleccionado por defecto
-- El texto seleccionado se ve más grande, brillante y con fondo verde WhatsApp
-- Los textos alejados del centro se ven más pequeños, difuminados y translúcidos (efecto de profundidad)
-- Feedback háptico sutil al cambiar de selección
-- Altura limitada (~200pt) para que no ocupe toda la pantalla
-
-**Opción de editar al final:**
-- Al final de la lista de presets, aparece un ícono de lápiz (✏️) como última opción scrolleable
-- Al seleccionarlo por scroll, abre el alert de edición de texto personalizado
-
-**Animaciones:**
-- Mismas animaciones de entrada/salida spring que el resto del panel
-- Transición suave al cambiar entre textos mientras se hace scroll
+2. **Fix bubble width to match text** — Currently the green capsule background stretches to a fixed width (180pt) regardless of text length. The fix will make each item use `.fixedSize()` so the green capsule hugs the text content, and items will be right-aligned in the scroll area.
