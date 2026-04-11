@@ -45,6 +45,16 @@ struct StatWidgetContentView: View {
     var fullBannerShowPace: Bool = true
     var fullBannerShowTime: Bool = true
     var fullBannerShowElevation: Bool = true
+    var bvtShowDate: Bool = true
+    var bvtShowTime: Bool = true
+    var bvtShowLocation: Bool = true
+    var bvtShowDistance: Bool = true
+    var bvtShowPace: Bool = true
+    var bvtShowDuration: Bool = true
+    var bvtShowElevation: Bool = true
+    var bvtShowCalories: Bool = true
+    var bvtShowBPM: Bool = true
+    var bvtUnitFilter: SplitsUnitFilter = .km
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -96,6 +106,7 @@ struct StatWidgetContentView: View {
         case .distanceWords: distanceWordsWidget(filter: distanceWordsFilter)
         case .fullBanner: fullBannerWidget
         case .fullBannerBottom: fullBannerBottomWidget
+        case .blurredVerticalText: blurredVerticalTextWidget
         }
     }
 
@@ -1819,6 +1830,90 @@ struct StatWidgetContentView: View {
         .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
     }
 
+    private var blurredVerticalTextWidget: some View {
+        let isKm = bvtUnitFilter == .km
+        let dateFormatter: DateFormatter = {
+            let f = DateFormatter()
+            f.dateFormat = "MMM d, yyyy"
+            return f
+        }()
+        let timeFormatter: DateFormatter = {
+            let f = DateFormatter()
+            f.dateFormat = "h:mm a"
+            return f
+        }()
+        let dateText = activity.startDate.map { dateFormatter.string(from: $0).uppercased() } ?? activity.date.uppercased()
+        let timeText = activity.startDate.map { timeFormatter.string(from: $0).uppercased() } ?? ""
+        let locationText: String = {
+            let city = activityDetail?.locationCity ?? ""
+            let state = activityDetail?.locationState ?? ""
+            if !city.isEmpty && !state.isEmpty { return "\(city), \(state)".uppercased() }
+            if !city.isEmpty { return city.uppercased() }
+            if !state.isEmpty { return state.uppercased() }
+            return ""
+        }()
+        let distText: String = {
+            guard activity.hasDistance else { return "" }
+            if isKm { return activity.distance.uppercased() }
+            let mi = activity.distanceRaw / 1609.34
+            return String(format: "%.1f MI", mi)
+        }()
+        let paceText: String = {
+            guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "" }
+            let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
+            let unitDist: Double = isKm ? 1000.0 : 1609.34
+            let secPerUnit = unitDist / speed
+            let m = Int(secPerUnit) / 60
+            let s = Int(secPerUnit) % 60
+            return isKm ? String(format: "%d:%02d/KM", m, s) : String(format: "%d:%02d/MI", m, s)
+        }()
+        let durationText: String = {
+            let totalSec = activity.movingTimeRaw
+            let h = totalSec / 3600
+            let m = (totalSec % 3600) / 60
+            let s = totalSec % 60
+            if h > 0 { return String(format: "%dH %dM %dS", h, m, s) }
+            return String(format: "%dM %dS", m, s)
+        }()
+        let elevText = activity.elevationGain.uppercased()
+        let calText: String = {
+            guard let cal = activityDetail?.calories, cal > 0 else { return "" }
+            return String(format: "%.0f CAL", cal)
+        }()
+        let bpmText: String = {
+            guard let hr = activity.averageHeartrate else { return "" }
+            let digits = hr.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+            guard let bpm = Int(digits), bpm > 0 else { return "" }
+            return "\(bpm) BPM"
+        }()
+
+        let lines: [(String, Bool)] = [
+            (dateText, bvtShowDate),
+            (timeText, bvtShowTime && !timeText.isEmpty),
+            (locationText, bvtShowLocation && !locationText.isEmpty),
+            (distText, bvtShowDistance && !distText.isEmpty),
+            (paceText, bvtShowPace && !paceText.isEmpty),
+            (durationText, bvtShowDuration),
+            (elevText, bvtShowElevation),
+            (calText, bvtShowCalories && !calText.isEmpty),
+            (bpmText, bvtShowBPM && !bpmText.isEmpty),
+        ]
+        let visibleLines = lines.filter { $0.1 }.map { $0.0 }
+
+        let mainFont: Font = .system(size: 22, weight: .black, design: .rounded)
+
+        return VStack(alignment: .leading, spacing: -2) {
+            ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
+                Text(line)
+                    .font(mainFont)
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+            }
+        }
+        .fixedSize(horizontal: true, vertical: true)
+    }
+
     private func topRowStatColumn(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
@@ -2002,7 +2097,7 @@ struct DraggableStatWidget: View {
     }
 
     private var widgetContent: some View {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter)
     }
 }
 

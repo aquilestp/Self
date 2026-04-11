@@ -25,6 +25,9 @@ nonisolated struct StravaActivityDetail: Codable, Sendable {
     let kilojoules: Double?
     let deviceWatts: Bool?
     let averageTemp: Double?
+    let locationCity: String?
+    let locationState: String?
+    let locationCountry: String?
     let segmentEfforts: [StravaSegmentEffort]?
     let bestEfforts: [StravaBestEffort]?
     let splitsMetric: [StravaSplit]?
@@ -51,6 +54,9 @@ nonisolated struct StravaActivityDetail: Codable, Sendable {
         case kilojoules
         case deviceWatts = "device_watts"
         case averageTemp = "average_temp"
+        case locationCity = "location_city"
+        case locationState = "location_state"
+        case locationCountry = "location_country"
         case segmentEfforts = "segment_efforts"
         case bestEfforts = "best_efforts"
         case splitsMetric = "splits_metric"

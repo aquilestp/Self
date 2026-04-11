@@ -36,6 +36,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case distanceWords = "Distance Words"
     case fullBanner = "Full Banner"
     case fullBannerBottom = "Full Banner Bottom"
+    case blurredVerticalText = "Blurred Vertical"
 
     var id: String { rawValue }
 
@@ -70,12 +71,13 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .distanceWords: return "textformat.abc"
         case .fullBanner: return "rectangle.fill"
         case .fullBannerBottom: return "rectangle.bottomhalf.filled"
+        case .blurredVerticalText: return "list.bullet"
         }
     }
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText:
             return false
         default:
             return true
@@ -99,7 +101,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
 
     var requiresDetail: Bool {
         switch self {
-        case .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts: return true
+        case .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts, .blurredVerticalText: return true
         default: return false
         }
     }
@@ -271,6 +273,16 @@ struct PlacedWidget: Identifiable {
     var fullBannerShowPace: Bool = true
     var fullBannerShowTime: Bool = true
     var fullBannerShowElevation: Bool = true
+    var bvtShowDate: Bool = true
+    var bvtShowTime: Bool = true
+    var bvtShowLocation: Bool = true
+    var bvtShowDistance: Bool = true
+    var bvtShowPace: Bool = true
+    var bvtShowDuration: Bool = true
+    var bvtShowElevation: Bool = true
+    var bvtShowCalories: Bool = true
+    var bvtShowBPM: Bool = true
+    var bvtUnitFilter: SplitsUnitFilter = .km
 }
 
 nonisolated enum SplitsUnitFilter: String, CaseIterable, Identifiable {

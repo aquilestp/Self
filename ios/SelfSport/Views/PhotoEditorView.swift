@@ -786,6 +786,17 @@ struct PhotoEditorView: View {
         let targetFBShowPace = targetWidget?.fullBannerShowPace ?? true
         let targetFBShowTime = targetWidget?.fullBannerShowTime ?? true
         let targetFBShowElevation = targetWidget?.fullBannerShowElevation ?? true
+        let targetIsBVT = targetWidget?.type == .blurredVerticalText
+        let targetBvtShowDate = targetWidget?.bvtShowDate ?? true
+        let targetBvtShowTime = targetWidget?.bvtShowTime ?? true
+        let targetBvtShowLocation = targetWidget?.bvtShowLocation ?? true
+        let targetBvtShowDistance = targetWidget?.bvtShowDistance ?? true
+        let targetBvtShowPace = targetWidget?.bvtShowPace ?? true
+        let targetBvtShowDuration = targetWidget?.bvtShowDuration ?? true
+        let targetBvtShowElevation = targetWidget?.bvtShowElevation ?? true
+        let targetBvtShowCalories = targetWidget?.bvtShowCalories ?? true
+        let targetBvtShowBPM = targetWidget?.bvtShowBPM ?? true
+        let targetBvtUnitFilter = targetWidget?.bvtUnitFilter ?? .km
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
         } ?? "5:30"
@@ -1179,6 +1190,118 @@ struct PhotoEditorView: View {
                           let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         placedWidgets[idx].fullBannerShowElevation.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+            }
+
+            if targetIsBVT {
+                Rectangle()
+                    .fill(Color.white.opacity(0.12))
+                    .frame(width: 20, height: 1)
+                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                    .opacity(showPaletteSelector ? 1 : 0)
+                    .animation(
+                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04),
+                        value: showPaletteSelector
+                    )
+
+                unitToggleButton(currentFilter: targetBvtUnitFilter, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtUnitFilter = placedWidgets[idx].bvtUnitFilter == .km ? .miles : .km
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "calendar", isOn: targetBvtShowDate, delay: Double(paletteCount) * 0.04 + 0.09) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowDate.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "clock", isOn: targetBvtShowTime, delay: Double(paletteCount) * 0.04 + 0.12) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowTime.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "location", isOn: targetBvtShowLocation, delay: Double(paletteCount) * 0.04 + 0.15) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowLocation.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "ruler", isOn: targetBvtShowDistance, delay: Double(paletteCount) * 0.04 + 0.18) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowDistance.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "speedometer", isOn: targetBvtShowPace, delay: Double(paletteCount) * 0.04 + 0.21) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowPace.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "timer", isOn: targetBvtShowDuration, delay: Double(paletteCount) * 0.04 + 0.24) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowDuration.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "mountain.2", isOn: targetBvtShowElevation, delay: Double(paletteCount) * 0.04 + 0.27) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowElevation.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "flame", isOn: targetBvtShowCalories, delay: Double(paletteCount) * 0.04 + 0.30) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowCalories.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "heart.fill", isOn: targetBvtShowBPM, delay: Double(paletteCount) * 0.04 + 0.33) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtShowBPM.toggle()
                     }
                     hapticLight.impactOccurred()
                     resetPaletteHideTimer()
@@ -2224,7 +2347,7 @@ struct PhotoEditorView: View {
             activeFilterOverlay(size: canvasSize)
 
             ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation)
+                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter)
                     .scaleEffect(widget.scale)
                     .rotationEffect(widget.rotation)
                     .offset(x: widget.position.width, y: widget.position.height)

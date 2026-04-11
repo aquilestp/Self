@@ -295,6 +295,8 @@ extension PhotoEditorView {
             miniFullBanner
         case .fullBannerBottom:
             miniFullBannerBottom
+        case .blurredVerticalText:
+            miniBlurredVerticalText
         }
     }
 
@@ -801,6 +803,33 @@ extension PhotoEditorView {
             .frame(maxWidth: .infinity)
         }
         .padding(.horizontal, 12)
+    }
+
+    var miniBlurredVerticalText: some View {
+        VStack(alignment: .leading, spacing: -1) {
+            Text(activity.date.uppercased())
+                .font(.system(size: 5, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+            if activity.hasDistance {
+                Text(activity.distance.uppercased())
+                    .font(.system(size: 5, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                Text(activity.pace.uppercased())
+                    .font(.system(size: 5, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            Text(activity.duration.uppercased())
+                .font(.system(size: 5, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+            Text(activity.elevationGain.uppercased())
+                .font(.system(size: 5, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+            if activity.averageHeartrate != nil {
+                Text("BPM")
+                    .font(.system(size: 5, weight: .black, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+        }
     }
 
     func miniTimeArc(value: String, label: String, icon: String, progress: Double) -> some View {
