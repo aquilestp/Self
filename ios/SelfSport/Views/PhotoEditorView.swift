@@ -823,6 +823,7 @@ struct PhotoEditorView: View {
         let paletteCount = WidgetPalette.allCases.count
 
         return VStack(spacing: 8) {
+          if !targetIsWhatsapp {
             ForEach(Array(WidgetPalette.allCases.enumerated()), id: \.element.id) { index, palette in
                 let isActive = targetPalette == palette
                 Button {
@@ -864,8 +865,9 @@ struct PhotoEditorView: View {
                     value: showPaletteSelector
                 )
             }
+          }
 
-            if targetSupportsGlass {
+            if targetSupportsGlass && !targetIsWhatsapp {
                 Rectangle()
                     .fill(Color.white.opacity(0.12))
                     .frame(width: 20, height: 1)
