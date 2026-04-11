@@ -196,6 +196,8 @@ extension PhotoEditorView {
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
+                    .scaleEffect(x: 1.0, y: 2.5, anchor: .top)
+                    .padding(.bottom, 20)
                 HStack(spacing: 8) {
                     if activity.hasDistance {
                         Text("PACE \(activity.pace)")

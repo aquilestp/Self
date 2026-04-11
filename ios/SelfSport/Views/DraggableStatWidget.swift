@@ -481,6 +481,8 @@ struct StatWidgetContentView: View {
                 .foregroundStyle(primaryColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
+                .scaleEffect(x: 1.0, y: 2.5, anchor: .top)
+                .padding(.bottom, 70)
             HStack(spacing: 16) {
                 if activity.hasDistance {
                     Text("PACE \(activity.pace)")
