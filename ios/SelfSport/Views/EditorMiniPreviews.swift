@@ -8,22 +8,22 @@ extension PhotoEditorView {
         case .distance:
             VStack(alignment: .leading, spacing: 2) {
                 Text(activity.primaryLabel)
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1)
                     .foregroundStyle(.white.opacity(0.5))
                 Text(activity.primaryStat)
-                    .font(.custom("InstrumentSerif-Italic", size: 16))
+                    .font(.system(size: 16, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
             }
         case .distPace:
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(activity.primaryLabelShort)
-                        .font(.custom("InstrumentSerif-Regular", size: 7))
+                        .font(.system(size: 7, weight: .regular, design: .serif))
                         .tracking(0.8)
                         .foregroundStyle(.white.opacity(0.45))
                     Text(activity.primaryStat)
-                        .font(.custom("InstrumentSerif-Italic", size: 12))
+                        .font(.system(size: 12, weight: .regular, design: .serif).italic())
                         .foregroundStyle(.white)
                 }
                 Rectangle()
@@ -31,11 +31,11 @@ extension PhotoEditorView {
                     .frame(width: 0.5, height: 18)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(activity.hasDistance ? "PACE" : "TIME")
-                        .font(.custom("InstrumentSerif-Regular", size: 7))
+                        .font(.system(size: 7, weight: .regular, design: .serif))
                         .tracking(0.8)
                         .foregroundStyle(.white.opacity(0.45))
                     Text(activity.hasDistance ? activity.pace : activity.duration)
-                        .font(.custom("InstrumentSerif-Italic", size: 12))
+                        .font(.system(size: 12, weight: .regular, design: .serif).italic())
                         .foregroundStyle(.white)
                 }
             }
@@ -301,11 +301,11 @@ extension PhotoEditorView {
     func miniStat(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 1) {
             Text(label)
-                .font(.custom("InstrumentSerif-Regular", size: 7))
+                .font(.system(size: 7, weight: .regular, design: .serif))
                 .tracking(0.8)
                 .foregroundStyle(.white.opacity(0.45))
             Text(value)
-                .font(.custom("InstrumentSerif-Italic", size: 9))
+                .font(.system(size: 9, weight: .regular, design: .serif).italic())
                 .foregroundStyle(.white)
                 .minimumScaleFactor(0.7)
         }
@@ -699,11 +699,11 @@ extension PhotoEditorView {
         HStack(spacing: 0) {
             VStack(spacing: 3) {
                 Text("TIME")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
                 Text(activity.duration)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -711,11 +711,11 @@ extension PhotoEditorView {
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
                 Text("DIST")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
                 Text(activity.distance)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -723,11 +723,11 @@ extension PhotoEditorView {
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
                 Text("PACE")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
                 Text(activity.pace)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -735,11 +735,11 @@ extension PhotoEditorView {
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
                 Text("ELEV")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
                 Text(activity.elevationGain)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
@@ -753,48 +753,48 @@ extension PhotoEditorView {
         HStack(spacing: 0) {
             VStack(spacing: 3) {
                 Text(activity.duration)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 Text("TIME")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
                 Text(activity.distance)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 Text("DIST")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
                 Text(activity.pace)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 Text("PACE")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
                 Text(activity.elevationGain)
-                    .font(.custom("InstrumentSerif-Italic", size: 18))
+                    .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 Text("ELEV")
-                    .font(.custom("InstrumentSerif-Regular", size: 8))
+                    .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white.opacity(0.4))
             }

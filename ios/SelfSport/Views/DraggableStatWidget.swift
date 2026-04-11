@@ -186,18 +186,18 @@ struct StatWidgetContentView: View {
         VStack(alignment: .leading, spacing: 4) {
             if !basicMetadataText.isEmpty {
                 Text(basicMetadataText)
-                    .font(.custom("InstrumentSerif-Regular", size: 9))
+                    .font(.system(size: 9, weight: .regular, design: .serif))
                     .foregroundStyle(secondaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
             if let primaryMetric = basicPrimaryMetric {
                 Text(primaryMetric.label)
-                    .font(.custom("InstrumentSerif-Regular", size: 10))
+                    .font(.system(size: 10, weight: .regular, design: .serif))
                     .tracking(1.5)
                     .foregroundStyle(tertiaryColor)
                 Text(primaryMetric.value)
-                    .font(.custom("InstrumentSerif-Italic", size: 28))
+                    .font(.system(size: 28, weight: .regular, design: .serif).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -213,7 +213,7 @@ struct StatWidgetContentView: View {
         return VStack(alignment: .leading, spacing: 8) {
             if !basicMetadataText.isEmpty {
                 Text(basicMetadataText)
-                    .font(.custom("InstrumentSerif-Regular", size: 9))
+                    .font(.system(size: 9, weight: .regular, design: .serif))
                     .foregroundStyle(secondaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -222,11 +222,11 @@ struct StatWidgetContentView: View {
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(firstMetric.label)
-                            .font(.custom("InstrumentSerif-Regular", size: 9))
+                            .font(.system(size: 9, weight: .regular, design: .serif))
                             .tracking(1.2)
                             .foregroundStyle(secondaryColor)
                         Text(firstMetric.value)
-                            .font(.custom("InstrumentSerif-Italic", size: 22))
+                            .font(.system(size: 22, weight: .regular, design: .serif).italic())
                             .foregroundStyle(primaryColor)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
@@ -237,11 +237,11 @@ struct StatWidgetContentView: View {
                             .frame(width: 1, height: 32)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(metrics[1].label)
-                                .font(.custom("InstrumentSerif-Regular", size: 9))
+                                .font(.system(size: 9, weight: .regular, design: .serif))
                                 .tracking(1.2)
                                 .foregroundStyle(secondaryColor)
                             Text(metrics[1].value)
-                                .font(.custom("InstrumentSerif-Italic", size: 22))
+                                .font(.system(size: 22, weight: .regular, design: .serif).italic())
                                 .foregroundStyle(primaryColor)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
@@ -260,7 +260,7 @@ struct StatWidgetContentView: View {
         return VStack(alignment: .leading, spacing: 8) {
             if !basicMetadataText.isEmpty {
                 Text(basicMetadataText)
-                    .font(.custom("InstrumentSerif-Regular", size: 9))
+                    .font(.system(size: 9, weight: .regular, design: .serif))
                     .foregroundStyle(secondaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -1751,11 +1751,11 @@ struct StatWidgetContentView: View {
             ForEach(Array(visible.enumerated()), id: \.offset) { idx, item in
                 VStack(spacing: 2) {
                     Text(item.0)
-                        .font(.custom("InstrumentSerif-Regular", size: 8))
+                        .font(.system(size: 8, weight: .regular, design: .serif))
                         .tracking(1.5)
                         .foregroundStyle(secondaryColor)
                     Text(item.1)
-                        .font(.custom("InstrumentSerif-Italic", size: 18))
+                        .font(.system(size: 18, weight: .regular, design: .serif).italic())
                         .foregroundStyle(primaryColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
@@ -1797,12 +1797,12 @@ struct StatWidgetContentView: View {
             ForEach(Array(visible.enumerated()), id: \.offset) { idx, item in
                 VStack(spacing: 2) {
                     Text(item.1)
-                        .font(.custom("InstrumentSerif-Italic", size: 18))
+                        .font(.system(size: 18, weight: .regular, design: .serif).italic())
                         .foregroundStyle(primaryColor)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                     Text(item.0)
-                        .font(.custom("InstrumentSerif-Regular", size: 8))
+                        .font(.system(size: 8, weight: .regular, design: .serif))
                         .tracking(1.5)
                         .foregroundStyle(secondaryColor)
                 }
@@ -1818,11 +1818,11 @@ struct StatWidgetContentView: View {
     private func topRowStatColumn(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
-                .font(.custom("InstrumentSerif-Regular", size: 9))
+                .font(.system(size: 9, weight: .regular, design: .serif))
                 .tracking(1.2)
                 .foregroundStyle(secondaryColor)
             Text(value)
-                .font(.custom("InstrumentSerif-Italic", size: 22))
+                .font(.system(size: 22, weight: .regular, design: .serif).italic())
                 .foregroundStyle(primaryColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -1832,11 +1832,11 @@ struct StatWidgetContentView: View {
     private func statColumn(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
-                .font(.custom("InstrumentSerif-Regular", size: 9))
+                .font(.system(size: 9, weight: .regular, design: .serif))
                 .tracking(1)
                 .foregroundStyle(secondaryColor)
             Text(value)
-                .font(.custom("InstrumentSerif-Italic", size: 16))
+                .font(.system(size: 16, weight: .regular, design: .serif).italic())
                 .foregroundStyle(primaryColor)
                 .minimumScaleFactor(0.8)
         }
