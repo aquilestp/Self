@@ -1363,70 +1363,27 @@ struct PhotoEditorView: View {
                     )
 
                 let currentWAText = targetWidget?.whatsappText ?? ""
-                ForEach(Array(Self.waPresetTexts.enumerated()), id: \.offset) { presetIdx, preset in
-                    let isPresetActive = currentWAText == preset
-                    Button {
+                WhatsAppTextScrollPicker(
+                    presets: Self.waPresetTexts,
+                    currentText: currentWAText,
+                    onSelectPreset: { preset in
                         guard let id = paletteTargetWidgetId,
                               let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
                         placedWidgets[idx].whatsappText = preset
-                        hapticLight.impactOccurred()
                         resetPaletteHideTimer()
-                    } label: {
-                        Text(preset)
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(isPresetActive ? .white : .white.opacity(0.7))
-                            .lineLimit(1)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 8)
-                            .frame(height: 36)
-                            .background(
-                                isPresetActive
-                                    ? Color(red: 0.00, green: 0.37, blue: 0.33)
-                                    : Color.white.opacity(0.12),
-                                in: Capsule()
-                            )
-                            .overlay(
-                                Capsule().stroke(isPresetActive ? Color.white.opacity(0.3) : Color.clear, lineWidth: 0.5)
-                            )
+                    },
+                    onEditTapped: {
+                        guard let id = paletteTargetWidgetId,
+                              let widget = placedWidgets.first(where: { $0.id == id }) else { return }
+                        whatsappEditingText = widget.whatsappText
+                        showWhatsappTextEdit = true
+                        resetPaletteHideTimer()
                     }
-                    .buttonStyle(.plain)
-                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
-                    .opacity(showPaletteSelector ? 1 : 0)
-                    .animation(
-                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04 + Double(presetIdx) * 0.03),
-                        value: showPaletteSelector
-                    )
-                }
-
-                Button {
-                    guard let id = paletteTargetWidgetId,
-                          let widget = placedWidgets.first(where: { $0.id == id }) else { return }
-                    whatsappEditingText = widget.whatsappText
-                    showWhatsappTextEdit = true
-                    resetPaletteHideTimer()
-                } label: {
-                    Image(systemName: "pencil")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .frame(width: 36, height: 36)
-                        .background(
-                            !Self.waPresetTexts.contains(currentWAText)
-                                ? Color(red: 0.00, green: 0.37, blue: 0.33)
-                                : Color.white.opacity(0.12),
-                            in: Circle()
-                        )
-                        .overlay(
-                            Circle().stroke(
-                                !Self.waPresetTexts.contains(currentWAText) ? Color.white.opacity(0.3) : Color.clear,
-                                lineWidth: 0.5
-                            )
-                        )
-                }
-                .buttonStyle(.plain)
+                )
                 .scaleEffect(showPaletteSelector ? 1 : 0.3)
                 .opacity(showPaletteSelector ? 1 : 0)
                 .animation(
-                    .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04 + Double(Self.waPresetTexts.count) * 0.03 + 0.02),
+                    .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.06),
                     value: showPaletteSelector
                 )
             }

@@ -1,24 +1,22 @@
-# WhatsApp stat: ancho dinámico y textos preestablecidos
+# Scroll vertical para cambiar texto del mensaje WhatsApp
 
 ## Cambios
 
-### Ancho dinámico del bubble
-- El bubble de WhatsApp en el editor dejará de tener un ancho fijo de 220px
-- El ancho se ajustará automáticamente al contenido del texto (más corto para mensajes cortos, más ancho para mensajes largos)
-- Se mantendrá un ancho máximo para que no se desborde en textos muy largos
+Reemplazar los botones actuales de texto preset del stat WhatsApp en el panel lateral derecho con una experiencia de scroll vertical tipo "rueda/picker":
 
-### Textos preestablecidos
-- Se agregarán varias frases predefinidas que el usuario puede elegir rápidamente al configurar el stat
-- Los presets aparecerán como opciones seleccionables en el drawer de configuración (junto al botón de editar texto actual)
-- Ejemplos de frases:
-  - "My coach would be proud" (default actual)
-  - "New PR 🔥"
-  - "Easy run day"
-  - "That was tough 😮‍💨"
-  - "Sunday long run ✅"
-  - "Recovery mode"
-  - "Let's gooo 🏃‍♂️"
-  - "Pain is temporary, PRs are forever"
-  - "Just getting started"
-  - "Who's coming tomorrow?"
-- El usuario seguirá pudiendo escribir su propio texto personalizado con el botón de edición
+**Experiencia de selección por scroll:**
+- Lista vertical de textos preset que se puede deslizar con el dedo
+- El texto centrado/más cercano al centro se selecciona automáticamente al hacer scroll (sin necesidad de tocar)
+- El primer texto viene seleccionado por defecto
+- El texto seleccionado se ve más grande, brillante y con fondo verde WhatsApp
+- Los textos alejados del centro se ven más pequeños, difuminados y translúcidos (efecto de profundidad)
+- Feedback háptico sutil al cambiar de selección
+- Altura limitada (~200pt) para que no ocupe toda la pantalla
+
+**Opción de editar al final:**
+- Al final de la lista de presets, aparece un ícono de lápiz (✏️) como última opción scrolleable
+- Al seleccionarlo por scroll, abre el alert de edición de texto personalizado
+
+**Animaciones:**
+- Mismas animaciones de entrada/salida spring que el resto del panel
+- Transición suave al cambiar entre textos mientras se hace scroll
