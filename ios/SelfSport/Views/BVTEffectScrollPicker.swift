@@ -17,7 +17,7 @@ struct BVTEffectScrollPicker: View {
         let allEffects = BVTEffect.allCases
 
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(spacing: 0) {
+            LazyVStack(alignment: .trailing, spacing: 0) {
                 Color.clear.frame(height: itemHeight * 2)
 
                 ForEach(allEffects) { effect in
@@ -84,7 +84,7 @@ struct BVTEffectScrollPicker: View {
                 }
             }
         )
-        .frame(width: 130, alignment: .center)
+        .frame(width: 130, alignment: .trailing)
         .animation(.easeOut(duration: 0.15), value: isSelected)
     }
 }

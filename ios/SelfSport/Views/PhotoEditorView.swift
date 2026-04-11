@@ -819,7 +819,7 @@ struct PhotoEditorView: View {
 
         let paletteCount = WidgetPalette.allCases.count
 
-        return VStack(spacing: 8) {
+        return VStack(alignment: .trailing, spacing: 8) {
           if !targetIsWhatsapp {
             ForEach(Array(WidgetPalette.allCases.enumerated()), id: \.element.id) { index, palette in
                 let isActive = targetPalette == palette
