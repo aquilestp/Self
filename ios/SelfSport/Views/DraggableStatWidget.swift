@@ -1949,15 +1949,15 @@ struct StatWidgetContentView: View, Equatable {
         }()
 
         let lines: [(String, Bool)] = [
-            (dateText, bvtShowDate),
-            (timeText, bvtShowTime && !timeText.isEmpty),
-            (locationText, bvtShowLocation && !locationText.isEmpty),
-            (distText, bvtShowDistance && !distText.isEmpty),
-            (paceText, bvtShowPace && !paceText.isEmpty),
-            (durationText, bvtShowDuration),
-            (elevText, bvtShowElevation),
-            (calText, bvtShowCalories && !calText.isEmpty),
-            (bpmText, bvtShowBPM && !bpmText.isEmpty),
+            (dateText, true),
+            (timeText, !timeText.isEmpty),
+            (locationText, !locationText.isEmpty),
+            (distText, !distText.isEmpty),
+            (paceText, !paceText.isEmpty),
+            (durationText, true),
+            (elevText, true),
+            (calText, !calText.isEmpty),
+            (bpmText, !bpmText.isEmpty),
         ]
         let visibleLines = lines.filter { $0.1 }.map { $0.0 }
 

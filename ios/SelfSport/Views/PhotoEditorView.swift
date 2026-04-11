@@ -1224,17 +1224,7 @@ struct PhotoEditorView: View {
                         value: showPaletteSelector
                     )
 
-                bvtEffectButton(effect: targetBvtEffect, delay: Double(paletteCount) * 0.04 + 0.06) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtEffect = placedWidgets[idx].bvtEffect.next()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                unitToggleButton(currentFilter: targetBvtUnitFilter, delay: Double(paletteCount) * 0.04 + 0.09) {
+                unitToggleButton(currentFilter: targetBvtUnitFilter, delay: Double(paletteCount) * 0.04 + 0.06) {
                     guard let id = paletteTargetWidgetId,
                           let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -1244,95 +1234,23 @@ struct PhotoEditorView: View {
                     resetPaletteHideTimer()
                 }
 
-                visibilityToggleButton(icon: "calendar", isOn: targetBvtShowDate, delay: Double(paletteCount) * 0.04 + 0.09) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowDate.toggle()
+                BVTEffectScrollPicker(
+                    currentEffect: targetBvtEffect,
+                    onSelectEffect: { effect in
+                        guard let id = paletteTargetWidgetId,
+                              let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            placedWidgets[idx].bvtEffect = effect
+                        }
+                        resetPaletteHideTimer()
                     }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "clock", isOn: targetBvtShowTime, delay: Double(paletteCount) * 0.04 + 0.12) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowTime.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "location", isOn: targetBvtShowLocation, delay: Double(paletteCount) * 0.04 + 0.15) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowLocation.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "ruler", isOn: targetBvtShowDistance, delay: Double(paletteCount) * 0.04 + 0.18) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowDistance.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "speedometer", isOn: targetBvtShowPace, delay: Double(paletteCount) * 0.04 + 0.21) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowPace.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "timer", isOn: targetBvtShowDuration, delay: Double(paletteCount) * 0.04 + 0.24) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowDuration.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "mountain.2", isOn: targetBvtShowElevation, delay: Double(paletteCount) * 0.04 + 0.27) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowElevation.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "flame", isOn: targetBvtShowCalories, delay: Double(paletteCount) * 0.04 + 0.30) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowCalories.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
-
-                visibilityToggleButton(icon: "heart.fill", isOn: targetBvtShowBPM, delay: Double(paletteCount) * 0.04 + 0.33) {
-                    guard let id = paletteTargetWidgetId,
-                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        placedWidgets[idx].bvtShowBPM.toggle()
-                    }
-                    hapticLight.impactOccurred()
-                    resetPaletteHideTimer()
-                }
+                )
+                .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                .opacity(showPaletteSelector ? 1 : 0)
+                .animation(
+                    .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.08),
+                    value: showPaletteSelector
+                )
             }
 
             if targetIsWhatsapp {
