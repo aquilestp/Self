@@ -5,7 +5,7 @@ struct WhatsAppTextScrollPicker: View {
     let currentText: String
     let onSelectPreset: (String) -> Void
 
-    private let itemHeight: CGFloat = 36
+    private let itemHeight: CGFloat = 33.5
     private let visibleItems: Int = 5
 
     @State private var scrolledID: String?
@@ -34,7 +34,7 @@ struct WhatsAppTextScrollPicker: View {
             .scrollPosition(id: $scrolledID, anchor: .center)
             .scrollTargetBehavior(.viewAligned)
             .frame(height: totalHeight)
-            .frame(width: 180)
+            .frame(width: 167)
             .mask(
                 VStack(spacing: 0) {
                     LinearGradient(colors: [.clear, .white], startPoint: .top, endPoint: .bottom)
@@ -69,11 +69,11 @@ struct WhatsAppTextScrollPicker: View {
         let isSelected = scrolledID == text
 
         Text(text)
-            .font(.system(size: isSelected ? 13 : 11, weight: isSelected ? .semibold : .regular))
+            .font(.system(size: isSelected ? 12 : 10, weight: isSelected ? .semibold : .regular))
             .foregroundStyle(isSelected ? .white : .white.opacity(0.45))
             .lineLimit(1)
             .fixedSize(horizontal: true, vertical: false)
-            .padding(.horizontal, 12)
+            .padding(.horizontal, 11)
             .padding(.vertical, 4)
             .background(
                 Group {
@@ -86,7 +86,7 @@ struct WhatsAppTextScrollPicker: View {
                     }
                 }
             )
-            .frame(width: 180, alignment: .trailing)
+            .frame(width: 167, alignment: .trailing)
             .animation(.easeOut(duration: 0.15), value: isSelected)
     }
 }

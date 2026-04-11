@@ -1,10 +1,7 @@
-# Eliminar botón "Edit" del widget de WhatsApp
+# Ajustar tamaño del selector de WhatsApp y ancho del stat
 
-**Cambio:**
-- Se eliminará el botón "Edit" que aparece debajo del selector de mensajes de WhatsApp en el editor de fotos
-- Los usuarios solo podrán elegir entre los mensajes predefinidos del scroll picker, sin opción de escribir un mensaje personalizado
+**Cambios:**
 
-**Archivos afectados:**
-- El componente del scroll picker de WhatsApp — se elimina el botón "Edit" y la propiedad `onEditTapped`
-- La vista del editor de fotos — se elimina la lógica del alert "Edit Message" y las variables relacionadas (`showWhatsappTextEdit`, `whatsappEditingText`)
-- Se limpia el parámetro `onEditTapped` donde se usa el picker
+1. **Selector de mensajes de WhatsApp 7% más pequeño** — Reducir proporcionalmente todas las dimensiones del componente de scroll (altura de items, tamaño de fuente, padding, ancho total) en un 7%
+
+2. **Ancho correcto del stat "Pain is temporary, PRs are forever"** — Actualmente el widget de WhatsApp usa un `maxWidth: 240` fijo que deja espacio vacío a la derecha cuando el texto es corto. Se cambiará para que el ancho se ajuste al contenido real del texto, eliminando el espacio vacío innecesario

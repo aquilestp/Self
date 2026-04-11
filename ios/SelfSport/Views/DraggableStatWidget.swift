@@ -2198,7 +2198,6 @@ struct StatWidgetContentView: View, Equatable {
                 .font(.system(size: 16))
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: 240, alignment: .leading)
 
             HStack(spacing: 3) {
                 Text(timeText)
