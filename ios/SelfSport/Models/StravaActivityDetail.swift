@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct StravaActivityDetail: Codable, Sendable {
+nonisolated struct StravaActivityDetail: Codable, Sendable, Equatable {
     let id: Int
     let name: String
     let description: String?
@@ -64,7 +64,7 @@ nonisolated struct StravaActivityDetail: Codable, Sendable {
     }
 }
 
-nonisolated struct StravaSegmentEffort: Codable, Sendable, Identifiable {
+nonisolated struct StravaSegmentEffort: Codable, Sendable, Identifiable, Equatable {
     let id: Int
     let name: String
     let elapsedTime: Int
@@ -90,7 +90,7 @@ nonisolated struct StravaSegmentEffort: Codable, Sendable, Identifiable {
     }
 }
 
-nonisolated struct StravaSegmentSummary: Codable, Sendable {
+nonisolated struct StravaSegmentSummary: Codable, Sendable, Equatable {
     let id: Int
     let name: String
     let distance: Double
@@ -110,7 +110,7 @@ nonisolated struct StravaSegmentSummary: Codable, Sendable {
     }
 }
 
-nonisolated struct StravaAchievement: Codable, Sendable {
+nonisolated struct StravaAchievement: Codable, Sendable, Equatable {
     let typeId: Int
     let type: String
     let rank: Int
@@ -121,7 +121,7 @@ nonisolated struct StravaAchievement: Codable, Sendable {
     }
 }
 
-nonisolated struct StravaBestEffort: Codable, Sendable, Identifiable {
+nonisolated struct StravaBestEffort: Codable, Sendable, Identifiable, Equatable {
     let id: Int
     let name: String
     let elapsedTime: Int
@@ -138,7 +138,7 @@ nonisolated struct StravaBestEffort: Codable, Sendable, Identifiable {
     }
 }
 
-nonisolated struct StravaSplit: Codable, Sendable {
+nonisolated struct StravaSplit: Codable, Sendable, Equatable {
     let distance: Double
     let elapsedTime: Int
     let movingTime: Int
@@ -159,7 +159,7 @@ nonisolated struct StravaSplit: Codable, Sendable {
     }
 }
 
-nonisolated struct StravaLap: Codable, Sendable, Identifiable {
+nonisolated struct StravaLap: Codable, Sendable, Identifiable, Equatable {
     let id: Int
     let name: String
     let elapsedTime: Int

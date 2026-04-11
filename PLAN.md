@@ -1,32 +1,35 @@
-# Agregar 10 nuevos efectos visuales al stat BVT
+# Fix BVT stat gesture performance (freeze during drag/rotation)
 
-## Features
+## Problem
 
-Se agregarán **10 nuevos efectos** al stat BVT, además de los 4 existentes (Blur, Glow, Stroke, Gradient):
+The "Blurred Vertical" stat freezes/stutters during drag and rotation gestures on the canvas. Every gesture frame triggers a full re-render of the BVT widget content, which is expensive due to DateFormatter creation, complex effects (Noise, Glitch, Echo), and lack of rasterization.
 
-1. **Glitch / Chromatic Split** — Texto con capas RGB separadas con diferentes desplazamientos, efecto cyberpunk/glitch
-2. **Wave / Ondulación** — Cada línea de texto con un desplazamiento horizontal sinusoidal progresivo
-3. **Pixelación** — Texto con efecto de baja resolución/pixelado
-4. **Blur por línea** — Algunas líneas del texto más borrosas que otras, creando profundidad
-5. **Noise / Estática** — Overlay de puntos aleatorios sobre el texto tipo señal de TV
-6. **Stretch** — Deformación vertical del texto (texto estirado/comprimido)
-7. **Skew** — Inclinación exagerada tipo poster tipográfico
-8. **Tracking** — Espaciado entre letras muy expandido
-9. **Gradient Mask** — Texto que se desvanece progresivamente con un gradiente
-10. **Echo / Stacked** — Múltiples copias del texto con offsets y opacidades decrecientes, efecto eco/sombra repetida
+## Fixes
 
-## Design
+### 1. Cache DateFormatters as static properties
 
-- Cada efecto tiene un icono SF Symbol representativo en el botón del editor
-- Los efectos se recorren con el botón circular existente (tap para siguiente efecto)
-- Los efectos Wave y Pixelación usarán Metal shaders para renderizado GPU nativo
-- El efecto Noise usará Canvas de SwiftUI para generar la estática
-- Los demás efectos se logran con SwiftUI puro (offsets, opacidades, blur, tracking, scaleEffect, rotation3DEffect, mask)
-- Los colores de cada efecto respetan el color primario seleccionado por el usuario
+- Move the two `DateFormatter` instances out of the computed property and into static constants
+- DateFormatter creation is very expensive — currently 2 are created **every frame** during gestures (~60/sec)
 
-## Cambios
+### 2. Add `.drawingGroup()` to the BVT widget
 
-- Se amplía el enum `BVTEffect` con los 10 nuevos casos
-- Se agregan las ramas de renderizado correspondientes en el widget
-- Se crean 2 archivos Metal (.metal) para los shaders de Wave y Pixelación
-- Se actualiza el botón de efecto en el editor para recorrer todos los efectos
+- Rasterizes the entire BVT widget into a single GPU layer
+- During gestures, only the offset/scale/rotation transform changes — the rasterized content stays cached
+- This is the single biggest performance win
+
+### 3. Optimize the Noise effect
+
+- Reduce random particle count from 300 to 120
+- Use a fixed seed-based pattern instead of fully random positions each frame
+- This prevents the Canvas from regenerating 300 random rects every gesture frame
+
+### 4. Make `StatWidgetContentView` conform to `Equatable`
+
+- All its sub-properties already conform to Equatable (ActivityHighlight, WidgetColorStyle, WeeklyKmData, MonthlyKmData, enums, Bools)
+- Adding Equatable lets SwiftUI skip re-rendering when only `dragOffset` changes in the parent — the content hasn't changed, only the position
+
+### 5. Pre-compute `textContent` once for multi-reference effects
+
+- Effects like Echo (5 references), Glitch (4 layers) re-evaluate `textContent` multiple times
+- Wrap in `.drawingGroup()` so each reference reuses the rasterized result instead of re-laying out the full VStack+ForEach
+

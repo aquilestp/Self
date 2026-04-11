@@ -1,5 +1,20 @@
 import SwiftUI
 
+nonisolated struct SplitMix64: Sendable {
+    private var state: UInt64
+    init(seed: UInt64) { state = seed }
+    mutating func next() -> UInt64 {
+        state &+= 0x9e3779b97f4a7c15
+        var z = state
+        z = (z ^ (z >> 30)) &* 0xbf58476d1ce4e5b9
+        z = (z ^ (z >> 27)) &* 0x94d049bb133111eb
+        return z ^ (z >> 31)
+    }
+    mutating func nextDouble() -> Double {
+        Double(next() >> 11) / Double(1 << 53)
+    }
+}
+
 nonisolated enum ExportEnvironmentKey: EnvironmentKey {
     static let defaultValue: Bool = false
 }
@@ -17,7 +32,48 @@ nonisolated private struct StatDisplayItem: Identifiable, Sendable {
     let value: String
 }
 
-struct StatWidgetContentView: View {
+struct StatWidgetContentView: View, Equatable {
+    static func == (lhs: StatWidgetContentView, rhs: StatWidgetContentView) -> Bool {
+        lhs.type == rhs.type &&
+        lhs.activity == rhs.activity &&
+        lhs.colorStyle == rhs.colorStyle &&
+        lhs.useGlassBackground == rhs.useGlassBackground &&
+        lhs.weeklyKmData == rhs.weeklyKmData &&
+        lhs.lastWeekKmData == rhs.lastWeekKmData &&
+        lhs.monthlyKmData == rhs.monthlyKmData &&
+        lhs.lastMonthKmData == rhs.lastMonthKmData &&
+        lhs.activityDetail == rhs.activityDetail &&
+        lhs.isLoadingDetail == rhs.isLoadingDetail &&
+        lhs.bestEffortsFilter == rhs.bestEffortsFilter &&
+        lhs.splitsFilter == rhs.splitsFilter &&
+        lhs.distanceWordsFilter == rhs.distanceWordsFilter &&
+        lhs.fontStyle == rhs.fontStyle &&
+        lhs.showTitle == rhs.showTitle &&
+        lhs.showActivityName == rhs.showActivityName &&
+        lhs.showDate == rhs.showDate &&
+        lhs.showDistance == rhs.showDistance &&
+        lhs.showPace == rhs.showPace &&
+        lhs.showTime == rhs.showTime &&
+        lhs.showElevation == rhs.showElevation &&
+        lhs.basicUnitFilter == rhs.basicUnitFilter &&
+        lhs.fullBannerUnitFilter == rhs.fullBannerUnitFilter &&
+        lhs.fullBannerShowDistance == rhs.fullBannerShowDistance &&
+        lhs.fullBannerShowPace == rhs.fullBannerShowPace &&
+        lhs.fullBannerShowTime == rhs.fullBannerShowTime &&
+        lhs.fullBannerShowElevation == rhs.fullBannerShowElevation &&
+        lhs.bvtShowDate == rhs.bvtShowDate &&
+        lhs.bvtShowTime == rhs.bvtShowTime &&
+        lhs.bvtShowLocation == rhs.bvtShowLocation &&
+        lhs.bvtShowDistance == rhs.bvtShowDistance &&
+        lhs.bvtShowPace == rhs.bvtShowPace &&
+        lhs.bvtShowDuration == rhs.bvtShowDuration &&
+        lhs.bvtShowElevation == rhs.bvtShowElevation &&
+        lhs.bvtShowCalories == rhs.bvtShowCalories &&
+        lhs.bvtShowBPM == rhs.bvtShowBPM &&
+        lhs.bvtUnitFilter == rhs.bvtUnitFilter &&
+        lhs.bvtEffect == rhs.bvtEffect
+    }
+
     let type: StatWidgetType
     let activity: ActivityHighlight
     var colorStyle: WidgetColorStyle = .initial
@@ -1831,20 +1887,21 @@ struct StatWidgetContentView: View {
         .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
     }
 
+    private static let bvtDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d, yyyy"
+        return f
+    }()
+    private static let bvtTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "h:mm a"
+        return f
+    }()
+
     private var blurredVerticalTextWidget: some View {
         let isKm = bvtUnitFilter == .km
-        let dateFormatter: DateFormatter = {
-            let f = DateFormatter()
-            f.dateFormat = "MMM d, yyyy"
-            return f
-        }()
-        let timeFormatter: DateFormatter = {
-            let f = DateFormatter()
-            f.dateFormat = "h:mm a"
-            return f
-        }()
-        let dateText = activity.startDate.map { dateFormatter.string(from: $0).uppercased() } ?? activity.date.uppercased()
-        let timeText = activity.startDate.map { timeFormatter.string(from: $0).uppercased() } ?? ""
+        let dateText = activity.startDate.map { Self.bvtDateFormatter.string(from: $0).uppercased() } ?? activity.date.uppercased()
+        let timeText = activity.startDate.map { Self.bvtTimeFormatter.string(from: $0).uppercased() } ?? ""
         let locationText: String = {
             let city = activityDetail?.locationCity ?? ""
             let state = activityDetail?.locationState ?? ""
@@ -1909,6 +1966,7 @@ struct StatWidgetContentView: View {
             }
         }
         .fixedSize(horizontal: true, vertical: true)
+        .drawingGroup()
 
         return Group {
             switch bvtEffect {
@@ -2022,11 +2080,13 @@ struct StatWidgetContentView: View {
                 textContent
                     .overlay {
                         Canvas { context, size in
-                            for _ in 0..<300 {
-                                let x = CGFloat.random(in: 0...size.width)
-                                let y = CGFloat.random(in: 0...size.height)
+                            var rng = SplitMix64(seed: 42)
+                            for _ in 0..<120 {
+                                let x = CGFloat(rng.nextDouble()) * size.width
+                                let y = CGFloat(rng.nextDouble()) * size.height
+                                let opacity = 0.1 + rng.nextDouble() * 0.5
                                 let rect = CGRect(x: x, y: y, width: 2, height: 2)
-                                context.fill(Path(rect), with: .color(primaryColor.opacity(Double.random(in: 0.1...0.6))))
+                                context.fill(Path(rect), with: .color(primaryColor.opacity(opacity)))
                             }
                         }
                         .allowsHitTesting(false)
@@ -2177,6 +2237,7 @@ struct DraggableStatWidget: View {
 
     var body: some View {
         widgetContent
+            .equatable()
             .onGeometryChange(for: CGSize.self, of: \.size) { newSize in
                 if newSize.width > 0, newSize.height > 0 {
                     measuredSize = newSize
@@ -2313,7 +2374,7 @@ extension DraggableStatWidget {
         return rotatedBoundingBox(size: scaledSize, rotation: widget.rotation + liveRotation)
     }
 
-    private var widgetContent: some View {
+    private var widgetContent: StatWidgetContentView {
         StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect)
     }
 }
