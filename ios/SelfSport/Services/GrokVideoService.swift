@@ -223,6 +223,11 @@ final class GrokVideoService {
             throw VideoGenerationError.networkError
         }
 
+        if httpResponse.statusCode == 202 {
+            let pending = try? JSONDecoder().decode(XAIVideoStatusResponse.self, from: data)
+            return XAIVideoStatusResponse(status: pending?.status ?? "pending", video: nil, error: nil)
+        }
+
         guard httpResponse.statusCode == 200 else {
             let responseBody = String(data: data, encoding: .utf8) ?? ""
             throw VideoGenerationError.serverError("Poll HTTP \(httpResponse.statusCode): \(String(responseBody.prefix(200)))")
