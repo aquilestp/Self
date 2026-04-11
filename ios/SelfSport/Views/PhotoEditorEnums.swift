@@ -290,8 +290,7 @@ struct PlacedWidget: Identifiable {
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
-    case none = 0
-    case blur
+    case blur = 0
     case glow
     case stroke
     case gradient
@@ -310,7 +309,6 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .none: return "None"
         case .blur: return "Blur"
         case .glow: return "Glow"
         case .stroke: return "Stroke"
@@ -330,7 +328,6 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
-        case .none: return "circle.dashed"
         case .blur: return "aqi.medium"
         case .glow: return "sparkle"
         case .stroke: return "character.textbox"

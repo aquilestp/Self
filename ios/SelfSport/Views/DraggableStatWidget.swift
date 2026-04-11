@@ -1973,8 +1973,6 @@ struct StatWidgetContentView: View, Equatable {
 
         return Group {
             switch bvtEffect {
-            case .none:
-                textContent
             case .blur:
                 textContent
                     .padding(.horizontal, 14)
