@@ -1954,6 +1954,123 @@ struct StatWidgetContentView: View {
                     }
                 }
                 .fixedSize(horizontal: true, vertical: true)
+            case .glitch:
+                ZStack {
+                    VStack(alignment: .leading, spacing: -2) {
+                        ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
+                            Text(line)
+                                .font(mainFont)
+                                .foregroundStyle(Color.red.opacity(0.7))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                        }
+                    }
+                    .fixedSize(horizontal: true, vertical: true)
+                    .offset(x: -3, y: -1)
+                    .blendMode(.screen)
+                    VStack(alignment: .leading, spacing: -2) {
+                        ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
+                            Text(line)
+                                .font(mainFont)
+                                .foregroundStyle(Color.blue.opacity(0.7))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                        }
+                    }
+                    .fixedSize(horizontal: true, vertical: true)
+                    .offset(x: 3, y: 1)
+                    .blendMode(.screen)
+                    VStack(alignment: .leading, spacing: -2) {
+                        ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
+                            Text(line)
+                                .font(mainFont)
+                                .foregroundStyle(Color.green.opacity(0.7))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                        }
+                    }
+                    .fixedSize(horizontal: true, vertical: true)
+                    .offset(x: 1, y: -2)
+                    .blendMode(.screen)
+                    textContent
+                        .opacity(0.5)
+                }
+            case .wave:
+                VStack(alignment: .leading, spacing: -2) {
+                    ForEach(Array(visibleLines.enumerated()), id: \.offset) { idx, line in
+                        bvtStyledLine(line, font: mainFont)
+                            .offset(x: sin(Double(idx) * 1.2) * 8)
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: true)
+            case .pixelate:
+                textContent
+                    .drawingGroup()
+                    .blur(radius: 1.5)
+                    .scaleEffect(x: 0.35, y: 0.35, anchor: .topLeading)
+                    .scaleEffect(x: 1.0 / 0.35, y: 1.0 / 0.35, anchor: .topLeading)
+            case .lineBlur:
+                VStack(alignment: .leading, spacing: -2) {
+                    ForEach(Array(visibleLines.enumerated()), id: \.offset) { idx, line in
+                        let blurAmount: CGFloat = idx % 3 == 0 ? 0 : (idx % 3 == 1 ? 2.5 : 4.5)
+                        bvtStyledLine(line, font: mainFont)
+                            .blur(radius: blurAmount)
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: true)
+            case .noise:
+                textContent
+                    .overlay {
+                        Canvas { context, size in
+                            for _ in 0..<300 {
+                                let x = CGFloat.random(in: 0...size.width)
+                                let y = CGFloat.random(in: 0...size.height)
+                                let rect = CGRect(x: x, y: y, width: 2, height: 2)
+                                context.fill(Path(rect), with: .color(primaryColor.opacity(Double.random(in: 0.1...0.6))))
+                            }
+                        }
+                        .allowsHitTesting(false)
+                        .blendMode(.overlay)
+                    }
+            case .stretch:
+                textContent
+                    .scaleEffect(x: 1.0, y: 1.6, anchor: .top)
+            case .skew:
+                textContent
+                    .transformEffect(CGAffineTransform(a: 1, b: 0, c: -0.35, d: 1, tx: 0, ty: 0))
+            case .tracking:
+                VStack(alignment: .leading, spacing: -2) {
+                    ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
+                        Text(line)
+                            .font(mainFont)
+                            .tracking(12)
+                            .foregroundStyle(primaryColor)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: true)
+            case .gradientMask:
+                textContent
+                    .mask {
+                        LinearGradient(
+                            stops: [
+                                .init(color: .white, location: 0),
+                                .init(color: .white, location: 0.5),
+                                .init(color: .clear, location: 1.0)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    }
+            case .echo:
+                ZStack(alignment: .topLeading) {
+                    textContent.opacity(0.1).offset(x: 8, y: 8)
+                    textContent.opacity(0.15).offset(x: 6, y: 6)
+                    textContent.opacity(0.25).offset(x: 4, y: 4)
+                    textContent.opacity(0.4).offset(x: 2, y: 2)
+                    textContent
+                }
             }
         }
     }

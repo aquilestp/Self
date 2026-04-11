@@ -292,6 +292,16 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
     case glow
     case stroke
     case gradient
+    case glitch
+    case wave
+    case pixelate
+    case lineBlur
+    case noise
+    case stretch
+    case skew
+    case tracking
+    case gradientMask
+    case echo
 
     var id: Int { rawValue }
 
@@ -302,6 +312,16 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
         case .glow: return "Glow"
         case .stroke: return "Stroke"
         case .gradient: return "Gradient"
+        case .glitch: return "Glitch"
+        case .wave: return "Wave"
+        case .pixelate: return "Pixel"
+        case .lineBlur: return "Line Blur"
+        case .noise: return "Noise"
+        case .stretch: return "Stretch"
+        case .skew: return "Skew"
+        case .tracking: return "Tracking"
+        case .gradientMask: return "Fade"
+        case .echo: return "Echo"
         }
     }
 
@@ -312,6 +332,16 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
         case .glow: return "sparkle"
         case .stroke: return "character.textbox"
         case .gradient: return "paintbrush.fill"
+        case .glitch: return "tv"
+        case .wave: return "water.waves"
+        case .pixelate: return "square.grid.3x3.fill"
+        case .lineBlur: return "line.3.horizontal.decrease"
+        case .noise: return "antenna.radiowaves.left.and.right"
+        case .stretch: return "arrow.up.and.down"
+        case .skew: return "italic"
+        case .tracking: return "arrow.left.and.right"
+        case .gradientMask: return "rectangle.lefthalf.filled"
+        case .echo: return "square.stack.fill"
         }
     }
 

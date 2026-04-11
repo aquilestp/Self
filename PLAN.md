@@ -1,29 +1,32 @@
-# Efectos visuales para el stat "Blurred Vertical"
+# Agregar 10 nuevos efectos visuales al stat BVT
 
-## Descripción
-Agregar un sistema de efectos visuales al stat "Blurred Vertical" con 5 opciones de efecto, controlable desde la paleta flotante. Por defecto, el stat se agrega con el efecto **Blur de fondo**.
+## Features
 
----
+Se agregarán **10 nuevos efectos** al stat BVT, además de los 4 existentes (Blur, Glow, Stroke, Gradient):
 
-## Efectos disponibles
-1. **None** — Texto plano, sin efecto (como está ahora)
-2. **Blur** *(por defecto)* — Un rectángulo difuminado semi-transparente detrás del bloque de texto, dándole profundidad y legibilidad sobre la foto
-3. **Glow** — Resplandor suave alrededor de cada línea de texto, usando el color del widget
-4. **Stroke** — Contorno/outline alrededor de las letras en un color contrastante (negro si el texto es claro, blanco si es oscuro)
-5. **Gradient** — El texto se rellena con un degradado vertical usando el color del widget y una versión más clara/oscura
+1. **Glitch / Chromatic Split** — Texto con capas RGB separadas con diferentes desplazamientos, efecto cyberpunk/glitch
+2. **Wave / Ondulación** — Cada línea de texto con un desplazamiento horizontal sinusoidal progresivo
+3. **Pixelación** — Texto con efecto de baja resolución/pixelado
+4. **Blur por línea** — Algunas líneas del texto más borrosas que otras, creando profundidad
+5. **Noise / Estática** — Overlay de puntos aleatorios sobre el texto tipo señal de TV
+6. **Stretch** — Deformación vertical del texto (texto estirado/comprimido)
+7. **Skew** — Inclinación exagerada tipo poster tipográfico
+8. **Tracking** — Espaciado entre letras muy expandido
+9. **Gradient Mask** — Texto que se desvanece progresivamente con un gradiente
+10. **Echo / Stacked** — Múltiples copias del texto con offsets y opacidades decrecientes, efecto eco/sombra repetida
 
----
+## Design
 
-## Diseño del control en la paleta
-- Un nuevo botón circular en la paleta flotante (al inicio, antes de las unidades)
-- Muestra un ícono representando el efecto activo (sparkles, blur, glow, etc.)
-- Cada tap cicla al siguiente efecto: None → Blur → Glow → Stroke → Gradient → None...
-- Se anima suavemente como los demás botones de la paleta
+- Cada efecto tiene un icono SF Symbol representativo en el botón del editor
+- Los efectos se recorren con el botón circular existente (tap para siguiente efecto)
+- Los efectos Wave y Pixelación usarán Metal shaders para renderizado GPU nativo
+- El efecto Noise usará Canvas de SwiftUI para generar la estática
+- Los demás efectos se logran con SwiftUI puro (offsets, opacidades, blur, tracking, scaleEffect, rotation3DEffect, mask)
+- Los colores de cada efecto respetan el color primario seleccionado por el usuario
 
----
+## Cambios
 
-## Comportamiento
-- Al agregar el stat desde el drawer, viene con efecto **Blur** preseleccionado
-- El efecto se aplica a todo el bloque de texto del stat
-- El efecto respeta el color elegido del widget
-- Los efectos se guardan por widget individual (cada stat puede tener su propio efecto)
+- Se amplía el enum `BVTEffect` con los 10 nuevos casos
+- Se agregan las ramas de renderizado correspondientes en el widget
+- Se crean 2 archivos Metal (.metal) para los shaders de Wave y Pixelación
+- Se actualiza el botón de efecto en el editor para recorrer todos los efectos
