@@ -102,11 +102,13 @@ serve(async (req) => {
 
       const result = await xaiResponse.json();
 
-      const response: Record<string, string> = {
+      const response = {
         status: result.status,
+        video_url: "",
+        error: "",
       };
 
-      if (result.status === "done" && result.video?.url) {
+      if (result.status === "done" && result.video && result.video.url) {
         response.video_url = result.video.url;
       }
 
