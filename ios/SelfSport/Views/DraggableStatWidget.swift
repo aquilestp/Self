@@ -2193,16 +2193,12 @@ struct StatWidgetContentView: View, Equatable {
         let waCheckBlue = Color(red: 0.33, green: 0.75, blue: 0.98)
         let waTimeColor = Color.white.opacity(0.55)
 
-        return HStack(alignment: .bottom, spacing: 0) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(whatsappText)
-                    .font(.system(size: 16))
-                    .foregroundStyle(.white)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: 220, alignment: .leading)
-            }
-
-            Spacer(minLength: 12)
+        return VStack(alignment: .trailing, spacing: 2) {
+            Text(whatsappText)
+                .font(.system(size: 16))
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: 240, alignment: .leading)
 
             HStack(spacing: 3) {
                 Text(timeText)
@@ -2219,10 +2215,10 @@ struct StatWidgetContentView: View, Equatable {
                     )
                     .padding(.trailing, 4)
             }
-            .padding(.bottom, 1)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
+        .fixedSize()
         .background(
             WhatsAppBubbleShape()
                 .fill(waBubbleGreen)
