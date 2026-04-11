@@ -2,27 +2,34 @@ import Foundation
 import UIKit
 import Supabase
 
-nonisolated struct VideoGenerationResponse: Codable, Sendable {
+nonisolated struct XAIVideoStartResponse: Codable, Sendable {
     let requestId: String?
-    let error: String?
-    let details: String?
+    let error: XAIVideoError?
+
+    nonisolated struct XAIVideoError: Codable, Sendable {
+        let code: String?
+        let message: String?
+    }
 
     nonisolated enum CodingKeys: String, CodingKey {
         case requestId = "request_id"
         case error
-        case details
     }
 }
 
-nonisolated struct VideoStatusResponse: Codable, Sendable {
-    let status: String
-    let videoUrl: String?
-    let error: String?
+nonisolated struct XAIVideoStatusResponse: Codable, Sendable {
+    let status: String?
+    let video: XAIVideo?
+    let error: XAIVideoStatusError?
 
-    nonisolated enum CodingKeys: String, CodingKey {
-        case status
-        case videoUrl = "video_url"
-        case error
+    nonisolated struct XAIVideo: Codable, Sendable {
+        let url: String?
+        let duration: Double?
+    }
+
+    nonisolated struct XAIVideoStatusError: Codable, Sendable {
+        let code: String?
+        let message: String?
     }
 }
 
@@ -32,6 +39,7 @@ nonisolated enum VideoGenerationError: Error, LocalizedError, Sendable {
     case serverError(String)
     case expired
     case cancelled
+    case missingAPIKey
 
     nonisolated var errorDescription: String? {
         switch self {
@@ -45,6 +53,8 @@ nonisolated enum VideoGenerationError: Error, LocalizedError, Sendable {
             return "Video generation expired. Please try again."
         case .cancelled:
             return "Video generation was cancelled"
+        case .missingAPIKey:
+            return "Video generation is not configured"
         }
     }
 }
@@ -54,18 +64,10 @@ final class GrokVideoService {
     private let maxPollingDuration: TimeInterval = 300.0
     private(set) var videoStyles: [VideoStylePrompt] = []
 
-    private var supabaseBaseURL: String {
-        Config.EXPO_PUBLIC_SUPABASE_URL.isEmpty
-            ? "https://placeholder.supabase.co"
-            : Config.EXPO_PUBLIC_SUPABASE_URL
-    }
+    private let xaiBaseURL = "https://api.x.ai/v1"
 
-    private var functionBaseURL: String {
-        "\(supabaseBaseURL)/functions/v1/grok-video-generate"
-    }
-
-    private var anonKey: String {
-        Config.EXPO_PUBLIC_SUPABASE_ANON_KEY
+    private var apiKey: String {
+        Config.EXPO_PUBLIC_XAI_API_KEY
     }
 
     func loadVideoStyles() async {
@@ -100,30 +102,37 @@ final class GrokVideoService {
     }
 
     func startGeneration(image: UIImage, prompt: String? = nil) async throws -> String {
+        guard !apiKey.isEmpty else {
+            throw VideoGenerationError.missingAPIKey
+        }
+
         let resized = resizedImage(image)
         guard let jpegData = resized.jpegData(compressionQuality: 0.6) else {
             throw VideoGenerationError.imageConversionFailed
         }
 
         let base64String = jpegData.base64EncodedString()
+        let dataURI = "data:image/jpeg;base64,\(base64String)"
 
-        let url = URL(string: functionBaseURL)!
+        let url = URL(string: "\(xaiBaseURL)/videos/generations")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(anonKey)", forHTTPHeaderField: "Authorization")
-        request.setValue(anonKey, forHTTPHeaderField: "apikey")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = 120
 
         var body: [String: Any] = [
-            "image_base64": base64String
+            "model": "grok-imagine-video",
+            "image": ["url": dataURI],
+            "duration": 8,
+            "resolution": "720p"
         ]
         if let prompt, !prompt.isEmpty {
             body["prompt"] = prompt
         }
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        print("[GrokVideo] Sending base64 image (\(base64String.count) chars) to edge function")
+        print("[GrokVideo] Calling xAI directly, image size: \(base64String.count) chars")
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
@@ -131,19 +140,19 @@ final class GrokVideoService {
             throw VideoGenerationError.networkError
         }
 
-        let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
-        print("[GrokVideo] Response HTTP \(httpResponse.statusCode): \(String(responseBody.prefix(300)))")
+        let responseBody = String(data: data, encoding: .utf8) ?? "No body"
+        print("[GrokVideo] HTTP \(httpResponse.statusCode): \(String(responseBody.prefix(500)))")
 
         guard httpResponse.statusCode == 200 else {
-            let decoded = try? JSONDecoder().decode(VideoGenerationResponse.self, from: data)
-            let detail = decoded?.details ?? decoded?.error ?? String(responseBody.prefix(300))
+            let decoded = try? JSONDecoder().decode(XAIVideoStartResponse.self, from: data)
+            let detail = decoded?.error?.message ?? String(responseBody.prefix(300))
             throw VideoGenerationError.serverError("HTTP \(httpResponse.statusCode): \(detail)")
         }
 
-        let decoded = try JSONDecoder().decode(VideoGenerationResponse.self, from: data)
+        let decoded = try JSONDecoder().decode(XAIVideoStartResponse.self, from: data)
 
         guard let requestId = decoded.requestId else {
-            throw VideoGenerationError.serverError(decoded.error ?? "No request ID returned")
+            throw VideoGenerationError.serverError(decoded.error?.message ?? "No request ID returned")
         }
 
         print("[GrokVideo] Got request_id: \(requestId)")
@@ -164,17 +173,19 @@ final class GrokVideoService {
             try Task.checkCancellation()
 
             let status = try await checkStatus(requestId: requestId)
-            print("[GrokVideo] Poll status: \(status.status)")
+            let statusStr = status.status ?? "unknown"
+            print("[GrokVideo] Poll status: \(statusStr)")
 
-            switch status.status {
+            switch statusStr {
             case "done":
-                guard let urlString = status.videoUrl,
+                guard let urlString = status.video?.url,
                       let url = URL(string: urlString) else {
                     throw VideoGenerationError.serverError("No video URL in response")
                 }
                 return url
-            case "expired":
-                throw VideoGenerationError.expired
+            case "failed":
+                let msg = status.error?.message ?? "Video generation failed"
+                throw VideoGenerationError.serverError(msg)
             default:
                 continue
             }
@@ -195,14 +206,15 @@ final class GrokVideoService {
         return fileURL
     }
 
-    private func checkStatus(requestId: String) async throws -> VideoStatusResponse {
-        var components = URLComponents(string: functionBaseURL)!
-        components.queryItems = [URLQueryItem(name: "request_id", value: requestId)]
+    private func checkStatus(requestId: String) async throws -> XAIVideoStatusResponse {
+        guard !apiKey.isEmpty else {
+            throw VideoGenerationError.missingAPIKey
+        }
 
-        var request = URLRequest(url: components.url!)
+        let url = URL(string: "\(xaiBaseURL)/videos/\(requestId)")!
+        var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(anonKey)", forHTTPHeaderField: "Authorization")
-        request.setValue(anonKey, forHTTPHeaderField: "apikey")
+        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.timeoutInterval = 30
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -216,6 +228,6 @@ final class GrokVideoService {
             throw VideoGenerationError.serverError("Poll HTTP \(httpResponse.statusCode): \(String(responseBody.prefix(200)))")
         }
 
-        return try JSONDecoder().decode(VideoStatusResponse.self, from: data)
+        return try JSONDecoder().decode(XAIVideoStatusResponse.self, from: data)
     }
 }
