@@ -93,6 +93,8 @@ struct PhotoEditorView: View {
     @State private var activityDetail: StravaActivityDetail? = nil
     @State private var isLoadingDetail: Bool = false
     @State private var detailFetchTask: Task<Void, Never>? = nil
+    @State private var showWhatsappTextEdit: Bool = false
+    @State private var whatsappEditingText: String = ""
     let grokService = GrokImageEditService()
     private let cityFilterService = CityFilterService()
     private let weeklyKmService = WeeklyKmService()
@@ -662,6 +664,20 @@ struct PhotoEditorView: View {
         } message: {
             Text("Your editing progress will be lost.")
         }
+        .alert("Edit Message", isPresented: $showWhatsappTextEdit) {
+            TextField("Message", text: $whatsappEditingText)
+            Button("Save") {
+                guard let id = paletteTargetWidgetId,
+                      let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                let trimmed = whatsappEditingText.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty {
+                    placedWidgets[idx].whatsappText = trimmed
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Type your WhatsApp message")
+        }
         .alert("Photo Saved!", isPresented: $showSavedAlert) {
             Button("View in Photos") {
                 if let url = URL(string: "photos-redirect://") {
@@ -798,6 +814,7 @@ struct PhotoEditorView: View {
         let targetBvtShowBPM = targetWidget?.bvtShowBPM ?? true
         let targetBvtUnitFilter = targetWidget?.bvtUnitFilter ?? .km
         let targetBvtEffect = targetWidget?.bvtEffect ?? .blur
+        let targetIsWhatsapp = targetWidget?.type == .whatsappMessage
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
         } ?? "5:30"
@@ -1317,6 +1334,42 @@ struct PhotoEditorView: View {
                     hapticLight.impactOccurred()
                     resetPaletteHideTimer()
                 }
+            }
+
+            if targetIsWhatsapp {
+                Rectangle()
+                    .fill(Color.white.opacity(0.12))
+                    .frame(width: 20, height: 1)
+                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                    .opacity(showPaletteSelector ? 1 : 0)
+                    .animation(
+                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04),
+                        value: showPaletteSelector
+                    )
+
+                Button {
+                    guard let id = paletteTargetWidgetId,
+                          let widget = placedWidgets.first(where: { $0.id == id }) else { return }
+                    whatsappEditingText = widget.whatsappText
+                    showWhatsappTextEdit = true
+                    resetPaletteHideTimer()
+                } label: {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .frame(width: 36, height: 36)
+                        .background(Color(red: 0.00, green: 0.37, blue: 0.33), in: Circle())
+                        .overlay(
+                            Circle().stroke(Color.white.opacity(0.3), lineWidth: 0.5)
+                        )
+                }
+                .buttonStyle(.plain)
+                .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                .opacity(showPaletteSelector ? 1 : 0)
+                .animation(
+                    .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.06),
+                    value: showPaletteSelector
+                )
             }
 
             if targetSupportsFontStyle {
@@ -2379,7 +2432,7 @@ struct PhotoEditorView: View {
             activeFilterOverlay(size: canvasSize)
 
             ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect)
+                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText)
                     .scaleEffect(widget.scale)
                     .rotationEffect(widget.rotation)
                     .offset(x: widget.position.width, y: widget.position.height)

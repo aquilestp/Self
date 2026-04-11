@@ -71,7 +71,8 @@ struct StatWidgetContentView: View, Equatable {
         lhs.bvtShowCalories == rhs.bvtShowCalories &&
         lhs.bvtShowBPM == rhs.bvtShowBPM &&
         lhs.bvtUnitFilter == rhs.bvtUnitFilter &&
-        lhs.bvtEffect == rhs.bvtEffect
+        lhs.bvtEffect == rhs.bvtEffect &&
+        lhs.whatsappText == rhs.whatsappText
     }
 
     let type: StatWidgetType
@@ -112,6 +113,7 @@ struct StatWidgetContentView: View, Equatable {
     var bvtShowBPM: Bool = true
     var bvtUnitFilter: SplitsUnitFilter = .km
     var bvtEffect: BVTEffect = .blur
+    var whatsappText: String = "My coach would be proud"
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -164,6 +166,7 @@ struct StatWidgetContentView: View, Equatable {
         case .fullBanner: fullBannerWidget
         case .fullBannerBottom: fullBannerBottomWidget
         case .blurredVerticalText: blurredVerticalTextWidget
+        case .whatsappMessage: whatsappMessageWidget
         }
     }
 
@@ -2177,6 +2180,55 @@ struct StatWidgetContentView: View, Equatable {
             )
     }
 
+    private static let waTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "h:mm a"
+        return f
+    }()
+
+    private var whatsappMessageWidget: some View {
+        let timeText = activity.startDate.map { Self.waTimeFormatter.string(from: $0) } ?? "9:54 PM"
+        let waGreen = Color(red: 0.00, green: 0.45, blue: 0.34)
+        let waBubbleGreen = Color(red: 0.00, green: 0.37, blue: 0.33)
+        let waCheckBlue = Color(red: 0.33, green: 0.75, blue: 0.98)
+        let waTimeColor = Color.white.opacity(0.55)
+
+        return HStack(alignment: .bottom, spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(whatsappText)
+                    .font(.system(size: 16))
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: 220, alignment: .leading)
+            }
+
+            Spacer(minLength: 12)
+
+            HStack(spacing: 3) {
+                Text(timeText)
+                    .font(.system(size: 11))
+                    .foregroundStyle(waTimeColor)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(waCheckBlue)
+                    .overlay(
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(waCheckBlue)
+                            .offset(x: 4)
+                    )
+                    .padding(.trailing, 4)
+            }
+            .padding(.bottom, 1)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(
+            WhatsAppBubbleShape()
+                .fill(waBubbleGreen)
+        )
+    }
+
     private func topRowStatColumn(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
@@ -2202,6 +2254,27 @@ struct StatWidgetContentView: View, Equatable {
                 .foregroundStyle(primaryColor)
                 .minimumScaleFactor(0.8)
         }
+    }
+}
+
+nonisolated struct WhatsAppBubbleShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let cr: CGFloat = 16
+        let tailW: CGFloat = 8
+        let tailH: CGFloat = 12
+        var p = Path()
+        let mainRect = CGRect(x: rect.minX, y: rect.minY, width: rect.width - tailW, height: rect.height)
+        p.addRoundedRect(in: mainRect, cornerSize: CGSize(width: cr, height: cr))
+        p.move(to: CGPoint(x: mainRect.maxX - 2, y: mainRect.maxY - 8))
+        p.addQuadCurve(
+            to: CGPoint(x: rect.maxX, y: mainRect.maxY + tailH - 8),
+            control: CGPoint(x: mainRect.maxX + 2, y: mainRect.maxY - 2)
+        )
+        p.addQuadCurve(
+            to: CGPoint(x: mainRect.maxX - 6, y: mainRect.maxY),
+            control: CGPoint(x: mainRect.maxX - 1, y: mainRect.maxY + 2)
+        )
+        return p
     }
 }
 
@@ -2375,7 +2448,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText)
     }
 }
 

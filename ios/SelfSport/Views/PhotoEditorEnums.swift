@@ -37,6 +37,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case fullBanner = "Full Banner"
     case fullBannerBottom = "Full Banner Bottom"
     case blurredVerticalText = "Blurred Vertical"
+    case whatsappMessage = "WhatsApp"
 
     var id: String { rawValue }
 
@@ -72,12 +73,13 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .fullBanner: return "rectangle.fill"
         case .fullBannerBottom: return "rectangle.bottomhalf.filled"
         case .blurredVerticalText: return "list.bullet"
+        case .whatsappMessage: return "bubble.right.fill"
         }
     }
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage:
             return false
         default:
             return true
@@ -284,6 +286,7 @@ struct PlacedWidget: Identifiable {
     var bvtShowBPM: Bool = true
     var bvtUnitFilter: SplitsUnitFilter = .km
     var bvtEffect: BVTEffect = .blur
+    var whatsappText: String = "My coach would be proud"
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {

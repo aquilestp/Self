@@ -297,6 +297,8 @@ extension PhotoEditorView {
             miniFullBannerBottom
         case .blurredVerticalText:
             miniBlurredVerticalText
+        case .whatsappMessage:
+            miniWhatsappMessage
         }
     }
 
@@ -803,6 +805,27 @@ extension PhotoEditorView {
             .frame(maxWidth: .infinity)
         }
         .padding(.horizontal, 12)
+    }
+
+    var miniWhatsappMessage: some View {
+        HStack(alignment: .bottom, spacing: 3) {
+            Text("My coach would be proud")
+                .font(.system(size: 5))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+            Text("9:54")
+                .font(.system(size: 3.5))
+                .foregroundStyle(.white.opacity(0.5))
+            Image(systemName: "checkmark")
+                .font(.system(size: 3, weight: .bold))
+                .foregroundStyle(Color(red: 0.33, green: 0.75, blue: 0.98))
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(Color(red: 0.00, green: 0.37, blue: 0.33))
+        )
     }
 
     var miniBlurredVerticalText: some View {
