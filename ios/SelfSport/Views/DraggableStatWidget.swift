@@ -1971,13 +1971,20 @@ struct StatWidgetContentView: View, Equatable {
         .fixedSize(horizontal: true, vertical: true)
         .drawingGroup()
 
-        return Group {
-            switch bvtEffect {
-            case .blur:
-                textContent
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(
+        let gestureAnchor = textContent
+            .hidden()
+            .padding(20)
+
+        return ZStack {
+            gestureAnchor
+
+            Group {
+                switch bvtEffect {
+                case .blur:
+                    textContent
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(
                         RoundedRectangle(cornerRadius: 12)
                             .fill(.ultraThinMaterial)
                             .opacity(0.85)
@@ -2132,6 +2139,7 @@ struct StatWidgetContentView: View, Equatable {
                     textContent.opacity(0.4).offset(x: 2, y: 2)
                     textContent
                 }
+            }
             }
         }
     }
