@@ -7,7 +7,7 @@ struct VideoGenerationView: View {
     let onDiscard: () -> Void
     let onKeep: () -> Void
 
-    @State private var phase: VideoGenPhase = .generating
+    @State private var phase: VideoGenPhase = .selectStyle
     @State private var videoLocalURL: URL? = nil
     @State private var videoTask: Task<Void, Never>? = nil
     @State private var appeared: Bool = false
@@ -23,6 +23,8 @@ struct VideoGenerationView: View {
     @State private var elapsedTimer: Timer? = nil
     @State private var player: AVPlayer? = nil
     @State private var playerLooper: Any? = nil
+    @State private var selectedStyle: VideoStylePrompt? = nil
+    @State private var isLoadingStyles: Bool = true
 
     private let videoService = GrokVideoService()
     private let glowColors: [Color] = [
@@ -38,6 +40,8 @@ struct VideoGenerationView: View {
             Color.black.ignoresSafeArea()
 
             switch phase {
+            case .selectStyle:
+                styleSelectionContent
             case .generating:
                 generatingContent
             case .done:
@@ -47,10 +51,7 @@ struct VideoGenerationView: View {
         .statusBarHidden()
         .onAppear {
             withAnimation(.easeOut(duration: 0.5)) { appeared = true }
-            startGeneration()
-            startDotAnimation()
-            startElapsedTimer()
-            startGlowAnimation()
+            Task { await loadStyles() }
         }
         .onDisappear {
             videoTask?.cancel()
@@ -70,6 +71,142 @@ struct VideoGenerationView: View {
         } message: {
             Text("Your video has been saved to the photo library.")
         }
+    }
+
+    // MARK: - Style Selection
+
+    private var styleSelectionContent: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button {
+                    onDiscard()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.7))
+                        .frame(width: 36, height: 36)
+                        .background(.white.opacity(0.1), in: .circle)
+                }
+                .buttonStyle(.plain)
+                .padding(.leading, 20)
+                .padding(.top, 16)
+                Spacer()
+            }
+
+            Spacer()
+
+            ZStack {
+                Image(uiImage: previewImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 40)
+                    .blur(radius: 6)
+                    .opacity(0.5)
+
+                Image(uiImage: previewImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 40)
+                    .clipShape(.rect(cornerRadius: 16))
+            }
+            .scaleEffect(appeared ? 1.0 : 0.92)
+            .opacity(appeared ? 1.0 : 0.0)
+
+            VStack(spacing: 16) {
+                Text("Choose animation style")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.top, 24)
+
+                if isLoadingStyles {
+                    ProgressView()
+                        .tint(.white)
+                        .frame(height: 80)
+                } else {
+                    styleGrid
+                }
+            }
+
+            Spacer()
+
+            Button {
+                startGeneration()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 14, weight: .bold))
+                    Text(selectedStyle == nil ? "Auto Animate" : "Generate")
+                        .font(.system(size: 16, weight: .semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.28), Color.white.opacity(0.18)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    in: .rect(cornerRadius: 14)
+                )
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 50)
+        }
+    }
+
+    private var styleGrid: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                styleChip(label: "Auto", icon: "wand.and.stars", isSelected: selectedStyle == nil) {
+                    selectedStyle = nil
+                }
+
+                ForEach(videoService.videoStyles) { style in
+                    styleChip(
+                        label: style.displayName,
+                        icon: style.icon,
+                        isSelected: selectedStyle?.id == style.id
+                    ) {
+                        if selectedStyle?.id == style.id {
+                            selectedStyle = nil
+                        } else {
+                            selectedStyle = style
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .contentMargins(.horizontal, 0)
+    }
+
+    private func styleChip(label: String, icon: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                    .font(.system(size: 13, weight: .medium))
+                Text(label)
+                    .font(.system(size: 14, weight: .medium))
+            }
+            .foregroundStyle(isSelected ? .black : .white.opacity(0.85))
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(
+                isSelected
+                    ? AnyShapeStyle(.white)
+                    : AnyShapeStyle(.white.opacity(0.1)),
+                in: .capsule
+            )
+            .overlay(
+                Capsule()
+                    .stroke(.white.opacity(isSelected ? 0 : 0.15), lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Generating
@@ -123,8 +260,6 @@ struct VideoGenerationView: View {
                             .padding(.horizontal, 24)
                     )
             }
-            .scaleEffect(appeared ? 1.0 : 0.92)
-            .opacity(appeared ? 1.0 : 0.0)
 
             VStack(spacing: 8) {
                 HStack(spacing: 0) {
@@ -135,6 +270,12 @@ struct VideoGenerationView: View {
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(width: 30, alignment: .leading)
+                }
+
+                if let style = selectedStyle {
+                    Text(style.displayName)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.5))
                 }
 
                 Text(elapsedText)
@@ -244,13 +385,25 @@ struct VideoGenerationView: View {
 
     // MARK: - Logic
 
+    private func loadStyles() async {
+        await videoService.loadVideoStyles()
+        isLoadingStyles = false
+    }
+
     private func startGeneration() {
-        phase = .generating
+        let prompt = selectedStyle?.promptTemplate
+
+        withAnimation(.easeInOut(duration: 0.4)) {
+            phase = .generating
+        }
         elapsedSeconds = 0
+        startDotAnimation()
+        startElapsedTimer()
+        startGlowAnimation()
 
         videoTask = Task {
             do {
-                let requestId = try await videoService.startGeneration(image: previewImage)
+                let requestId = try await videoService.startGeneration(image: previewImage, prompt: prompt)
                 try Task.checkCancellation()
 
                 let remoteURL = try await videoService.pollUntilDone(requestId: requestId)
@@ -357,6 +510,7 @@ struct VideoGenerationView: View {
 }
 
 nonisolated enum VideoGenPhase: Sendable {
+    case selectStyle
     case generating
     case done
 }

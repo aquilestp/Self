@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import Supabase
 
 nonisolated struct VideoGenerationResponse: Codable, Sendable {
     let requestId: String?
@@ -55,6 +56,7 @@ final class GrokVideoService {
     private let pollingInterval: TimeInterval = 5.0
     private let maxPollingDuration: TimeInterval = 300.0
     private var uploadedImagePath: String?
+    private(set) var videoStyles: [VideoStylePrompt] = []
 
     private var supabaseBaseURL: String {
         Config.EXPO_PUBLIC_SUPABASE_URL.isEmpty
@@ -70,6 +72,25 @@ final class GrokVideoService {
         Config.EXPO_PUBLIC_SUPABASE_ANON_KEY
     }
 
+    func loadVideoStyles() async {
+        do {
+            let rows: [VideoStylePrompt] = try await supabase
+                .from("video_style_prompts")
+                .select()
+                .eq("is_active", value: true)
+                .order("sort_order")
+                .execute()
+                .value
+            videoStyles = rows
+        } catch {
+            print("[GrokVideo] Failed to load video styles: \(error)")
+        }
+    }
+
+    func promptTemplate(for styleKey: String) -> String? {
+        videoStyles.first(where: { $0.styleKey == styleKey })?.promptTemplate
+    }
+
     private func resizedImage(_ image: UIImage, maxDimension: CGFloat = 1280) -> UIImage {
         let size = image.size
         let longestSide = max(size.width, size.height)
@@ -82,7 +103,7 @@ final class GrokVideoService {
         }
     }
 
-    func startGeneration(image: UIImage) async throws -> String {
+    func startGeneration(image: UIImage, prompt: String? = nil) async throws -> String {
         let resized = resizedImage(image)
         guard let jpegData = resized.jpegData(compressionQuality: 0.6) else {
             throw VideoGenerationError.imageConversionFailed
@@ -98,9 +119,12 @@ final class GrokVideoService {
         request.setValue(anonKey, forHTTPHeaderField: "apikey")
         request.timeoutInterval = 60
 
-        let body: [String: Any] = [
+        var body: [String: Any] = [
             "image_url": imageURL
         ]
+        if let prompt, !prompt.isEmpty {
+            body["prompt"] = prompt
+        }
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
