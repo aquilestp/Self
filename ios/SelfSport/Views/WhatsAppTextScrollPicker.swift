@@ -5,7 +5,7 @@ struct WhatsAppTextScrollPicker: View {
     let currentText: String
     let onSelectPreset: (String) -> Void
 
-    private let itemHeight: CGFloat = 33.5
+    private let itemHeight: CGFloat = 40
     private let visibleItems: Int = 5
 
     @State private var scrolledID: String?
@@ -71,8 +71,9 @@ struct WhatsAppTextScrollPicker: View {
         Text(text)
             .font(.system(size: isSelected ? 12 : 10, weight: isSelected ? .semibold : .regular))
             .foregroundStyle(isSelected ? .white : .white.opacity(0.45))
-            .lineLimit(1)
-            .fixedSize(horizontal: true, vertical: false)
+            .lineLimit(2)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 11)
             .padding(.vertical, 4)
             .background(

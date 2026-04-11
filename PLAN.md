@@ -1,7 +1,7 @@
-# Ajustar tamaño del selector de WhatsApp y ancho del stat
+# Fix WhatsApp bubble tail & allow two-line messages in selector
 
-**Cambios:**
+**Changes:**
 
-1. **Selector de mensajes de WhatsApp 7% más pequeño** — Reducir proporcionalmente todas las dimensiones del componente de scroll (altura de items, tamaño de fuente, padding, ancho total) en un 7%
+- **Remove the bubble tail (triangle):** Replace the custom `WhatsAppBubbleShape` (which draws a curved tail at the bottom-right) with a simple rounded rectangle. The WhatsApp message on the canvas will just be a clean rounded bubble with no tail/triangle.
 
-2. **Ancho correcto del stat "Pain is temporary, PRs are forever"** — Actualmente el widget de WhatsApp usa un `maxWidth: 240` fijo que deja espacio vacío a la derecha cuando el texto es corto. Se cambiará para que el ancho se ajuste al contenido real del texto, eliminando el espacio vacío innecesario
+- **Two-line text in the message selector:** Allow "My coach would be proud" and "Pain is temporary, PRs are forever" (and any other long messages) to wrap onto two lines in the scroll picker. Currently they are forced to a single line. Only the selector is affected — the canvas bubble stays as-is.

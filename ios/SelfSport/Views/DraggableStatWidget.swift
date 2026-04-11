@@ -2219,7 +2219,7 @@ struct StatWidgetContentView: View, Equatable {
         .padding(.vertical, 8)
         .fixedSize()
         .background(
-            WhatsAppBubbleShape()
+            RoundedRectangle(cornerRadius: 16)
                 .fill(waBubbleGreen)
         )
     }
