@@ -412,7 +412,6 @@ struct VideoGenerationView: View {
                 let localURL = try await videoService.downloadVideo(from: remoteURL)
                 try Task.checkCancellation()
 
-                videoService.cleanupTempImage()
                 videoLocalURL = localURL
                 dotTimer?.invalidate()
                 elapsedTimer?.invalidate()
@@ -430,7 +429,6 @@ struct VideoGenerationView: View {
             } catch is VideoGenerationError where Task.isCancelled {
                 return
             } catch {
-                videoService.cleanupTempImage()
                 guard !Task.isCancelled else { return }
                 HapticService.notification.notificationOccurred(.error)
                 errorMessage = error.localizedDescription

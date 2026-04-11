@@ -28,7 +28,6 @@ nonisolated struct VideoStatusResponse: Codable, Sendable {
 
 nonisolated enum VideoGenerationError: Error, LocalizedError, Sendable {
     case imageConversionFailed
-    case uploadFailed(String)
     case networkError
     case serverError(String)
     case expired
@@ -38,8 +37,6 @@ nonisolated enum VideoGenerationError: Error, LocalizedError, Sendable {
         switch self {
         case .imageConversionFailed:
             return "Failed to process the image"
-        case .uploadFailed(let message):
-            return "Failed to upload image: \(message)"
         case .networkError:
             return "Network connection error"
         case .serverError(let message):
@@ -55,7 +52,6 @@ nonisolated enum VideoGenerationError: Error, LocalizedError, Sendable {
 final class GrokVideoService {
     private let pollingInterval: TimeInterval = 5.0
     private let maxPollingDuration: TimeInterval = 300.0
-    private var uploadedImagePath: String?
     private(set) var videoStyles: [VideoStylePrompt] = []
 
     private var supabaseBaseURL: String {
@@ -109,7 +105,7 @@ final class GrokVideoService {
             throw VideoGenerationError.imageConversionFailed
         }
 
-        let imageURL = try await uploadImageToStorage(data: jpegData)
+        let base64String = jpegData.base64EncodedString()
 
         let url = URL(string: functionBaseURL)!
         var request = URLRequest(url: url)
@@ -117,15 +113,17 @@ final class GrokVideoService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(anonKey)", forHTTPHeaderField: "Authorization")
         request.setValue(anonKey, forHTTPHeaderField: "apikey")
-        request.timeoutInterval = 60
+        request.timeoutInterval = 120
 
         var body: [String: Any] = [
-            "image_url": imageURL
+            "image_base64": base64String
         ]
         if let prompt, !prompt.isEmpty {
             body["prompt"] = prompt
         }
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        print("[GrokVideo] Sending base64 image (\(base64String.count) chars) to edge function")
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
@@ -133,8 +131,10 @@ final class GrokVideoService {
             throw VideoGenerationError.networkError
         }
 
+        let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
+        print("[GrokVideo] Response HTTP \(httpResponse.statusCode): \(String(responseBody.prefix(300)))")
+
         guard httpResponse.statusCode == 200 else {
-            let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
             let decoded = try? JSONDecoder().decode(VideoGenerationResponse.self, from: data)
             let detail = decoded?.details ?? decoded?.error ?? String(responseBody.prefix(300))
             throw VideoGenerationError.serverError("HTTP \(httpResponse.statusCode): \(detail)")
@@ -146,55 +146,8 @@ final class GrokVideoService {
             throw VideoGenerationError.serverError(decoded.error ?? "No request ID returned")
         }
 
+        print("[GrokVideo] Got request_id: \(requestId)")
         return requestId
-    }
-
-    private func uploadImageToStorage(data: Data) async throws -> String {
-        let fileName = "\(UUID().uuidString).jpg"
-        let storagePath = "video-temp/\(fileName)"
-        uploadedImagePath = storagePath
-
-        let uploadURL = URL(string: "\(supabaseBaseURL)/storage/v1/object/video-temp/\(fileName)")!
-        var request = URLRequest(url: uploadURL)
-        request.httpMethod = "POST"
-        request.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(anonKey)", forHTTPHeaderField: "Authorization")
-        request.setValue(anonKey, forHTTPHeaderField: "apikey")
-        request.timeoutInterval = 30
-        request.httpBody = data
-
-        let (responseData, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw VideoGenerationError.uploadFailed("No response")
-        }
-
-        guard httpResponse.statusCode == 200 else {
-            let body = String(data: responseData, encoding: .utf8) ?? "Unknown error"
-            throw VideoGenerationError.uploadFailed("HTTP \(httpResponse.statusCode): \(String(body.prefix(200)))")
-        }
-
-        let publicURL = "\(supabaseBaseURL)/storage/v1/object/public/video-temp/\(fileName)"
-        return publicURL
-    }
-
-    func cleanupTempImage() {
-        guard let path = uploadedImagePath else { return }
-        let parts = path.split(separator: "/", maxSplits: 1)
-        guard parts.count == 2 else { return }
-        let bucket = String(parts[0])
-        let objectPath = String(parts[1])
-
-        let deleteURL = URL(string: "\(supabaseBaseURL)/storage/v1/object/\(bucket)/\(objectPath)")!
-        var request = URLRequest(url: deleteURL)
-        request.httpMethod = "DELETE"
-        request.setValue("Bearer \(anonKey)", forHTTPHeaderField: "Authorization")
-        request.setValue(anonKey, forHTTPHeaderField: "apikey")
-
-        Task.detached {
-            _ = try? await URLSession.shared.data(for: request)
-        }
-        uploadedImagePath = nil
     }
 
     func pollUntilDone(requestId: String) async throws -> URL {
@@ -211,6 +164,7 @@ final class GrokVideoService {
             try Task.checkCancellation()
 
             let status = try await checkStatus(requestId: requestId)
+            print("[GrokVideo] Poll status: \(status.status)")
 
             switch status.status {
             case "done":

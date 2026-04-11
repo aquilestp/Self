@@ -23,24 +23,28 @@ serve(async (req) => {
 
     if (req.method === "POST") {
       const body = await req.json();
-      const { image_url, prompt, duration, resolution } = body;
+      const { image_base64, image_url, prompt, duration, resolution } = body;
 
-      if (!image_url) {
+      const imageSource = image_base64
+        ? `data:image/jpeg;base64,${image_base64}`
+        : image_url;
+
+      if (!imageSource) {
         return new Response(
-          JSON.stringify({ error: "Missing image_url" }),
+          JSON.stringify({ error: "Missing image_base64 or image_url" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
-      console.log(`Received image_url: ${image_url.substring(0, 80)}...`);
+      console.log(`Image source type: ${image_base64 ? "base64" : "url"}`);
       if (prompt) {
-        console.log(`Received prompt: ${prompt.substring(0, 100)}`);
+        console.log(`Prompt: ${prompt.substring(0, 100)}`);
       }
 
       const requestBody: Record<string, unknown> = {
         model: "grok-imagine-video",
         image: {
-          url: image_url,
+          url: imageSource,
         },
         duration: duration || 6,
         aspect_ratio: "9:16",
@@ -53,7 +57,7 @@ serve(async (req) => {
         requestBody.prompt = "Subtle cinematic motion. Gentle camera movement with parallax depth. Soft atmospheric effects like light rays or particles drifting. Keep the composition faithful to the original image.";
       }
 
-      console.log(`Sending request to xAI with model: grok-imagine-video`);
+      console.log("Sending request to xAI video generation...");
 
       const xaiResponse = await fetch("https://api.x.ai/v1/videos/generations", {
         method: "POST",
@@ -110,7 +114,7 @@ serve(async (req) => {
 
       const result = await xaiResponse.json();
 
-      const response = {
+      const response: Record<string, string> = {
         status: result.status || "pending",
         video_url: "",
         error: "",
