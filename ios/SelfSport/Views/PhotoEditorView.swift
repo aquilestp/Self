@@ -772,6 +772,7 @@ struct PhotoEditorView: View {
         let targetSupportsBasicFieldVisibility = targetWidget?.type.supportsBasicFieldVisibility ?? false
         let targetBasicUnitFilter = targetWidget?.basicUnitFilter ?? .km
         let targetIsBoldOrImpact = targetWidget?.type == .bold || targetWidget?.type == .impact
+        let targetIsHeroStat = targetWidget?.type == .heroStat
         let targetIsFullBanner = targetWidget?.type == .fullBanner || targetWidget?.type == .fullBannerBottom
         let targetShowTitle = targetWidget?.showTitle ?? true
         let targetShowActivityName = targetWidget?.showActivityName ?? true
@@ -1074,6 +1075,38 @@ struct PhotoEditorView: View {
                           let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         placedWidgets[idx].showElevation.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+            }
+
+            if targetIsHeroStat {
+                Rectangle()
+                    .fill(Color.white.opacity(0.12))
+                    .frame(width: 20, height: 1)
+                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                    .opacity(showPaletteSelector ? 1 : 0)
+                    .animation(
+                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04),
+                        value: showPaletteSelector
+                    )
+
+                visibilityToggleButton(icon: "speedometer", isOn: targetShowPace, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].showPace.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "clock", isOn: targetShowTime, delay: Double(paletteCount) * 0.04 + 0.09) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].showTime.toggle()
                     }
                     hapticLight.impactOccurred()
                     resetPaletteHideTimer()

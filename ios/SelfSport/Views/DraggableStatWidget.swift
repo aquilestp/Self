@@ -483,22 +483,26 @@ struct StatWidgetContentView: View {
                 .minimumScaleFactor(0.5)
                 .scaleEffect(x: 1.0, y: 2.5, anchor: .top)
                 .padding(.bottom, 70)
-            HStack(spacing: 16) {
-                if activity.hasDistance {
-                    Text("PACE \(activity.pace)")
-                        .font(.system(size: 14, weight: .bold))
-                        .tracking(0.5)
-                        .foregroundStyle(secondaryColor)
-                    Text("TIME \(activity.duration)")
-                        .font(.system(size: 14, weight: .bold))
-                        .tracking(0.5)
-                        .foregroundStyle(secondaryColor)
-                } else {
-                    Text(activity.date.uppercased())
-                        .font(.system(size: 14, weight: .bold))
-                        .tracking(0.5)
-                        .foregroundStyle(secondaryColor)
+            if activity.hasDistance, (showPace || showTime) {
+                HStack(spacing: 16) {
+                    if showPace {
+                        Text("PACE \(activity.pace)")
+                            .font(.system(size: 14, weight: .bold))
+                            .tracking(0.5)
+                            .foregroundStyle(secondaryColor)
+                    }
+                    if showTime {
+                        Text("TIME \(activity.duration)")
+                            .font(.system(size: 14, weight: .bold))
+                            .tracking(0.5)
+                            .foregroundStyle(secondaryColor)
+                    }
                 }
+            } else if !activity.hasDistance {
+                Text(activity.date.uppercased())
+                    .font(.system(size: 14, weight: .bold))
+                    .tracking(0.5)
+                    .foregroundStyle(secondaryColor)
             }
         }
         .padding(.horizontal, 20)
