@@ -23,7 +23,7 @@ serve(async (req) => {
 
     if (req.method === "POST") {
       const body = await req.json();
-      const { image_url } = body;
+      const { image_url, prompt, duration, resolution } = body;
 
       if (!image_url) {
         return new Response(
@@ -33,19 +33,27 @@ serve(async (req) => {
       }
 
       console.log(`Received image_url: ${image_url.substring(0, 80)}...`);
+      if (prompt) {
+        console.log(`Received prompt: ${prompt.substring(0, 100)}`);
+      }
 
-      const requestBody = {
+      const requestBody: Record<string, unknown> = {
         model: "grok-imagine-video",
-        prompt: "Subtle cinematic motion. Gentle camera movement with parallax depth. Soft atmospheric effects like light rays or particles drifting. Keep the composition faithful to the original image.",
         image: {
           url: image_url,
         },
-        duration: 6,
+        duration: duration || 6,
         aspect_ratio: "9:16",
-        resolution: "720p",
+        resolution: resolution || "720p",
       };
 
-      console.log(`Sending request to xAI. Payload size: ~${Math.round(JSON.stringify(requestBody).length / 1024)}KB`);
+      if (prompt && prompt.trim().length > 0) {
+        requestBody.prompt = prompt;
+      } else {
+        requestBody.prompt = "Subtle cinematic motion. Gentle camera movement with parallax depth. Soft atmospheric effects like light rays or particles drifting. Keep the composition faithful to the original image.";
+      }
+
+      console.log(`Sending request to xAI with model: grok-imagine-video`);
 
       const xaiResponse = await fetch("https://api.x.ai/v1/videos/generations", {
         method: "POST",
@@ -103,7 +111,7 @@ serve(async (req) => {
       const result = await xaiResponse.json();
 
       const response = {
-        status: result.status,
+        status: result.status || "pending",
         video_url: "",
         error: "",
       };
@@ -113,7 +121,7 @@ serve(async (req) => {
       }
 
       if (result.error) {
-        response.error = result.error.code || "unknown_error";
+        response.error = result.error.message || result.error.code || "unknown_error";
       }
 
       return new Response(
