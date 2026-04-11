@@ -70,7 +70,6 @@ struct StatWidgetContentView: View {
         case .distance: distanceWidget
         case .distPace: distPaceWidget
         case .threeStats: threeStatsWidget
-        case .fullStats: fullStatsWidget
         case .titleCard: titleCardWidget
         case .stack: stackWidget
         case .bold: boldWidget
@@ -277,38 +276,6 @@ struct StatWidgetContentView: View {
         .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
     }
 
-    private var fullStatsWidget: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if showActivityName {
-                HStack(spacing: 6) {
-                    Image(systemName: activity.systemImage)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(primaryColor.opacity(0.7))
-                    Text(activity.title.uppercased())
-                        .font(.system(size: 10, weight: .semibold))
-                        .tracking(1.5)
-                        .foregroundStyle(tertiaryColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
-            }
-            HStack(spacing: 14) {
-                ForEach(basicMetricItems) { metric in
-                    statColumn(label: metric.label, value: metric.value)
-                }
-            }
-            if showDate {
-                Text(activity.date)
-                    .font(.system(size: 10, weight: .regular))
-                    .foregroundStyle(dimColor)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
-    }
 
     private var titleCardWidget: some View {
         return VStack(alignment: .leading, spacing: 4) {

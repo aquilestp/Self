@@ -50,27 +50,6 @@ extension PhotoEditorView {
                     miniStat(label: "TYPE", value: activity.title)
                 }
             }
-        case .fullStats:
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 3) {
-                    Image(systemName: activity.systemImage)
-                        .font(.system(size: 7, weight: .medium))
-                        .foregroundStyle(.white.opacity(0.6))
-                    Text(activity.title.uppercased())
-                        .font(.system(size: 6, weight: .semibold))
-                        .tracking(0.8)
-                        .foregroundStyle(.white.opacity(0.5))
-                        .lineLimit(1)
-                }
-                HStack(spacing: 6) {
-                    if activity.hasDistance {
-                        miniStat(label: "DIST", value: activity.distance)
-                        miniStat(label: "PACE", value: activity.pace)
-                    } else {
-                        miniStat(label: "TIME", value: activity.duration)
-                    }
-                }
-            }
         case .titleCard:
             VStack(alignment: .leading, spacing: 2) {
                 Text(activity.title)

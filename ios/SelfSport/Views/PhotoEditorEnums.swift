@@ -10,7 +10,6 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case distance = "Distance"
     case distPace = "Dist+Pace"
     case threeStats = "3 Stats"
-    case fullStats = "Full Stats"
     case titleCard = "Title Card"
     case stack = "Stack"
     case bold = "Bold"
@@ -45,7 +44,6 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .distance: return "ruler"
         case .distPace: return "speedometer"
         case .threeStats: return "chart.bar"
-        case .fullStats: return "list.bullet.rectangle"
         case .titleCard: return "textformat"
         case .stack: return "square.stack"
         case .bold: return "flame.fill"
@@ -119,7 +117,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
 
     var supportsBasicFieldVisibility: Bool {
         switch self {
-        case .distance, .distPace, .threeStats, .fullStats, .titleCard, .stack:
+        case .distance, .distPace, .threeStats, .titleCard, .stack:
             return true
         default:
             return false

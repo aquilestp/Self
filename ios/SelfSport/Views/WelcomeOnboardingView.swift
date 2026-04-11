@@ -426,7 +426,7 @@ private struct WelcomeCanvasAnimationView: View {
         ),
         OnboardingWidgetSpec(
             id: 2,
-            type: .fullStats,
+            type: .threeStats,
             finalOffset: CGSize(width: -62, height: 84),
             entryOffset: CGSize(width: -260, height: 220),
             finalRotation: .degrees(-3),
