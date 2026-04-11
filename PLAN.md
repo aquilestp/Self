@@ -1,37 +1,29 @@
-# Nuevo stat "Blurred Vertical Text" — listado vertical de datos de actividad
+# Efectos visuales para el stat "Blurred Vertical"
 
 ## Descripción
-Un nuevo stat tipo lista vertical que muestra todos los datos clave de la actividad apilados, con tipografía pesada (SF Pro Rounded Black), alineado a la izquierda, todo en mayúsculas. Similar al diseño del screenshot compartido.
+Agregar un sistema de efectos visuales al stat "Blurred Vertical" con 5 opciones de efecto, controlable desde la paleta flotante. Por defecto, el stat se agrega con el efecto **Blur de fondo**.
 
 ---
 
-## Líneas de datos (cada una se puede ocultar individualmente)
-1. **Fecha** — APR 10, 2026
-2. **Hora** — 5:49 AM
-3. **Ubicación** — MEDELLÍN, ANTIOQUIA (ciudad + región de Strava)
-4. **Distancia** — 9.8 KM
-5. **Pace** — 5:17/KM
-6. **Tiempo** — 52M 0S
-7. **Elevación** — 37 M
-8. **Calorías** — 785 CAL (requiere detalle de actividad)
-9. **BPM** — 171 BPM (frecuencia cardíaca promedio)
+## Efectos disponibles
+1. **None** — Texto plano, sin efecto (como está ahora)
+2. **Blur** *(por defecto)* — Un rectángulo difuminado semi-transparente detrás del bloque de texto, dándole profundidad y legibilidad sobre la foto
+3. **Glow** — Resplandor suave alrededor de cada línea de texto, usando el color del widget
+4. **Stroke** — Contorno/outline alrededor de las letras en un color contrastante (negro si el texto es claro, blanco si es oscuro)
+5. **Gradient** — El texto se rellena con un degradado vertical usando el color del widget y una versión más clara/oscura
 
 ---
 
-## Diseño
-- Tipografía: **SF Pro Rounded Black** — la más parecida al screenshot, pesada y con terminales redondeados
-- Todo en **mayúsculas**
-- Alineación a la **izquierda**
-- Sin fondo ni bordes — solo el texto apilado con espaciado compacto entre líneas
-- Color del texto sigue el **sistema de color del widget** (como los demás stats)
-- Tamaño de fuente grande (~20-24pt) para que se vea impactante
+## Diseño del control en la paleta
+- Un nuevo botón circular en la paleta flotante (al inicio, antes de las unidades)
+- Muestra un ícono representando el efecto activo (sparkles, blur, glow, etc.)
+- Cada tap cicla al siguiente efecto: None → Blur → Glow → Stroke → Gradient → None...
+- Se anima suavemente como los demás botones de la paleta
 
 ---
 
-## Cambios necesarios
-- **Nuevo tipo de stat** llamado "Blurred Vertical Text" en el drawer con ícono de lista
-- **Ubicación de Strava**: agregar campos `location_city` y `location_state` al modelo de detalle, para que se muestre la ciudad y región
-- **Calorías**: usar el campo `calories` del detalle de actividad (ya existe en el modelo)
-- **Controles de visibilidad**: cada línea tiene toggle individual en el editor (fecha, hora, ubicación, distancia, pace, tiempo, elevación, calorías, BPM)
-- El stat aparece en el **drawer** como opción seleccionable
-- Respeta el selector de **unidades** (KM/MI) para distancia y pace
+## Comportamiento
+- Al agregar el stat desde el drawer, viene con efecto **Blur** preseleccionado
+- El efecto se aplica a todo el bloque de texto del stat
+- El efecto respeta el color elegido del widget
+- Los efectos se guardan por widget individual (cada stat puede tener su propio efecto)

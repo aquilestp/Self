@@ -55,6 +55,7 @@ struct StatWidgetContentView: View {
     var bvtShowCalories: Bool = true
     var bvtShowBPM: Bool = true
     var bvtUnitFilter: SplitsUnitFilter = .km
+    var bvtEffect: BVTEffect = .blur
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -1902,16 +1903,101 @@ struct StatWidgetContentView: View {
 
         let mainFont: Font = .system(size: 22, weight: .black, design: .rounded)
 
-        return VStack(alignment: .leading, spacing: -2) {
+        let textContent = VStack(alignment: .leading, spacing: -2) {
             ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
-                Text(line)
-                    .font(mainFont)
-                    .foregroundStyle(primaryColor)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
+                bvtStyledLine(line, font: mainFont)
             }
         }
         .fixedSize(horizontal: true, vertical: true)
+
+        return Group {
+            switch bvtEffect {
+            case .none:
+                textContent
+            case .blur:
+                textContent
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(.ultraThinMaterial)
+                            .opacity(0.85)
+                    )
+            case .glow:
+                textContent
+                    .shadow(color: primaryColor.opacity(0.7), radius: 8, x: 0, y: 0)
+                    .shadow(color: primaryColor.opacity(0.35), radius: 16, x: 0, y: 0)
+            case .stroke:
+                ZStack {
+                    VStack(alignment: .leading, spacing: -2) {
+                        ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
+                            bvtStrokedLine(line, font: mainFont)
+                        }
+                    }
+                    .fixedSize(horizontal: true, vertical: true)
+                    textContent
+                }
+            case .gradient:
+                VStack(alignment: .leading, spacing: -2) {
+                    ForEach(Array(visibleLines.enumerated()), id: \.offset) { _, line in
+                        Text(line)
+                            .font(mainFont)
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [primaryColor, primaryColor.opacity(0.5)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.5)
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: true)
+            }
+        }
+    }
+
+    private func bvtStyledLine(_ text: String, font: Font) -> some View {
+        Text(text)
+            .font(font)
+            .foregroundStyle(primaryColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+    }
+
+    private func bvtStrokedLine(_ text: String, font: Font) -> some View {
+        let strokeColor: Color = primaryColor.isLightColor ? Color.black : Color.white
+        return Text(text)
+            .font(font)
+            .foregroundStyle(strokeColor.opacity(0.8))
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .offset(x: -1, y: -1)
+            .overlay(
+                Text(text)
+                    .font(font)
+                    .foregroundStyle(strokeColor.opacity(0.8))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .offset(x: 1, y: -1)
+            )
+            .overlay(
+                Text(text)
+                    .font(font)
+                    .foregroundStyle(strokeColor.opacity(0.8))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .offset(x: -1, y: 1)
+            )
+            .overlay(
+                Text(text)
+                    .font(font)
+                    .foregroundStyle(strokeColor.opacity(0.8))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .offset(x: 1, y: 1)
+            )
     }
 
     private func topRowStatColumn(label: String, value: String) -> some View {
@@ -2080,6 +2166,20 @@ struct DraggableStatWidget: View {
         .transition(.scale.combined(with: .opacity))
     }
 
+}
+
+extension Color {
+    var isLightColor: Bool {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        UIColor(self).getRed(&r, green: &g, blue: &b, alpha: nil)
+        let luminance = 0.299 * r + 0.587 * g + 0.114 * b
+        return luminance > 0.5
+    }
+}
+
+extension DraggableStatWidget {
     private var widgetVisualCenter: CGPoint {
         CGPoint(
             x: canvasGlobalOrigin.x + canvasSize.width * 0.5 + widget.position.width + dragOffset.width + snapAdjustment.width,
@@ -2097,7 +2197,7 @@ struct DraggableStatWidget: View {
     }
 
     private var widgetContent: some View {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect)
     }
 }
 

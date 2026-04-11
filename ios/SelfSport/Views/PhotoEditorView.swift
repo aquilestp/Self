@@ -797,6 +797,7 @@ struct PhotoEditorView: View {
         let targetBvtShowCalories = targetWidget?.bvtShowCalories ?? true
         let targetBvtShowBPM = targetWidget?.bvtShowBPM ?? true
         let targetBvtUnitFilter = targetWidget?.bvtUnitFilter ?? .km
+        let targetBvtEffect = targetWidget?.bvtEffect ?? .blur
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
         } ?? "5:30"
@@ -1207,7 +1208,17 @@ struct PhotoEditorView: View {
                         value: showPaletteSelector
                     )
 
-                unitToggleButton(currentFilter: targetBvtUnitFilter, delay: Double(paletteCount) * 0.04 + 0.06) {
+                bvtEffectButton(effect: targetBvtEffect, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].bvtEffect = placedWidgets[idx].bvtEffect.next()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                unitToggleButton(currentFilter: targetBvtUnitFilter, delay: Double(paletteCount) * 0.04 + 0.09) {
                     guard let id = paletteTargetWidgetId,
                           let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
@@ -1529,6 +1540,27 @@ struct PhotoEditorView: View {
                     lineWidth: isOn ? 1.5 : 0.5
                 )
             )
+        }
+        .buttonStyle(.plain)
+        .scaleEffect(showPaletteSelector ? 1 : 0.3)
+        .opacity(showPaletteSelector ? 1 : 0)
+        .animation(
+            .spring(response: 0.35, dampingFraction: 0.7).delay(delay),
+            value: showPaletteSelector
+        )
+    }
+
+    private func bvtEffectButton(effect: BVTEffect, delay: Double, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: effect.icon)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(.white.opacity(0.9))
+                .contentTransition(.symbolEffect(.replace))
+                .frame(width: 36, height: 36)
+                .background(Color.white.opacity(0.25), in: Circle())
+                .overlay(
+                    Circle().stroke(Color.white.opacity(0.6), lineWidth: 1.5)
+                )
         }
         .buttonStyle(.plain)
         .scaleEffect(showPaletteSelector ? 1 : 0.3)
@@ -2347,7 +2379,7 @@ struct PhotoEditorView: View {
             activeFilterOverlay(size: canvasSize)
 
             ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter)
+                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect)
                     .scaleEffect(widget.scale)
                     .rotationEffect(widget.rotation)
                     .offset(x: widget.position.width, y: widget.position.height)

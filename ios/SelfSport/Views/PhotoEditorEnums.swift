@@ -283,6 +283,43 @@ struct PlacedWidget: Identifiable {
     var bvtShowCalories: Bool = true
     var bvtShowBPM: Bool = true
     var bvtUnitFilter: SplitsUnitFilter = .km
+    var bvtEffect: BVTEffect = .blur
+}
+
+nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
+    case none = 0
+    case blur
+    case glow
+    case stroke
+    case gradient
+
+    var id: Int { rawValue }
+
+    var label: String {
+        switch self {
+        case .none: return "None"
+        case .blur: return "Blur"
+        case .glow: return "Glow"
+        case .stroke: return "Stroke"
+        case .gradient: return "Gradient"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .none: return "circle.dashed"
+        case .blur: return "aqi.medium"
+        case .glow: return "sparkle"
+        case .stroke: return "character.textbox"
+        case .gradient: return "paintbrush.fill"
+        }
+    }
+
+    func next() -> BVTEffect {
+        let all = BVTEffect.allCases
+        let idx = (all.firstIndex(of: self) ?? 0) + 1
+        return all[idx % all.count]
+    }
 }
 
 nonisolated enum SplitsUnitFilter: String, CaseIterable, Identifiable {
