@@ -530,6 +530,8 @@ struct StatWidgetContentView: View {
             .foregroundStyle(primaryColor)
             .lineLimit(1)
             .minimumScaleFactor(0.3)
+            .scaleEffect(x: 1.0, y: 2.5, anchor: .top)
+            .padding(.bottom, 160)
     }
 
     private var routeCleanWidget: some View {
