@@ -24,9 +24,26 @@ enum FontRegistration {
             "InstrumentSerif-Regular",
         ]
 
+        let specialFontNames = [
+            "MetalMania-Regular",
+            "Monofett-Regular",
+            "NewRocker-Regular",
+            "Rubik80sFade-Regular",
+            "RubikDistressed-Regular",
+            "RubikGlitch-Regular",
+        ]
+
         for fontName in fontNames {
             if let url = Bundle.main.url(forResource: fontName, withExtension: "ttf")
                 ?? Bundle.main.url(forResource: fontName, withExtension: "ttf", subdirectory: "Fonts")
+            {
+                CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
+            }
+        }
+
+        for fontName in specialFontNames {
+            if let url = Bundle.main.url(forResource: fontName, withExtension: "ttf")
+                ?? Bundle.main.url(forResource: fontName, withExtension: "ttf", subdirectory: "SpecialFonts")
             {
                 CTFontManagerRegisterFontsForURL(url as CFURL, .process, nil)
             }
