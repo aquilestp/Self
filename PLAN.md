@@ -1,16 +1,19 @@
-# Mejorar fluidez, haptics y sensación del VerticalSnapPicker
+# VerticalSnapPicker: más fluido y vibraciones más fuertes
 
-## Problemas detectados
+**Mejoras de fluidez:**
 
-- El scroll no tiene resistencia en los bordes (se puede arrastrar infinitamente)
-- El haptic solo vibra al soltar el dedo, no mientras arrastras entre opciones
-- La animación de snap no se siente tan natural como antes
-- Swipes rápidos y lentos se sienten igual por el clamp a ±1
+- Reducir la resistencia del momentum para que el scroll se sienta más libre y natural (actualmente frena demasiado rápido)
+- Hacer que el highlight del item seleccionado siga tu dedo en tiempo real durante el drag, no solo cuando está quieto
+- Reducir el `minimumDistance` del gesto para que responda más rápido al toque
 
-## Mejoras
+**Mejoras de haptics (vibraciones más fuertes):**
 
-- **Rubber banding en los bordes** — Al arrastrar más allá del primer o último item, se aplica una resistencia progresiva (como en los scroll de iOS), haciendo que el componente "rebote" de vuelta suavemente
-- **Haptic durante el arrastre** — Cada vez que el dedo cruza la frontera de un item (sin soltar), se dispara un haptic ligero. Esto da la sensación de "engranaje" como los pickers nativos de iOS
-- **Snap basado en la distancia real** — En lugar de usar la predicción de velocidad limitada a ±1, se calcula el item más cercano al centro basándose en la posición real del dedo más un poco de momentum. Esto permite swipes rápidos que avanzan 2-3 items cuando tiene sentido
-- **Animación spring mejorada** — Se ajusta el spring para que el snap se sienta más "crisp" y rápido, similar a un UIPickerView nativo
-- **Se aplica a todos los pickers** — Como `BVTEffectScrollPicker` y `WhatsAppTextScrollPicker` ya usan `VerticalSnapPicker`, el cambio los mejora automáticamente a todos
+- Cambiar de `UISelectionFeedbackGenerator` (vibración suave) a `UIImpactFeedbackGenerator` con intensidad `.medium` para cada cambio de item durante el drag — se sentirá mucho más táctil
+- Al soltar el dedo y hacer snap al item final, usar una vibración `.heavy` para dar una confirmación clara
+- Pre-calentar el motor háptico antes de cada vibración para que no haya delay
+
+**Resultado esperado:**
+
+- El scroll vertical se sentirá como el picker nativo de iOS (tipo ruleta)
+- Cada item que pases con el dedo dará un "click" satisfactorio
+- Al aterrizar en el item final, sentirás un golpe firme de confirmación
