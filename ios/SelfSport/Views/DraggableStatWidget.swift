@@ -75,7 +75,8 @@ struct StatWidgetContentView: View, Equatable {
         lhs.whatsappText == rhs.whatsappText &&
         lhs.goldenArchUnitFilter == rhs.goldenArchUnitFilter &&
         lhs.goldenArchShowPace == rhs.goldenArchShowPace &&
-        lhs.goldenArchShowTime == rhs.goldenArchShowTime
+        lhs.goldenArchShowTime == rhs.goldenArchShowTime &&
+        lhs.notesUnitFilter == rhs.notesUnitFilter
     }
 
     let type: StatWidgetType
@@ -120,6 +121,7 @@ struct StatWidgetContentView: View, Equatable {
     var goldenArchUnitFilter: SplitsUnitFilter = .km
     var goldenArchShowPace: Bool = true
     var goldenArchShowTime: Bool = true
+    var notesUnitFilter: SplitsUnitFilter = .km
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -174,6 +176,7 @@ struct StatWidgetContentView: View, Equatable {
         case .blurredVerticalText: blurredVerticalTextWidget
         case .whatsappMessage: whatsappMessageWidget
         case .goldenArch: goldenArchWidget
+        case .notesScreenshot: notesScreenshotWidget
         }
     }
 
@@ -2232,6 +2235,113 @@ struct StatWidgetContentView: View, Equatable {
         )
     }
 
+    private var notesIsMiles: Bool { notesUnitFilter == .miles }
+
+    private var notesDistanceText: String {
+        if notesIsMiles {
+            let mi = activity.distanceRaw / 1609.34
+            return String(format: "%.1f mi", mi)
+        }
+        let km = activity.distanceRaw / 1000.0
+        return String(format: "%.1f km", km)
+    }
+
+    private var notesPaceText: String {
+        guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
+        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
+        if notesIsMiles {
+            let secPerMile = 1609.34 / speed
+            let m = Int(secPerMile) / 60
+            let s = Int(secPerMile) % 60
+            return String(format: "%d:%02d /mi", m, s)
+        } else {
+            let secPerKm = 1000.0 / speed
+            let m = Int(secPerKm) / 60
+            let s = Int(secPerKm) % 60
+            return String(format: "%d:%02d /km", m, s)
+        }
+    }
+
+    private var notesDateText: String {
+        if let d = activity.startDate {
+            let f = DateFormatter()
+            f.dateFormat = "EEEE, MMM d, yyyy"
+            return f.string(from: d)
+        }
+        return activity.date
+    }
+
+    private var notesScreenshotWidget: some View {
+        let notesOrange = Color(red: 1.0, green: 0.65, blue: 0.0)
+
+        return VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .center) {
+                HStack(spacing: 3) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(notesOrange)
+                    Text("workout notes")
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundStyle(notesOrange)
+                }
+                Spacer()
+                if activity.hasDistance {
+                    HStack(spacing: 4) {
+                        Text(notesDistanceText)
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(notesOrange)
+                        Image(systemName: "figure.run")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(notesOrange)
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 14)
+            .padding(.bottom, 10)
+
+            Rectangle()
+                .fill(Color(red: 0.9, green: 0.9, blue: 0.9))
+                .frame(height: 0.5)
+                .padding(.horizontal, 16)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(activity.title)
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(.black)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.7)
+
+                Text(notesBodyText)
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(Color(red: 0.55, green: 0.55, blue: 0.57))
+                    .lineLimit(3)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 20)
+
+            Spacer(minLength: 30)
+        }
+        .frame(width: 260)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.white)
+                .shadow(color: .black.opacity(0.25), radius: 12, x: 0, y: 4)
+        )
+        .clipShape(.rect(cornerRadius: 14))
+    }
+
+    private var notesBodyText: String {
+        var lines: [String] = []
+        if activity.hasDistance {
+            lines.append("Pace: \(notesPaceText)")
+        }
+        lines.append("Duration: \(activity.duration)")
+        lines.append(notesDateText)
+        return lines.joined(separator: "\n")
+    }
+
     private var goldenArchIsMiles: Bool { goldenArchUnitFilter == .miles }
 
     private var goldenArchDistanceText: String {
@@ -2761,7 +2871,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime, notesUnitFilter: widget.notesUnitFilter)
     }
 }
 

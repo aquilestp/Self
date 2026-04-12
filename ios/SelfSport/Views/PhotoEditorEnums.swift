@@ -39,6 +39,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case blurredVerticalText = "Blurred Vertical"
     case whatsappMessage = "WhatsApp"
     case goldenArch = "Golden Arch"
+    case notesScreenshot = "Notes"
 
     var id: String { rawValue }
 
@@ -76,12 +77,13 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .blurredVerticalText: return "list.bullet"
         case .whatsappMessage: return "bubble.right.fill"
         case .goldenArch: return "trophy.fill"
+        case .notesScreenshot: return "note.text"
         }
     }
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch, .notesScreenshot:
             return false
         default:
             return true
@@ -112,6 +114,10 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
 
     var isGoldenArch: Bool {
         self == .goldenArch
+    }
+
+    var isNotesScreenshot: Bool {
+        self == .notesScreenshot
     }
 
     var isDistanceWords: Bool {
@@ -296,6 +302,7 @@ struct PlacedWidget: Identifiable {
     var goldenArchUnitFilter: SplitsUnitFilter = .km
     var goldenArchShowPace: Bool = true
     var goldenArchShowTime: Bool = true
+    var notesUnitFilter: SplitsUnitFilter = .km
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {

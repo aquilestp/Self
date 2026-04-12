@@ -301,6 +301,8 @@ extension PhotoEditorView {
             miniWhatsappMessage
         case .goldenArch:
             miniGoldenArch
+        case .notesScreenshot:
+            miniNotesScreenshot
         }
     }
 
@@ -874,6 +876,42 @@ extension PhotoEditorView {
                     .foregroundStyle(Color.black.opacity(0.3))
             }
         }
+    }
+
+    var miniNotesScreenshot: some View {
+        let notesOrange = Color(red: 1.0, green: 0.65, blue: 0.0)
+        return VStack(alignment: .leading, spacing: 2) {
+            HStack(spacing: 2) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 4, weight: .semibold))
+                    .foregroundStyle(notesOrange)
+                Text("notes")
+                    .font(.system(size: 5, weight: .regular))
+                    .foregroundStyle(notesOrange)
+                Spacer()
+                Text(activity.hasDistance ? activity.distance : "")
+                    .font(.system(size: 5, weight: .semibold))
+                    .foregroundStyle(notesOrange)
+                Image(systemName: "figure.run")
+                    .font(.system(size: 4.5, weight: .semibold))
+                    .foregroundStyle(notesOrange)
+            }
+            Text(activity.title)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.black)
+                .lineLimit(1)
+            Text(activity.hasDistance ? activity.pace : activity.duration)
+                .font(.system(size: 6, weight: .regular))
+                .foregroundStyle(.gray)
+                .lineLimit(1)
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 5)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(.white)
+        )
+        .padding(.horizontal, 8)
     }
 
     var miniBlurredVerticalText: some View {
