@@ -2264,78 +2264,126 @@ struct StatWidgetContentView: View, Equatable {
     }
 
     private var goldenArchWidget: some View {
-        let goldDark = Color(red: 0.72, green: 0.53, blue: 0.04)
-        let goldBright = Color(red: 1.0, green: 0.84, blue: 0.0)
-        let goldLight = Color(red: 1.0, green: 0.97, blue: 0.86)
-        let archGradient = AngularGradient(
-            gradient: Gradient(colors: [goldDark, goldBright, goldLight, goldBright, goldDark]),
-            center: .center,
-            startAngle: .degrees(135),
-            endAngle: .degrees(405)
+        let goldDark = Color(red: 0.55, green: 0.40, blue: 0.05)
+        let goldMid = Color(red: 0.72, green: 0.53, blue: 0.04)
+        let goldBright = Color(red: 0.85, green: 0.68, blue: 0.0)
+        let goldLight = Color(red: 0.95, green: 0.85, blue: 0.45)
+        let goldShine = Color(red: 1.0, green: 0.95, blue: 0.75)
+        let textColor = Color.black
+
+        let medalGradient = LinearGradient(
+            colors: [goldMid, goldBright, goldShine, goldBright, goldMid],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
         )
-        let archSize: CGFloat = 110
-        let archLineWidth: CGFloat = 10
+        let borderGradient = LinearGradient(
+            colors: [goldDark, goldBright, goldLight, goldBright, goldDark],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+        let innerGradient = LinearGradient(
+            colors: [goldBright, goldShine, goldBright],
+            startPoint: .top,
+            endPoint: .bottom
+        )
 
         let hasSubMetrics = (goldenArchShowPace && activity.hasDistance) || goldenArchShowTime
 
-        return VStack(spacing: 6) {
-            Text("MY FIRST")
-                .font(.system(size: 11, weight: .heavy, design: .default).width(.expanded))
-                .tracking(5)
-                .foregroundStyle(goldBright)
-                .shadow(color: goldBright.opacity(0.5), radius: 6, x: 0, y: 0)
+        let medalWidth: CGFloat = 150
+        let medalHeight: CGFloat = hasSubMetrics ? 175 : 155
 
-            ZStack {
-                Circle()
-                    .trim(from: 0, to: 0.75)
-                    .stroke(goldDark.opacity(0.15), style: StrokeStyle(lineWidth: archLineWidth, lineCap: .round))
-                    .rotationEffect(.degrees(135))
-                    .frame(width: archSize, height: archSize)
+        return ZStack {
+            MedalShape()
+                .fill(medalGradient)
+                .overlay(
+                    MedalShape()
+                        .stroke(borderGradient, lineWidth: 3)
+                )
+                .overlay(
+                    MedalShape(inset: 6)
+                        .stroke(goldDark.opacity(0.4), lineWidth: 0.5)
+                )
+                .overlay(
+                    MedalShape(inset: 8)
+                        .fill(innerGradient.opacity(0.3))
+                )
+                .frame(width: medalWidth, height: medalHeight)
+                .shadow(color: goldDark.opacity(0.6), radius: 1, x: 0, y: 1)
+                .shadow(color: .black.opacity(0.35), radius: 6, x: 0, y: 3)
 
-                Circle()
-                    .trim(from: 0, to: 0.75)
-                    .stroke(archGradient, style: StrokeStyle(lineWidth: archLineWidth, lineCap: .round))
-                    .rotationEffect(.degrees(135))
-                    .frame(width: archSize, height: archSize)
-                    .shadow(color: goldBright.opacity(0.45), radius: 12, x: 0, y: 0)
-                    .shadow(color: goldBright.opacity(0.2), radius: 24, x: 0, y: 0)
+            VStack(spacing: 0) {
+                Text("★  MY FIRST  ★")
+                    .font(.system(size: 10, weight: .heavy, design: .default).width(.expanded))
+                    .tracking(2)
+                    .foregroundStyle(textColor.opacity(0.85))
+                    .padding(.top, 18)
 
-                VStack(spacing: 2) {
-                    Text(goldenArchDistanceText)
-                        .font(.system(size: 32, weight: .black, design: .default).width(.compressed))
-                        .foregroundStyle(primaryColor)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.5)
-                    Text(goldenArchUnitLabel)
-                        .font(.system(size: 12, weight: .bold, design: .default).width(.expanded))
-                        .tracking(3)
-                        .foregroundStyle(primaryColor.opacity(0.6))
+                Spacer().frame(height: 4)
+
+                RoundedRectangle(cornerRadius: 1)
+                    .fill(goldDark.opacity(0.3))
+                    .frame(width: 80, height: 1)
+
+                Spacer().frame(height: 8)
+
+                Text(goldenArchDistanceText)
+                    .font(.system(size: 44, weight: .black, design: .default).width(.compressed))
+                    .foregroundStyle(textColor.opacity(0.9))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .shadow(color: goldShine.opacity(0.5), radius: 2, x: 0, y: 1)
+
+                Text(goldenArchUnitLabel)
+                    .font(.system(size: 13, weight: .heavy, design: .default).width(.expanded))
+                    .tracking(6)
+                    .foregroundStyle(textColor.opacity(0.65))
+
+                if hasSubMetrics {
+                    Spacer().frame(height: 8)
+
+                    RoundedRectangle(cornerRadius: 1)
+                        .fill(goldDark.opacity(0.3))
+                        .frame(width: 100, height: 1)
+
+                    Spacer().frame(height: 6)
+
+                    HStack(spacing: 0) {
+                        if goldenArchShowPace, activity.hasDistance {
+                            Text(goldenArchPaceText)
+                                .font(.system(size: 11, weight: .bold, design: .default))
+                                .foregroundStyle(textColor.opacity(0.7))
+                        }
+                        if goldenArchShowPace && activity.hasDistance && goldenArchShowTime {
+                            Text("  ·  ")
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundStyle(textColor.opacity(0.35))
+                        }
+                        if goldenArchShowTime {
+                            Text(activity.duration)
+                                .font(.system(size: 11, weight: .bold, design: .default))
+                                .foregroundStyle(textColor.opacity(0.7))
+                        }
+                    }
+                }
+
+                Spacer().frame(height: hasSubMetrics ? 10 : 14)
+
+                HStack(spacing: 16) {
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 7))
+                        .foregroundStyle(goldDark.opacity(0.5))
+                    Image(systemName: "figure.run")
+                        .font(.system(size: 10))
+                        .foregroundStyle(textColor.opacity(0.45))
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 7))
+                        .foregroundStyle(goldDark.opacity(0.5))
                 }
             }
-
-            if hasSubMetrics {
-                HStack(spacing: 0) {
-                    if goldenArchShowPace, activity.hasDistance {
-                        Text(goldenArchPaceText)
-                            .font(.system(size: 12, weight: .semibold, design: .default))
-                            .foregroundStyle(primaryColor.opacity(0.75))
-                    }
-                    if goldenArchShowPace && activity.hasDistance && goldenArchShowTime {
-                        Text("  ·  ")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(goldBright.opacity(0.5))
-                    }
-                    if goldenArchShowTime {
-                        Text(activity.duration)
-                            .font(.system(size: 12, weight: .semibold, design: .default))
-                            .foregroundStyle(primaryColor.opacity(0.75))
-                    }
-                }
-            }
+            .frame(width: medalWidth, height: medalHeight)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .shadow(color: .black.opacity(0.4), radius: 8, x: 0, y: 3)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
     }
 
     private func topRowStatColumn(label: String, value: String) -> some View {
@@ -2363,6 +2411,48 @@ struct StatWidgetContentView: View, Equatable {
                 .foregroundStyle(primaryColor)
                 .minimumScaleFactor(0.8)
         }
+    }
+}
+
+nonisolated struct MedalShape: Shape {
+    var inset: CGFloat = 0
+
+    func path(in rect: CGRect) -> Path {
+        let r = rect.insetBy(dx: inset, dy: inset)
+        var p = Path()
+        let archRadius = r.width * 0.5
+        let archCenterY = r.minY + archRadius
+        let pillarTop = archCenterY
+        let pillarBottom = r.maxY
+        let pillarWidth = r.width * 0.18
+        let baseHeight = r.height * 0.12
+        let baseInset = r.width * 0.05
+        let cr: CGFloat = 4
+
+        p.move(to: CGPoint(x: r.minX + pillarWidth, y: pillarBottom - baseHeight))
+        p.addLine(to: CGPoint(x: r.minX + pillarWidth, y: pillarTop))
+        p.addArc(center: CGPoint(x: r.midX, y: archCenterY),
+                 radius: archRadius - pillarWidth,
+                 startAngle: .degrees(180),
+                 endAngle: .degrees(0),
+                 clockwise: false)
+        p.addLine(to: CGPoint(x: r.maxX - pillarWidth, y: pillarBottom - baseHeight))
+
+        p.addLine(to: CGPoint(x: r.maxX - baseInset + cr, y: pillarBottom - baseHeight))
+        p.addQuadCurve(to: CGPoint(x: r.maxX - baseInset, y: pillarBottom - baseHeight + cr),
+                       control: CGPoint(x: r.maxX - baseInset, y: pillarBottom - baseHeight))
+        p.addLine(to: CGPoint(x: r.maxX - baseInset, y: pillarBottom - cr))
+        p.addQuadCurve(to: CGPoint(x: r.maxX - baseInset - cr, y: pillarBottom),
+                       control: CGPoint(x: r.maxX - baseInset, y: pillarBottom))
+        p.addLine(to: CGPoint(x: r.minX + baseInset + cr, y: pillarBottom))
+        p.addQuadCurve(to: CGPoint(x: r.minX + baseInset, y: pillarBottom - cr),
+                       control: CGPoint(x: r.minX + baseInset, y: pillarBottom))
+        p.addLine(to: CGPoint(x: r.minX + baseInset, y: pillarBottom - baseHeight + cr))
+        p.addQuadCurve(to: CGPoint(x: r.minX + baseInset + cr, y: pillarBottom - baseHeight),
+                       control: CGPoint(x: r.minX + baseInset, y: pillarBottom - baseHeight))
+        p.closeSubpath()
+
+        return p
     }
 }
 
