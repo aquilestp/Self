@@ -1,25 +1,35 @@
-# Rediseñar Golden Arch como Medalla Conmemorativa Dorada
+# Rediseñar stat Golden Arch como medalla circular tipo badge conmemorativo
 
-## Cambios
 
-### Diseño de Medalla Conmemorativa
+## Lo que se hará
 
-- **Reemplazar el arco circular** (estilo barra de progreso) por una forma de medalla/escudo conmemorativo
-- La medalla tendrá un **borde dorado grueso con relieve** simulando metal grabado, usando gradientes dorados (oscuro → brillante → claro → brillante → oscuro)
-- Dentro de la medalla: **forma de arco superior** con el texto "MY FIRST" curvado siguiendo el arco, como en la imagen de referencia
-- La distancia (ej. "5.0") grande y prominente en el centro con la unidad ("KM" / "MI") debajo
-- **Estrellas decorativas** pequeñas a los lados del arco, como detalles de condecoración
-- El pace y tiempo aparecerán debajo del arco en una franja inferior tipo placa
-- Todo con **sombras sutiles** para dar sensación de profundidad y relieve metálico
+Transformar el stat "Golden Arch" de su forma actual (arco con pilares) a una **medalla circular premium** inspirada en la foto de referencia — una medalla dorada redonda con texto curvo, anillos decorativos, silueta de corredor, y fecha.
 
-### Colores Fijos (Sin Cambio)
+### Diseño de la medalla circular
 
-- **Fondo de la medalla**: gradiente dorado (dorado oscuro → dorado brillante → dorado claro)
-- **Texto**: siempre **negro** embebido en el dorado — sin opción de cambiar color
-- Los **3 círculos de colores** (selector de paleta) **no aparecerán** cuando este stat esté seleccionado
-- Los botones de pace y tiempo seguirán disponibles para mostrar/ocultar, así como el toggle KM/MI
+- **Forma**: Círculo completo (~170pt diámetro) reemplazando la forma de arco
+- **Borde exterior**: Anillo dorado grueso con gradiente metálico (borde elevado)
+- **Segundo anillo interior**: Línea decorativa fina dorada oscura separando el borde del cuerpo
+- **Cuerpo**: Relleno dorado con gradiente que simula metal pulido
+- **Texto curvo superior**: "★ MY FIRST ★" siguiendo el arco superior de la medalla (texto embebido negro)
+- **Distancia central grande**: Número grande (ej. "5.0") en negro con peso heavy
+- **Unidad debajo**: "KM" o "MI" en tracking expandido
+- **Banner/cinta central**: Pequeña cinta decorativa con la fecha de la actividad
+- **Silueta de corredor**: Ícono `figure.run` centrado como decoración
+- **Texto curvo inferior**: "- ¡LOGRADO! -" o "FINISHER" siguiendo el arco inferior
+- **Estrellas decorativas**: Pequeñas estrellas doradas oscuras como separadores
+- **Sub-métricas** (pace y tiempo): Debajo de la distancia, separadas por punto medio
 
-### Miniatura
+### Detalles técnicos del estilo
 
-- La miniatura en el selector de stats también se actualizará con la silueta de medalla dorada
+- Todos los colores fijos (dorado/negro) — sin cambio de color permitido
+- Texto embebido en negro sobre superficie dorada
+- Sombras sutiles para dar profundidad y sensación 3D
+- Gradiente metálico con highlights para simular metal real
+- El texto curvo se logra con Canvas o transformaciones rotacionales
 
+### Archivos que se modificarán
+
+- El stat principal (widget grande en el editor de fotos)
+- La miniatura de preview del stat
+- Se reemplaza `MedalShape` por una forma circular con anillos

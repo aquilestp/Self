@@ -831,46 +831,47 @@ extension PhotoEditorView {
     }
 
     var miniGoldenArch: some View {
-        let goldDark = Color(red: 0.55, green: 0.40, blue: 0.05)
-        let goldMid = Color(red: 0.72, green: 0.53, blue: 0.04)
-        let goldBright = Color(red: 0.85, green: 0.68, blue: 0.0)
-        let goldShine = Color(red: 1.0, green: 0.95, blue: 0.75)
-        let medalGradient = LinearGradient(
-            colors: [goldMid, goldBright, goldShine, goldBright, goldMid],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+        let goldDark = Color(red: 0.50, green: 0.36, blue: 0.04)
+        let goldMid = Color(red: 0.68, green: 0.50, blue: 0.04)
+        let goldBright = Color(red: 0.82, green: 0.65, blue: 0.0)
+        let goldShine = Color(red: 1.0, green: 0.94, blue: 0.70)
+        let rimGrad = AngularGradient(
+            colors: [goldDark, goldBright, goldShine, goldBright, goldDark, goldMid, goldShine, goldMid, goldDark],
+            center: .center
         )
-        let borderGradient = LinearGradient(
-            colors: [goldDark, goldBright, goldShine, goldBright, goldDark],
-            startPoint: .top,
-            endPoint: .bottom
+        let bodyGrad = RadialGradient(
+            colors: [goldShine, goldBright, goldMid],
+            center: .init(x: 0.4, y: 0.35),
+            startRadius: 2,
+            endRadius: 24
         )
+        let sz: CGFloat = 48
         return ZStack {
-            MedalShape()
-                .fill(medalGradient)
-                .overlay(
-                    MedalShape()
-                        .stroke(borderGradient, lineWidth: 1.5)
-                )
-                .frame(width: 44, height: 52)
+            Circle()
+                .fill(rimGrad)
+                .frame(width: sz, height: sz)
                 .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-            VStack(spacing: 1) {
+            Circle()
+                .fill(bodyGrad)
+                .frame(width: sz - 5, height: sz - 5)
+            Circle()
+                .strokeBorder(goldDark.opacity(0.3), lineWidth: 0.5)
+                .frame(width: sz - 8, height: sz - 8)
+            VStack(spacing: 0) {
                 Text("MY FIRST")
-                    .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
-                    .tracking(1)
-                    .foregroundStyle(Color.black.opacity(0.8))
-                    .padding(.top, 6)
+                    .font(.system(size: 3.5, weight: .heavy, design: .default).width(.expanded))
+                    .tracking(0.5)
+                    .foregroundStyle(Color.black.opacity(0.75))
                 Text(activity.hasDistance ? String(format: "%.1f", activity.distanceRaw / 1000.0) : "--")
-                    .font(.system(size: 12, weight: .black, design: .default).width(.compressed))
+                    .font(.system(size: 13, weight: .black, design: .default).width(.compressed))
                     .foregroundStyle(Color.black.opacity(0.85))
                 Text("KM")
-                    .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
+                    .font(.system(size: 3.5, weight: .heavy, design: .default).width(.expanded))
                     .tracking(1)
-                    .foregroundStyle(Color.black.opacity(0.55))
+                    .foregroundStyle(Color.black.opacity(0.5))
                 Image(systemName: "figure.run")
-                    .font(.system(size: 4))
-                    .foregroundStyle(Color.black.opacity(0.35))
-                    .padding(.top, 1)
+                    .font(.system(size: 3.5))
+                    .foregroundStyle(Color.black.opacity(0.3))
             }
         }
     }
