@@ -2280,7 +2280,7 @@ struct StatWidgetContentView: View, Equatable {
         let goldShine = Color(red: 1.0, green: 0.94, blue: 0.70)
         let textColor = Color(red: 0.15, green: 0.10, blue: 0.02)
 
-        let medalSize: CGFloat = 170
+        let medalSize: CGFloat = 190
         let halfSize = medalSize / 2
 
         let bodyGradient = RadialGradient(
@@ -2330,39 +2330,50 @@ struct StatWidgetContentView: View, Equatable {
                     ),
                     lineWidth: 1
                 )
-                .frame(width: medalSize - 28, height: medalSize - 28)
+                .frame(width: medalSize - 30, height: medalSize - 30)
+
+            Circle()
+                .strokeBorder(
+                    AngularGradient(
+                        colors: [goldDark.opacity(0.15), goldBright.opacity(0.1), goldDark.opacity(0.15), goldBright.opacity(0.1), goldDark.opacity(0.15)],
+                        center: .center
+                    ),
+                    lineWidth: 0.5
+                )
+                .frame(width: medalSize - 36, height: medalSize - 36)
+
+            MedalStarDots(radius: halfSize - 18, count: 24, dotSize: 1.2, color: goldDark.opacity(0.15))
 
             MedalCurvedText(
-                text: "✦  MY FIRST  ✦",
-                radius: halfSize - 24,
-                fontSize: 11,
+                text: "✦  M Y   F I R S T  ✦",
+                radius: halfSize - 27,
+                fontSize: 10,
                 fontWeight: .heavy,
-                kerning: 1.2,
+                kerning: 0.5,
                 clockwise: true,
-                arcSpan: 140,
-                color: textColor.opacity(0.9)
+                arcSpan: 155,
+                color: textColor.opacity(0.85)
             )
 
             MedalCurvedText(
-                text: "FINISHER",
-                radius: halfSize - 22,
-                fontSize: 8,
+                text: "F  I  N  I  S  H  E  R",
+                radius: halfSize - 25,
+                fontSize: 7,
                 fontWeight: .bold,
-                kerning: 2.5,
+                kerning: 0.3,
                 clockwise: false,
-                arcSpan: 80,
-                color: textColor.opacity(0.55)
+                arcSpan: 100,
+                color: textColor.opacity(0.45)
             )
 
             VStack(spacing: 0) {
                 Image(systemName: "figure.run")
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(textColor.opacity(0.3))
-
-                Spacer().frame(height: 1)
+                    .padding(.bottom, 1)
 
                 Text(goldenArchDistanceText)
-                    .font(.system(size: 40, weight: .black, design: .default).width(.compressed))
+                    .font(.system(size: 42, weight: .black, design: .default).width(.compressed))
                     .foregroundStyle(textColor.opacity(0.92))
                     .lineLimit(1)
                     .minimumScaleFactor(0.4)
@@ -2372,10 +2383,9 @@ struct StatWidgetContentView: View, Equatable {
                     .font(.system(size: 10, weight: .heavy, design: .default).width(.expanded))
                     .tracking(5)
                     .foregroundStyle(textColor.opacity(0.5))
+                    .padding(.bottom, 3)
 
                 if hasSubMetrics {
-                    Spacer().frame(height: 2)
-
                     HStack(spacing: 0) {
                         if goldenArchShowPace, activity.hasDistance {
                             Text(goldenArchPaceText)
@@ -2393,9 +2403,8 @@ struct StatWidgetContentView: View, Equatable {
                                 .foregroundStyle(textColor.opacity(0.45))
                         }
                     }
+                    .padding(.bottom, 3)
                 }
-
-                Spacer().frame(height: 2)
 
                 MedalBannerView(
                     text: goldenArchDateText,
@@ -2405,8 +2414,8 @@ struct StatWidgetContentView: View, Equatable {
                     textColor: textColor
                 )
             }
-            .frame(width: medalSize - 44)
-            .offset(y: 2)
+            .frame(width: medalSize - 50)
+            .offset(y: 3)
         }
         .frame(width: medalSize + 8, height: medalSize + 8)
     }
@@ -2435,6 +2444,26 @@ struct StatWidgetContentView: View, Equatable {
                 .font(.system(size: 16, weight: .regular, design: .serif).italic())
                 .foregroundStyle(primaryColor)
                 .minimumScaleFactor(0.8)
+        }
+    }
+}
+
+struct MedalStarDots: View {
+    let radius: CGFloat
+    let count: Int
+    let dotSize: CGFloat
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<count, id: \.self) { i in
+                let angle = (360.0 / Double(count)) * Double(i)
+                let rad = angle * .pi / 180
+                Circle()
+                    .fill(color)
+                    .frame(width: dotSize, height: dotSize)
+                    .offset(x: cos(rad) * radius, y: sin(rad) * radius)
+            }
         }
     }
 }
