@@ -1,17 +1,17 @@
-# Arreglar selección del segundo item en los scroll pickers verticales
+# Unificar los scroll pickers verticales en un solo componente reutilizable
 
-## Problema
+## Problema actual
 
-Los selectores verticales de estilo (efectos BVT y presets WhatsApp) saltan del primer item al tercero cuando intentas seleccionar el segundo. Esto ocurre porque el scroll automático de iOS genera demasiada velocidad incluso con un gesto mínimo, y los items son muy pequeños (40pt) para que el "snap" funcione bien.
+Existen dos componentes casi idénticos (`BVTEffectScrollPicker` y `WhatsAppTextScrollPicker`) que comparten toda la lógica de arrastre, snap, haptics y desvanecimiento por distancia. La única diferencia es el contenido visual de cada fila y dimensiones menores.
 
 ## Solución
 
-Reemplazar el mecanismo de scroll nativo por un sistema de **arrastre manual con snap controlado**, donde nosotros decidimos exactamente a qué item se mueve según la distancia del dedo.
+Crear un **único componente genérico** que encapsule toda la mecánica compartida y permita personalizar solo la apariencia de cada fila desde afuera.
 
 ## Cambios
 
-- **Nuevo comportamiento de selección** — En lugar de depender del scroll de iOS para decidir dónde parar, el componente calcula manualmente cuál es el item más cercano al centro basándose en cuánto movió el dedo el usuario
-- **Snap preciso** — Al soltar el dedo, el componente se mueve con una animación suave (spring) exactamente al item más cercano, sin importar la velocidad del gesto
-- **Mismo aspecto visual** — Se mantiene exactamente el mismo diseño: la máscara de desvanecimiento arriba/abajo, la cápsula de selección, los iconos y textos, y el efecto haptic al cambiar
-- **Se aplica a ambos componentes** — Tanto el selector de efectos BVT (lado derecho del canvas) como el selector de presets WhatsApp se actualizan con este nuevo mecanismo
-- **Swipe rápido funciona** — Un swipe rápido avanza solo 1 item a la vez (no se salta), garantizando control preciso
+- **Nuevo componente genérico `VerticalSnapPicker`** — Contiene toda la lógica de arrastre, snap de 1 item a la vez, haptics, y efecto de desvanecimiento por distancia. Acepta una lista de items genéricos y un closure para renderizar cada fila
+- **Parámetros configurables** — Ancho del picker y número de items visibles se pueden personalizar por uso (130pt para efectos BVT, 167pt para presets WhatsApp)
+- **Se reemplazan ambos componentes existentes** — `BVTEffectScrollPicker` y `WhatsAppTextScrollPicker` se convierten en wrappers delgados (o se eliminan) que simplemente pasan su contenido al componente genérico
+- **Misma apariencia visual** — Cada stat mantiene exactamente su diseño actual (iconos, colores, tipografía), solo cambia la implementación interna
+- **Listo para futuros stats** — Si se agrega un nuevo stat con selector vertical, solo se necesita definir el contenido de la fila, sin duplicar la mecánica de scroll
