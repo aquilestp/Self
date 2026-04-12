@@ -303,6 +303,8 @@ extension PhotoEditorView {
             miniGoldenArch
         case .notesScreenshot:
             miniNotesScreenshot
+        case .ancestralMedal:
+            miniAncestralMedal
         }
     }
 
@@ -874,6 +876,62 @@ extension PhotoEditorView {
                 Image(systemName: "figure.run")
                     .font(.system(size: 3.5))
                     .foregroundStyle(Color.black.opacity(0.3))
+            }
+        }
+    }
+
+    var miniAncestralMedal: some View {
+        let bronzeDark = Color(red: 0.54, green: 0.40, blue: 0.14)
+        let goldDeep = Color(red: 0.83, green: 0.68, blue: 0.21)
+        let goldBright = Color(red: 0.93, green: 0.79, blue: 0.28)
+        let goldShine = Color(red: 0.98, green: 0.91, blue: 0.55)
+        let rimGrad = AngularGradient(
+            colors: [bronzeDark, goldDeep, goldShine, goldBright, bronzeDark, goldDeep, goldShine, goldDeep, bronzeDark],
+            center: .center
+        )
+        let bodyGrad = RadialGradient(
+            colors: [goldShine, goldBright, goldDeep, bronzeDark.opacity(0.8)],
+            center: .init(x: 0.38, y: 0.32),
+            startRadius: 2,
+            endRadius: 26
+        )
+        let sz: CGFloat = 50
+        return ZStack {
+            Circle()
+                .fill(rimGrad)
+                .frame(width: sz, height: sz)
+                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 1)
+            Circle()
+                .fill(bodyGrad)
+                .frame(width: sz - 5, height: sz - 5)
+            Circle()
+                .strokeBorder(bronzeDark.opacity(0.35), lineWidth: 0.7)
+                .frame(width: sz - 9, height: sz - 9)
+            ForEach(0..<6, id: \.self) { i in
+                let side: CGFloat = i < 3 ? -1 : 1
+                let idx = i < 3 ? i : i - 3
+                let t = Double(idx) / 2.0
+                let baseAngle = side < 0 ? (-60.0 + t * 120.0) : (180.0 + 60.0 - t * 120.0)
+                let rad = baseAngle * .pi / 180
+                let r: CGFloat = sz * 0.32
+                Ellipse()
+                    .fill(bronzeDark.opacity(0.18))
+                    .frame(width: 2.5, height: 5)
+                    .rotationEffect(.degrees(baseAngle + (side < 0 ? 90 : -90)))
+                    .offset(x: cos(rad) * r, y: sin(rad) * r)
+            }
+            VStack(spacing: 0) {
+                Text("MY FIRST")
+                    .font(.system(size: 3, weight: .heavy, design: .serif))
+                    .tracking(0.3)
+                    .foregroundStyle(Color.black.opacity(0.6))
+                Text(activity.hasDistance ? String(format: "%.1f", activity.distanceRaw / 1000.0) : "--")
+                    .font(.system(size: 14, weight: .black, design: .serif))
+                    .foregroundStyle(Color.black.opacity(0.8))
+                Text("KM")
+                    .font(.system(size: 3, weight: .heavy, design: .serif))
+                    .tracking(1)
+                    .foregroundStyle(Color.black.opacity(0.4))
             }
         }
     }

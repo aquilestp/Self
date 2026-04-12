@@ -40,6 +40,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case whatsappMessage = "WhatsApp"
     case goldenArch = "Golden Arch"
     case notesScreenshot = "Notes"
+    case ancestralMedal = "Ancestral"
 
     var id: String { rawValue }
 
@@ -78,12 +79,13 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .whatsappMessage: return "bubble.right.fill"
         case .goldenArch: return "trophy.fill"
         case .notesScreenshot: return "note.text"
+        case .ancestralMedal: return "crown.fill"
         }
     }
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch, .notesScreenshot:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch, .notesScreenshot, .ancestralMedal:
             return false
         default:
             return true
@@ -118,6 +120,10 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
 
     var isNotesScreenshot: Bool {
         self == .notesScreenshot
+    }
+
+    var isAncestralMedal: Bool {
+        self == .ancestralMedal
     }
 
     var isDistanceWords: Bool {
@@ -303,6 +309,9 @@ struct PlacedWidget: Identifiable {
     var goldenArchShowPace: Bool = true
     var goldenArchShowTime: Bool = true
     var notesUnitFilter: SplitsUnitFilter = .km
+    var ancestralUnitFilter: SplitsUnitFilter = .km
+    var ancestralShowPace: Bool = true
+    var ancestralShowTime: Bool = true
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {

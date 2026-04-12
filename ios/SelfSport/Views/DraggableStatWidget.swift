@@ -76,7 +76,10 @@ struct StatWidgetContentView: View, Equatable {
         lhs.goldenArchUnitFilter == rhs.goldenArchUnitFilter &&
         lhs.goldenArchShowPace == rhs.goldenArchShowPace &&
         lhs.goldenArchShowTime == rhs.goldenArchShowTime &&
-        lhs.notesUnitFilter == rhs.notesUnitFilter
+        lhs.notesUnitFilter == rhs.notesUnitFilter &&
+        lhs.ancestralUnitFilter == rhs.ancestralUnitFilter &&
+        lhs.ancestralShowPace == rhs.ancestralShowPace &&
+        lhs.ancestralShowTime == rhs.ancestralShowTime
     }
 
     let type: StatWidgetType
@@ -122,6 +125,9 @@ struct StatWidgetContentView: View, Equatable {
     var goldenArchShowPace: Bool = true
     var goldenArchShowTime: Bool = true
     var notesUnitFilter: SplitsUnitFilter = .km
+    var ancestralUnitFilter: SplitsUnitFilter = .km
+    var ancestralShowPace: Bool = true
+    var ancestralShowTime: Bool = true
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -177,6 +183,7 @@ struct StatWidgetContentView: View, Equatable {
         case .whatsappMessage: whatsappMessageWidget
         case .goldenArch: goldenArchWidget
         case .notesScreenshot: notesScreenshotWidget
+        case .ancestralMedal: ancestralMedalWidget
         }
     }
 
@@ -2530,6 +2537,191 @@ struct StatWidgetContentView: View, Equatable {
         .frame(width: medalSize + 8, height: medalSize + 8)
     }
 
+    private var ancestralIsMiles: Bool { ancestralUnitFilter == .miles }
+
+    private var ancestralDistanceText: String {
+        if ancestralIsMiles {
+            let mi = activity.distanceRaw / 1609.34
+            return String(format: "%.1f", mi)
+        }
+        let km = activity.distanceRaw / 1000.0
+        return String(format: "%.1f", km)
+    }
+
+    private var ancestralUnitLabel: String {
+        ancestralIsMiles ? "MI" : "KM"
+    }
+
+    private var ancestralPaceText: String {
+        guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
+        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
+        if ancestralIsMiles {
+            let secPerMile = 1609.34 / speed
+            let m = Int(secPerMile) / 60
+            let s = Int(secPerMile) % 60
+            return String(format: "%d:%02d /mi", m, s)
+        } else {
+            let secPerKm = 1000.0 / speed
+            let m = Int(secPerKm) / 60
+            let s = Int(secPerKm) % 60
+            return String(format: "%d:%02d /km", m, s)
+        }
+    }
+
+    private var ancestralDateText: String {
+        if let d = activity.startDate {
+            let f = DateFormatter()
+            f.dateFormat = "dd MMM yyyy"
+            return f.string(from: d).uppercased()
+        }
+        return activity.date.uppercased()
+    }
+
+    private var ancestralMedalWidget: some View {
+        let bronzeDark = Color(red: 0.54, green: 0.40, blue: 0.14)
+        let goldDeep = Color(red: 0.83, green: 0.68, blue: 0.21)
+        let goldBright = Color(red: 0.93, green: 0.79, blue: 0.28)
+        let goldLight = Color(red: 0.98, green: 0.91, blue: 0.55)
+        let goldShine = Color(red: 1.0, green: 0.97, blue: 0.78)
+        let engraveColor = Color(red: 0.12, green: 0.08, blue: 0.02)
+
+        let medalSize: CGFloat = 210
+        let halfSize = medalSize / 2
+
+        let bodyGradient = RadialGradient(
+            colors: [goldShine, goldLight, goldBright, goldDeep, bronzeDark.opacity(0.9)],
+            center: .init(x: 0.38, y: 0.32),
+            startRadius: 4,
+            endRadius: medalSize * 0.52
+        )
+        let rimGradient = AngularGradient(
+            colors: [bronzeDark, goldDeep, goldShine, goldBright, bronzeDark, goldDeep, goldShine, goldDeep, bronzeDark],
+            center: .center
+        )
+        let innerRimGradient = AngularGradient(
+            colors: [bronzeDark.opacity(0.7), goldBright.opacity(0.4), bronzeDark.opacity(0.7), goldBright.opacity(0.4), bronzeDark.opacity(0.7)],
+            center: .center
+        )
+
+        let hasSubMetrics = (ancestralShowPace && activity.hasDistance) || ancestralShowTime
+
+        let engraveGradient = LinearGradient(
+            colors: [
+                Color(red: 0.83, green: 0.68, blue: 0.21),
+                Color(red: 0.54, green: 0.40, blue: 0.14)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+
+        return ZStack {
+            Circle()
+                .fill(rimGradient)
+                .frame(width: medalSize, height: medalSize)
+                .shadow(color: .black.opacity(0.55), radius: 10, x: 0, y: 5)
+                .shadow(color: bronzeDark.opacity(0.9), radius: 3, x: 0, y: 2)
+
+            Circle()
+                .fill(bodyGradient)
+                .frame(width: medalSize - 16, height: medalSize - 16)
+
+            Circle()
+                .strokeBorder(innerRimGradient, lineWidth: 2)
+                .frame(width: medalSize - 16, height: medalSize - 16)
+
+            Circle()
+                .strokeBorder(
+                    LinearGradient(
+                        colors: [bronzeDark.opacity(0.5), goldBright.opacity(0.25), bronzeDark.opacity(0.5)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.2
+                )
+                .frame(width: medalSize - 26, height: medalSize - 26)
+
+            Circle()
+                .strokeBorder(bronzeDark.opacity(0.15), lineWidth: 0.5)
+                .frame(width: medalSize - 34, height: medalSize - 34)
+
+            AncestralLaurelWreath(radius: halfSize - 22, leafCount: 18, color: bronzeDark.opacity(0.2))
+
+            AncestralStarRing(radius: halfSize - 16, count: 12, starSize: 3.5, color: bronzeDark.opacity(0.12))
+
+            MedalCurvedText(
+                text: "✦  M Y   F I R S T  ✦",
+                radius: halfSize - 30,
+                fontSize: 9,
+                fontWeight: .heavy,
+                kerning: 0.4,
+                clockwise: true,
+                arcSpan: 160,
+                color: engraveColor.opacity(0.7)
+            )
+
+            MedalCurvedText(
+                text: "A C H I E V E M E N T",
+                radius: halfSize - 28,
+                fontSize: 6.5,
+                fontWeight: .bold,
+                kerning: 0.3,
+                clockwise: false,
+                arcSpan: 110,
+                color: engraveColor.opacity(0.35)
+            )
+
+            VStack(spacing: 0) {
+                Text(ancestralDistanceText)
+                    .font(.system(size: 48, weight: .black, design: .serif))
+                    .foregroundStyle(engraveGradient)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
+                    .shadow(color: goldShine.opacity(0.5), radius: 0.5, x: 0, y: 1)
+                    .shadow(color: bronzeDark.opacity(0.6), radius: 1, x: 0, y: -0.5)
+
+                Text(ancestralUnitLabel)
+                    .font(.system(size: 11, weight: .heavy, design: .serif))
+                    .tracking(6)
+                    .foregroundStyle(engraveColor.opacity(0.45))
+                    .padding(.top, -4)
+                    .padding(.bottom, 3)
+
+                if hasSubMetrics {
+                    HStack(spacing: 0) {
+                        if ancestralShowPace, activity.hasDistance {
+                            Text(ancestralPaceText)
+                                .font(.system(size: 8, weight: .semibold, design: .serif))
+                                .foregroundStyle(engraveColor.opacity(0.38))
+                        }
+                        if ancestralShowPace && activity.hasDistance && ancestralShowTime {
+                            Text("  ·  ")
+                                .font(.system(size: 6, weight: .black, design: .serif))
+                                .foregroundStyle(engraveColor.opacity(0.2))
+                        }
+                        if ancestralShowTime {
+                            Text(activity.duration)
+                                .font(.system(size: 8, weight: .semibold, design: .serif))
+                                .foregroundStyle(engraveColor.opacity(0.38))
+                        }
+                    }
+                    .padding(.bottom, 3)
+                }
+
+                MedalBannerView(
+                    text: ancestralDateText,
+                    goldDark: bronzeDark,
+                    goldBright: goldBright,
+                    goldShine: goldShine,
+                    textColor: engraveColor
+                )
+            }
+            .frame(width: medalSize - 56)
+            .offset(y: 5)
+        }
+        .frame(width: medalSize + 10, height: medalSize + 10)
+        .drawingGroup()
+    }
+
     private func topRowStatColumn(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
@@ -2554,6 +2746,70 @@ struct StatWidgetContentView: View, Equatable {
                 .font(.system(size: 16, weight: .regular, design: .serif).italic())
                 .foregroundStyle(primaryColor)
                 .minimumScaleFactor(0.8)
+        }
+    }
+}
+
+struct AncestralLaurelWreath: View {
+    let radius: CGFloat
+    let leafCount: Int
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<leafCount, id: \.self) { i in
+                let side: CGFloat = i < leafCount / 2 ? -1 : 1
+                let idx = i < leafCount / 2 ? i : i - leafCount / 2
+                let totalPerSide = leafCount / 2
+                let t = Double(idx) / Double(max(totalPerSide - 1, 1))
+                let baseAngle = side < 0 ? (-70.0 + t * 140.0) : (180.0 + 70.0 - t * 140.0)
+                let rad = baseAngle * .pi / 180
+                let x = cos(rad) * radius
+                let y = sin(rad) * radius
+                AncestralLeafShape()
+                    .fill(color)
+                    .frame(width: 6, height: 14)
+                    .rotationEffect(.degrees(baseAngle + (side < 0 ? 90 : -90)))
+                    .offset(x: x, y: y)
+            }
+        }
+    }
+}
+
+nonisolated struct AncestralLeafShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        let w = rect.width
+        let h = rect.height
+        p.move(to: CGPoint(x: w * 0.5, y: 0))
+        p.addQuadCurve(
+            to: CGPoint(x: w * 0.5, y: h),
+            control: CGPoint(x: w * 1.1, y: h * 0.45)
+        )
+        p.addQuadCurve(
+            to: CGPoint(x: w * 0.5, y: 0),
+            control: CGPoint(x: w * -0.1, y: h * 0.45)
+        )
+        return p
+    }
+}
+
+struct AncestralStarRing: View {
+    let radius: CGFloat
+    let count: Int
+    let starSize: CGFloat
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            ForEach(0..<count, id: \.self) { i in
+                let angle = (360.0 / Double(count)) * Double(i) - 90
+                let rad = angle * .pi / 180
+                Image(systemName: "star.fill")
+                    .font(.system(size: starSize, weight: .bold))
+                    .foregroundStyle(color)
+                    .offset(x: cos(rad) * radius, y: sin(rad) * radius)
+            }
         }
     }
 }
@@ -2871,7 +3127,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime, notesUnitFilter: widget.notesUnitFilter)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime)
     }
 }
 
