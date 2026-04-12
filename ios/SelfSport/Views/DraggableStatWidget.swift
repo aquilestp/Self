@@ -2330,8 +2330,6 @@ struct StatWidgetContentView: View, Equatable {
             .padding(.horizontal, 16)
             .padding(.top, 12)
             .padding(.bottom, 20)
-
-            Spacer(minLength: 30)
         }
         .frame(width: 260)
         .background(
