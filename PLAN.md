@@ -1,19 +1,27 @@
-# VerticalSnapPicker: más fluido y vibraciones más fuertes
+# Reescribir VerticalSnapPicker usando ScrollView nativo (como TextStyleCarousel)
 
-**Mejoras de fluidez:**
+## Problema
 
-- Reducir la resistencia del momentum para que el scroll se sienta más libre y natural (actualmente frena demasiado rápido)
-- Hacer que el highlight del item seleccionado siga tu dedo en tiempo real durante el drag, no solo cuando está quieto
-- Reducir el `minimumDistance` del gesto para que responda más rápido al toque
+El `VerticalSnapPicker` usa un gesto manual (`DragGesture`) para simular el scroll, lo que se siente rígido y artificial. El `TextStyleCarousel` se siente fluido porque usa el `ScrollView` nativo de SwiftUI, que delega toda la física (inercia, momentum, bounce) al sistema.
 
-**Mejoras de haptics (vibraciones más fuertes):**
+## Solución
 
-- Cambiar de `UISelectionFeedbackGenerator` (vibración suave) a `UIImpactFeedbackGenerator` con intensidad `.medium` para cada cambio de item durante el drag — se sentirá mucho más táctil
-- Al soltar el dedo y hacer snap al item final, usar una vibración `.heavy` para dar una confirmación clara
-- Pre-calentar el motor háptico antes de cada vibración para que no haya delay
+Reescribir el `VerticalSnapPicker` para usar **exactamente el mismo patrón** que `TextStyleCarousel`, pero en vertical:
 
-**Resultado esperado:**
+### Cambios técnicos
 
-- El scroll vertical se sentirá como el picker nativo de iOS (tipo ruleta)
-- Cada item que pases con el dedo dará un "click" satisfactorio
-- Al aterrizar en el item final, sentirás un golpe firme de confirmación
+- **Reemplazar `DragGesture` manual** → `ScrollView(.vertical)` nativo
+- **Usar `.scrollTargetBehavior(.viewAligned)`** — snap automático al item más cercano
+- **Usar `.scrollPosition(id:)`** — tracking nativo del item centrado
+- **Usar `.contentMargins(.vertical, ...)`** — centrar el primer/último item
+- **Usar `.scrollTargetLayout()`** en el contenedor interior
+- **Mantener haptics con `.sensoryFeedback(.impact, trigger:)`** en el `onChange` del ID scrolleado
+- **Mantener la misma interfaz pública** (`items`, `selectedItem`, `onSelect`, `rowContent`) para no romper nada
+
+### Resultado esperado
+
+- **Momentum natural** — un swipe fuerte recorre varios items antes de detenerse
+- **Bounce elástico** en los bordes (nativo del sistema)
+- **Deceleration suave** idéntica al `TextStyleCarousel`
+- **Haptic al cambiar de item** — impacto medio al pasar por cada uno
+- Sin cambios en ninguna otra vista que use `VerticalSnapPicker`
