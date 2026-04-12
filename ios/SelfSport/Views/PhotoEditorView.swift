@@ -899,7 +899,7 @@ struct PhotoEditorView: View {
         let paletteCount = WidgetPalette.allCases.count
 
         return VStack(alignment: .trailing, spacing: 8) {
-          if !targetIsWhatsapp && !targetIsGoldenArch && !targetIsAncestralMedal && !targetIsSplitBanner {
+          if !targetIsWhatsapp && !targetIsGoldenArch && !targetIsAncestralMedal {
             ForEach(Array(WidgetPalette.allCases.enumerated()), id: \.element.id) { index, palette in
                 let isActive = targetPalette == palette
                 Button {
