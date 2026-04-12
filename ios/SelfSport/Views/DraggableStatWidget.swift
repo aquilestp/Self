@@ -885,7 +885,7 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", weeklyKmData.totalKm))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -925,7 +925,7 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", lastWeekKmData.totalKm))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -964,7 +964,7 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", data.totalKm))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -1010,7 +1010,7 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", data.totalKm))
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
@@ -1065,7 +1065,7 @@ struct StatWidgetContentView: View, Equatable {
                     .font(.system(size: 11, weight: .bold))
                     .foregroundStyle(primaryColor.opacity(0.50))
                 Text(elev)
-                    .font(.system(size: 36, weight: .black, design: .default).width(.expanded))
+                    .font(.system(size: 36, weight: .heavy).width(.condensed).italic())
                     .tracking(-1)
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
