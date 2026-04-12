@@ -72,7 +72,10 @@ struct StatWidgetContentView: View, Equatable {
         lhs.bvtShowBPM == rhs.bvtShowBPM &&
         lhs.bvtUnitFilter == rhs.bvtUnitFilter &&
         lhs.bvtEffect == rhs.bvtEffect &&
-        lhs.whatsappText == rhs.whatsappText
+        lhs.whatsappText == rhs.whatsappText &&
+        lhs.goldenArchUnitFilter == rhs.goldenArchUnitFilter &&
+        lhs.goldenArchShowPace == rhs.goldenArchShowPace &&
+        lhs.goldenArchShowTime == rhs.goldenArchShowTime
     }
 
     let type: StatWidgetType
@@ -114,6 +117,9 @@ struct StatWidgetContentView: View, Equatable {
     var bvtUnitFilter: SplitsUnitFilter = .km
     var bvtEffect: BVTEffect = .glow
     var whatsappText: String = "My coach would be proud"
+    var goldenArchUnitFilter: SplitsUnitFilter = .km
+    var goldenArchShowPace: Bool = true
+    var goldenArchShowTime: Bool = true
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -167,6 +173,7 @@ struct StatWidgetContentView: View, Equatable {
         case .fullBannerBottom: fullBannerBottomWidget
         case .blurredVerticalText: blurredVerticalTextWidget
         case .whatsappMessage: whatsappMessageWidget
+        case .goldenArch: goldenArchWidget
         }
     }
 
@@ -2225,6 +2232,112 @@ struct StatWidgetContentView: View, Equatable {
         )
     }
 
+    private var goldenArchIsMiles: Bool { goldenArchUnitFilter == .miles }
+
+    private var goldenArchDistanceText: String {
+        if goldenArchIsMiles {
+            let mi = activity.distanceRaw / 1609.34
+            return String(format: "%.2f", mi)
+        }
+        let km = activity.distanceRaw / 1000.0
+        return String(format: "%.1f", km)
+    }
+
+    private var goldenArchUnitLabel: String {
+        goldenArchIsMiles ? "MI" : "KM"
+    }
+
+    private var goldenArchPaceText: String {
+        guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
+        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
+        if goldenArchIsMiles {
+            let secPerMile = 1609.34 / speed
+            let m = Int(secPerMile) / 60
+            let s = Int(secPerMile) % 60
+            return String(format: "%d:%02d /mi", m, s)
+        } else {
+            let secPerKm = 1000.0 / speed
+            let m = Int(secPerKm) / 60
+            let s = Int(secPerKm) % 60
+            return String(format: "%d:%02d /km", m, s)
+        }
+    }
+
+    private var goldenArchWidget: some View {
+        let goldDark = Color(red: 0.72, green: 0.53, blue: 0.04)
+        let goldBright = Color(red: 1.0, green: 0.84, blue: 0.0)
+        let goldLight = Color(red: 1.0, green: 0.97, blue: 0.86)
+        let archGradient = AngularGradient(
+            gradient: Gradient(colors: [goldDark, goldBright, goldLight, goldBright, goldDark]),
+            center: .center,
+            startAngle: .degrees(135),
+            endAngle: .degrees(405)
+        )
+        let archSize: CGFloat = 110
+        let archLineWidth: CGFloat = 10
+
+        let hasSubMetrics = (goldenArchShowPace && activity.hasDistance) || goldenArchShowTime
+
+        return VStack(spacing: 6) {
+            Text("MY FIRST")
+                .font(.system(size: 11, weight: .heavy, design: .default).width(.expanded))
+                .tracking(5)
+                .foregroundStyle(goldBright)
+                .shadow(color: goldBright.opacity(0.5), radius: 6, x: 0, y: 0)
+
+            ZStack {
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(goldDark.opacity(0.15), style: StrokeStyle(lineWidth: archLineWidth, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: archSize, height: archSize)
+
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(archGradient, style: StrokeStyle(lineWidth: archLineWidth, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: archSize, height: archSize)
+                    .shadow(color: goldBright.opacity(0.45), radius: 12, x: 0, y: 0)
+                    .shadow(color: goldBright.opacity(0.2), radius: 24, x: 0, y: 0)
+
+                VStack(spacing: 2) {
+                    Text(goldenArchDistanceText)
+                        .font(.system(size: 32, weight: .black, design: .default).width(.compressed))
+                        .foregroundStyle(primaryColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                    Text(goldenArchUnitLabel)
+                        .font(.system(size: 12, weight: .bold, design: .default).width(.expanded))
+                        .tracking(3)
+                        .foregroundStyle(primaryColor.opacity(0.6))
+                }
+            }
+
+            if hasSubMetrics {
+                HStack(spacing: 0) {
+                    if goldenArchShowPace, activity.hasDistance {
+                        Text(goldenArchPaceText)
+                            .font(.system(size: 12, weight: .semibold, design: .default))
+                            .foregroundStyle(primaryColor.opacity(0.75))
+                    }
+                    if goldenArchShowPace && activity.hasDistance && goldenArchShowTime {
+                        Text("  ·  ")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(goldBright.opacity(0.5))
+                    }
+                    if goldenArchShowTime {
+                        Text(activity.duration)
+                            .font(.system(size: 12, weight: .semibold, design: .default))
+                            .foregroundStyle(primaryColor.opacity(0.75))
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .shadow(color: .black.opacity(0.4), radius: 8, x: 0, y: 3)
+    }
+
     private func topRowStatColumn(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
@@ -2444,7 +2557,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime)
     }
 }
 

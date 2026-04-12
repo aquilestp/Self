@@ -299,6 +299,8 @@ extension PhotoEditorView {
             miniBlurredVerticalText
         case .whatsappMessage:
             miniWhatsappMessage
+        case .goldenArch:
+            miniGoldenArch
         }
     }
 
@@ -826,6 +828,46 @@ extension PhotoEditorView {
             RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .fill(Color(red: 0.00, green: 0.37, blue: 0.33))
         )
+    }
+
+    var miniGoldenArch: some View {
+        let goldBright = Color(red: 1.0, green: 0.84, blue: 0.0)
+        let goldDark = Color(red: 0.72, green: 0.53, blue: 0.04)
+        let goldLight = Color(red: 1.0, green: 0.97, blue: 0.86)
+        let archGradient = AngularGradient(
+            gradient: Gradient(colors: [goldDark, goldBright, goldLight, goldBright, goldDark]),
+            center: .center,
+            startAngle: .degrees(135),
+            endAngle: .degrees(405)
+        )
+        return VStack(spacing: 2) {
+            Text("MY FIRST")
+                .font(.system(size: 5, weight: .heavy, design: .default).width(.expanded))
+                .tracking(2)
+                .foregroundStyle(goldBright)
+            ZStack {
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(archGradient, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 36, height: 36)
+                    .shadow(color: goldBright.opacity(0.4), radius: 4, x: 0, y: 0)
+                VStack(spacing: 0) {
+                    Text(activity.hasDistance ? String(format: "%.1f", activity.distanceRaw / 1000.0) : "--")
+                        .font(.system(size: 10, weight: .black, design: .default).width(.compressed))
+                        .foregroundStyle(.white)
+                    Text("KM")
+                        .font(.system(size: 4, weight: .bold, design: .default).width(.expanded))
+                        .tracking(1)
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
+            if activity.hasDistance {
+                Text(activity.pace)
+                    .font(.system(size: 5, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.6))
+            }
+        }
     }
 
     var miniBlurredVerticalText: some View {

@@ -38,6 +38,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case fullBannerBottom = "Full Banner Bottom"
     case blurredVerticalText = "Blurred Vertical"
     case whatsappMessage = "WhatsApp"
+    case goldenArch = "Golden Arch"
 
     var id: String { rawValue }
 
@@ -74,12 +75,13 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .fullBannerBottom: return "rectangle.bottomhalf.filled"
         case .blurredVerticalText: return "list.bullet"
         case .whatsappMessage: return "bubble.right.fill"
+        case .goldenArch: return "trophy.fill"
         }
     }
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch:
             return false
         default:
             return true
@@ -106,6 +108,10 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts, .blurredVerticalText: return true
         default: return false
         }
+    }
+
+    var isGoldenArch: Bool {
+        self == .goldenArch
     }
 
     var isDistanceWords: Bool {
@@ -287,6 +293,9 @@ struct PlacedWidget: Identifiable {
     var bvtUnitFilter: SplitsUnitFilter = .km
     var bvtEffect: BVTEffect = .glow
     var whatsappText: String = "My coach would be proud"
+    var goldenArchUnitFilter: SplitsUnitFilter = .km
+    var goldenArchShowPace: Bool = true
+    var goldenArchShowTime: Bool = true
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {

@@ -1,30 +1,37 @@
-# Área de gesto dinámica y estable para el stat BVT
+# Stat "Golden Arch" — MY FIRST (Arco Dorado Premium)
 
-## Problema
+## Concepto
+Un stat compacto con forma de **arco dorado grueso tipo medalla/trofeo** que celebra tu primera actividad. Se siente premium, llamativo y de logro desbloqueado.
 
-Cada variación de estilo del stat BVT tiene un tamaño de layout diferente (blur añade padding, glitch expande con offsets, glow tiene sombras fuera del frame, etc.). Esto causa que el área táctil cambie de tamaño al cambiar de estilo, pudiendo quedar muy pequeña o desalineada respecto a lo que el usuario ve.
+---
 
-## Solución: Contenedor de gesto normalizado
+### **Diseño Visual**
 
-Un enfoque elegante y mínimo en 2 partes:
+- **Arco grueso dorado** (~270° de arco) con gradiente metálico dorado (de oro oscuro a oro brillante a oro claro)
+- Shadow/glow dorado sutil alrededor del arco para efecto premium luminoso
+- **"MY FIRST"** en texto compacto bold con tracking amplio, posicionado **encima del arco** como un título de trofeo
+- **Distancia grande** centrada **dentro del arco** (ej: "5.3 KM" o "3.3 MI") — texto grueso, impactante
+- **Sub-métricas** debajo del arco en fila horizontal compacta: Pace · Tiempo (con separadores dorados)
+- Cada sub-métrica puede ocultarse individualmente
+- Selector de unidad (KM/MI) integrado en las opciones del stat
 
-### 1. Medir el contenido base una sola vez
+### **Colores**
+- El arco siempre es dorado metálico (gradiente: `#B8860B` → `#FFD700` → `#FFF8DC`)
+- El texto respeta el color seleccionado del usuario (como todos los stats)
+- Glow dorado en el arco con sombra suave
 
-- Se mide el tamaño del `textContent` base (el VStack de líneas de texto) **antes** de aplicar cualquier efecto visual
-- Este tamaño base es estable — solo cambia si cambian los datos o campos visibles, nunca por el efecto
+### **Indicadores configurables**
+- Distancia (siempre visible — es el dato central)
+- Pace — puede ocultarse
+- Tiempo — puede ocultarse
+- Selector de unidad KM/MI
 
-### 2. Envolver el resultado en un contenedor de tamaño mínimo garantizado
+### **Integración**
+- Nuevo tipo `goldenArch` en la lista de stats disponibles
+- Mini preview en el drawer de selección de stats
+- Soporta glass background como otros stats compactos
+- Soporta los 3 colores de paleta para el texto (el arco siempre dorado)
 
-- Después de aplicar el efecto (blur, glow, glitch, etc.), el resultado se envuelve en un contenedor invisible que tiene como tamaño mínimo el del texto base + un margen generoso fijo (ej. 20pt por lado)
-- Esto asegura que:
-  - Efectos que reducen el área (glow sin padding) siguen teniendo un área de gesto amplia
-  - Efectos que expanden el área (glitch, wave) mantienen su tamaño natural si es mayor
-  - La transición entre estilos no genera saltos bruscos en el área táctil
-  - El usuario siempre puede tocar, arrastrar y hacer pinch sobre lo que ve
-
-### Resultado esperado
-
-- Sin importar la variación de estilo activa, el stat siempre será fácil de mover, escalar y rotar
-- No hay cambios visuales — solo se estabiliza el área de interacción
-- El cambio es interno al `blurredVerticalTextWidget` — no afecta ningún otro stat ni la arquitectura de gestos existente
-
+### **Tamaño**
+- Compacto: ~140pt de ancho × ~160pt de alto aproximadamente
+- Similar en escala a los stats de tipo "Moving Clean" o "Heart Rate"

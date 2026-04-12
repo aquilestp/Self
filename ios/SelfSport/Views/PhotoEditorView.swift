@@ -811,6 +811,10 @@ struct PhotoEditorView: View {
         let targetBvtShowBPM = targetWidget?.bvtShowBPM ?? true
         let targetBvtUnitFilter = targetWidget?.bvtUnitFilter ?? .km
         let targetBvtEffect = targetWidget?.bvtEffect ?? .glow
+        let targetIsGoldenArch = targetWidget?.type == .goldenArch
+        let targetGoldenArchUnit = targetWidget?.goldenArchUnitFilter ?? .km
+        let targetGoldenArchShowPace = targetWidget?.goldenArchShowPace ?? true
+        let targetGoldenArchShowTime = targetWidget?.goldenArchShowTime ?? true
         let targetIsWhatsapp = targetWidget?.type == .whatsappMessage
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
@@ -1251,6 +1255,58 @@ struct PhotoEditorView: View {
                     .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.08),
                     value: showPaletteSelector
                 )
+            }
+
+            if targetIsGoldenArch {
+                Rectangle()
+                    .fill(Color.white.opacity(0.12))
+                    .frame(width: 20, height: 1)
+                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                    .opacity(showPaletteSelector ? 1 : 0)
+                    .animation(
+                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04),
+                        value: showPaletteSelector
+                    )
+
+                unitToggleButton(currentFilter: targetGoldenArchUnit, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].goldenArchUnitFilter = placedWidgets[idx].goldenArchUnitFilter == .km ? .miles : .km
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                Rectangle()
+                    .fill(Color.white.opacity(0.12))
+                    .frame(width: 20, height: 1)
+                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                    .opacity(showPaletteSelector ? 1 : 0)
+                    .animation(
+                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.10),
+                        value: showPaletteSelector
+                    )
+
+                visibilityToggleButton(icon: "speedometer", isOn: targetGoldenArchShowPace, delay: Double(paletteCount) * 0.04 + 0.12) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].goldenArchShowPace.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+
+                visibilityToggleButton(icon: "clock", isOn: targetGoldenArchShowTime, delay: Double(paletteCount) * 0.04 + 0.15) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].goldenArchShowTime.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
             }
 
             if targetIsWhatsapp {
