@@ -2373,16 +2373,6 @@ struct StatWidgetContentView: View, Equatable {
                     .tracking(5)
                     .foregroundStyle(textColor.opacity(0.5))
 
-                Spacer().frame(height: 2)
-
-                MedalBannerView(
-                    text: goldenArchDateText,
-                    goldDark: goldDark,
-                    goldBright: goldBright,
-                    goldShine: goldShine,
-                    textColor: textColor
-                )
-
                 if hasSubMetrics {
                     Spacer().frame(height: 2)
 
@@ -2404,6 +2394,16 @@ struct StatWidgetContentView: View, Equatable {
                         }
                     }
                 }
+
+                Spacer().frame(height: 2)
+
+                MedalBannerView(
+                    text: goldenArchDateText,
+                    goldDark: goldDark,
+                    goldBright: goldBright,
+                    goldShine: goldShine,
+                    textColor: textColor
+                )
             }
             .frame(width: medalSize - 44)
             .offset(y: 2)
