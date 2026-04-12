@@ -13,46 +13,34 @@ struct VerticalSnapPicker<Item: Equatable, RowContent: View>: View {
     @State private var selectedIndex: Int = 0
     @State private var dragOffset: CGFloat = 0
     @State private var lastHapticIndex: Int = 0
+    @State private var isDragging: Bool = false
 
-    private let dragHaptic = UIImpactFeedbackGenerator(style: .medium)
-    private let snapHaptic = UIImpactFeedbackGenerator(style: .heavy)
+    private let tickHaptic = UIImpactFeedbackGenerator(style: .medium)
+    private let landHaptic = UIImpactFeedbackGenerator(style: .heavy)
 
-    private func rubberBand(_ offset: CGFloat, limit: CGFloat) -> CGFloat {
-        let coefficient: CGFloat = 0.55
-        let dimension: CGFloat = itemHeight * CGFloat(visibleItems)
-        if limit == 0 { return offset }
-        let absOffset = abs(offset)
-        let sign: CGFloat = offset < 0 ? -1 : 1
-        let clamped = (1.0 - (1.0 / ((absOffset * coefficient / dimension) + 1.0))) * dimension
-        return sign * clamped
+    private var continuousIndex: CGFloat {
+        CGFloat(selectedIndex) - dragOffset / itemHeight
     }
 
-    private var maxUpOffset: CGFloat {
-        CGFloat(selectedIndex) * itemHeight
-    }
-
-    private var maxDownOffset: CGFloat {
-        CGFloat(items.count - 1 - selectedIndex) * itemHeight
-    }
-
-    private var dampedDragOffset: CGFloat {
-        if dragOffset > maxUpOffset {
-            let overshoot = dragOffset - maxUpOffset
-            return maxUpOffset + rubberBand(overshoot, limit: maxUpOffset)
-        } else if -dragOffset > maxDownOffset {
-            let overshoot = -dragOffset - maxDownOffset
-            return -(maxDownOffset + rubberBand(overshoot, limit: maxDownOffset))
+    private var clampedContinuousIndex: CGFloat {
+        let raw = continuousIndex
+        if raw < 0 {
+            return -rubberBand(abs(raw), maxItems: 2)
+        } else if raw > CGFloat(items.count - 1) {
+            let over = raw - CGFloat(items.count - 1)
+            return CGFloat(items.count - 1) + rubberBand(over, maxItems: 2)
         }
-        return dragOffset
+        return raw
     }
 
-    private var effectiveOffset: CGFloat {
-        -CGFloat(selectedIndex) * itemHeight + dampedDragOffset
+    private func rubberBand(_ overshoot: CGFloat, maxItems: CGFloat) -> CGFloat {
+        let dim = maxItems
+        let c: CGFloat = 0.4
+        return (1.0 - (1.0 / ((overshoot * c / dim) + 1.0))) * dim
     }
 
-    private var closestIndexDuringDrag: Int {
-        let rawIndex = CGFloat(selectedIndex) - dampedDragOffset / itemHeight
-        return max(0, min(items.count - 1, Int(round(rawIndex))))
+    private var snappedIndex: Int {
+        max(0, min(items.count - 1, Int(round(clampedContinuousIndex))))
     }
 
     var body: some View {
@@ -61,11 +49,12 @@ struct VerticalSnapPicker<Item: Equatable, RowContent: View>: View {
 
         ZStack {
             ForEach(Array(items.enumerated()), id: \.offset) { idx, item in
-                let y = centerY + CGFloat(idx) * itemHeight + effectiveOffset - itemHeight / 2
-                let distFromCenter = abs(y - centerY + itemHeight / 2)
-                let maxDist = totalHeight / 2
+                let indexOffset = CGFloat(idx) - clampedContinuousIndex
+                let y = centerY + indexOffset * itemHeight
+                let distFromCenter = abs(indexOffset)
+                let maxDist = CGFloat(visibleItems) / 2.0
                 let normalizedDist = min(distFromCenter / maxDist, 1.0)
-                let isSelected = idx == closestIndexDuringDrag
+                let isSelected = idx == snappedIndex
 
                 rowContent(item, isSelected)
                     .frame(height: itemHeight)
@@ -79,33 +68,40 @@ struct VerticalSnapPicker<Item: Equatable, RowContent: View>: View {
         .clipped()
         .contentShape(Rectangle())
         .gesture(
-            DragGesture(minimumDistance: 1)
+            DragGesture(minimumDistance: 0)
                 .onChanged { value in
+                    if !isDragging {
+                        isDragging = true
+                        tickHaptic.prepare()
+                    }
                     dragOffset = value.translation.height
 
-                    let current = closestIndexDuringDrag
+                    let current = snappedIndex
                     if current != lastHapticIndex {
-                        dragHaptic.impactOccurred(intensity: 0.7)
-                        dragHaptic.prepare()
+                        tickHaptic.impactOccurred(intensity: 0.85)
+                        tickHaptic.prepare()
                         lastHapticIndex = current
                     }
                 }
                 .onEnded { value in
-                    let velocityPts = value.velocity.height
-                    let momentumItems = velocityPts / (itemHeight * 8)
-                    let currentPosition = CGFloat(selectedIndex) - dampedDragOffset / itemHeight
-                    let projectedPosition = currentPosition + momentumItems
-                    let targetIndex = max(0, min(items.count - 1, Int(round(projectedPosition))))
+                    isDragging = false
+                    let velocity = value.predictedEndTranslation.height - value.translation.height
+                    let currentPos = continuousIndex
+                    let projected = currentPos - velocity / itemHeight
+                    let targetIndex = max(0, min(items.count - 1, Int(round(projected))))
 
                     let previousIndex = selectedIndex
-                    withAnimation(.spring(response: 0.25, dampingFraction: 0.82)) {
+                    let distance = abs(targetIndex - selectedIndex)
+                    let responseDuration = min(0.45, 0.18 + Double(distance) * 0.02)
+
+                    withAnimation(.spring(response: responseDuration, dampingFraction: 0.78)) {
                         dragOffset = 0
                         selectedIndex = targetIndex
                     }
 
                     if targetIndex != previousIndex {
-                        snapHaptic.impactOccurred(intensity: 1.0)
-                        snapHaptic.prepare()
+                        landHaptic.impactOccurred(intensity: 1.0)
+                        landHaptic.prepare()
                         onSelect(items[targetIndex])
                     }
 
@@ -113,8 +109,8 @@ struct VerticalSnapPicker<Item: Equatable, RowContent: View>: View {
                 }
         )
         .onAppear {
-            dragHaptic.prepare()
-            snapHaptic.prepare()
+            tickHaptic.prepare()
+            landHaptic.prepare()
             if let idx = items.firstIndex(of: selectedItem) {
                 selectedIndex = idx
                 lastHapticIndex = idx
