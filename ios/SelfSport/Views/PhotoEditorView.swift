@@ -106,6 +106,12 @@ struct PhotoEditorView: View {
     @State private var activityDetail: StravaActivityDetail? = nil
     @State private var isLoadingDetail: Bool = false
     @State private var detailFetchTask: Task<Void, Never>? = nil
+    @State private var activePhotoFilter: PhotoFilterType = .original
+    @State private var filteredPhotoCache: [PhotoFilterType: UIImage] = [:]
+    @State private var showFilterLabel: Bool = false
+    @State private var filterLabelText: String = ""
+    @State private var filterLabelHideTask: Task<Void, Never>? = nil
+    private let photoFilterService = PhotoFilterService()
     let grokService = GrokImageEditService()
     private let cityFilterService = CityFilterService()
     private let weeklyKmService = WeeklyKmService()
@@ -114,7 +120,41 @@ struct PhotoEditorView: View {
     private let stravaService = StravaService()
 
     var currentPhoto: UIImage {
-        aiEditedPhoto ?? photo
+        let base = aiEditedPhoto ?? photo
+        guard activePhotoFilter != .original else { return base }
+        if let cached = filteredPhotoCache[activePhotoFilter] { return cached }
+        return base
+    }
+
+    private func applyCurrentFilter() {
+        let base = aiEditedPhoto ?? photo
+        guard activePhotoFilter != .original else { return }
+        if filteredPhotoCache[activePhotoFilter] != nil { return }
+        photoFilterService.setSource(base)
+        let result = photoFilterService.apply(activePhotoFilter, to: base)
+        filteredPhotoCache[activePhotoFilter] = result
+    }
+
+    private func cyclePhotoFilter(by delta: Int) {
+        let allFilters = PhotoFilterType.allCases
+        guard let idx = allFilters.firstIndex(of: activePhotoFilter) else { return }
+        let newIdx = ((idx + delta) % allFilters.count + allFilters.count) % allFilters.count
+        let newFilter = allFilters[newIdx]
+        activePhotoFilter = newFilter
+        applyCurrentFilter()
+        filterLabelText = newFilter.rawValue
+        withAnimation(.easeInOut(duration: 0.25)) {
+            showFilterLabel = true
+        }
+        filterLabelHideTask?.cancel()
+        filterLabelHideTask = Task {
+            try? await Task.sleep(for: .seconds(1.0))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.4)) {
+                showFilterLabel = false
+            }
+        }
+        HapticService.selection.selectionChanged()
     }
 
     var photoBeforeAIEdit: UIImage {
@@ -415,6 +455,20 @@ struct PhotoEditorView: View {
                                 .frame(maxHeight: .infinity, alignment: .bottom)
                                 .padding(.bottom, drawerState == .collapsed ? 140 : drawerState == .open ? 280 : 140)
                         }
+
+                        photoFilterDotsView
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                            .padding(.bottom, drawerState == .collapsed ? 110 : drawerState == .open ? 250 : 110)
+                            .allowsHitTesting(false)
+                            .zIndex(5.8)
+
+                        if showFilterLabel {
+                            photoFilterLabelView
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                                .allowsHitTesting(false)
+                                .transition(.opacity)
+                                .zIndex(5.9)
+                        }
                     }
                     .clipShape(.rect(cornerRadius: 55))
                     .onAppear {
@@ -440,19 +494,26 @@ struct PhotoEditorView: View {
                         DragGesture(minimumDistance: 30, coordinateSpace: .local)
                             .onEnded { value in
                                 guard !isDraggingWidget, !isPhotoGesturing, !isTextEditing, !photoSessionActive else { return }
-                                guard filterMode != .none || hasDynamicCityFilters else { return }
                                 let horizontal = value.translation.width
                                 let vertical = abs(value.translation.height)
                                 guard abs(horizontal) > vertical else { return }
-                                if horizontal < 0 {
-                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                                        filterSwipeDirection = .trailing
-                                        advanceFilter(by: 1)
+                                if filterMode != .none || hasDynamicCityFilters {
+                                    if horizontal < 0 {
+                                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                            filterSwipeDirection = .trailing
+                                            advanceFilter(by: 1)
+                                        }
+                                    } else {
+                                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                                            filterSwipeDirection = .leading
+                                            advanceFilter(by: -1)
+                                        }
                                     }
                                 } else {
-                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-                                        filterSwipeDirection = .leading
-                                        advanceFilter(by: -1)
+                                    if horizontal < 0 {
+                                        cyclePhotoFilter(by: 1)
+                                    } else {
+                                        cyclePhotoFilter(by: -1)
                                     }
                                 }
                             }
@@ -641,6 +702,13 @@ struct PhotoEditorView: View {
             monthlyKmData = await monthlyKmService.fetchMonthlyKm()
             lastMonthKmData = await monthlyKmService.fetchLastMonthKm()
         }
+        .onChange(of: aiEditedPhoto) { _, _ in
+            filteredPhotoCache.removeAll()
+            photoFilterService.invalidateCache()
+            if activePhotoFilter != .original {
+                applyCurrentFilter()
+            }
+        }
         .onChange(of: locationService.latitude) { _, newLat in
             guard let lat = newLat, let lng = locationService.longitude else { return }
             Task {
@@ -734,7 +802,8 @@ struct PhotoEditorView: View {
         photoScale != defaultPhotoScale(canvasSize: canvasSize) ||
         photoRotation != .zero ||
         filterMode != .none ||
-        canvasBackgroundColor != .black
+        canvasBackgroundColor != .black ||
+        activePhotoFilter != .original
     }
 
     var hasCanvasContent: Bool {
@@ -1842,6 +1911,33 @@ struct PhotoEditorView: View {
         .buttonStyle(.plain)
         .sensoryFeedback(.selection, trigger: isActive)
         .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 2)
+    }
+
+    // MARK: - Photo Filter Views
+
+    private var photoFilterDotsView: some View {
+        let allFilters = PhotoFilterType.allCases
+        return HStack(spacing: 6) {
+            ForEach(Array(allFilters.enumerated()), id: \.element) { idx, filter in
+                let isActive = filter == activePhotoFilter
+                Circle()
+                    .fill(isActive ? Color.white : Color.white.opacity(0.35))
+                    .frame(width: isActive ? 8 : 6, height: isActive ? 8 : 6)
+                    .animation(.easeInOut(duration: 0.2), value: activePhotoFilter)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+        .background(.black.opacity(0.25), in: .capsule)
+    }
+
+    private var photoFilterLabelView: some View {
+        Text(filterLabelText)
+            .font(.system(size: 22, weight: .bold))
+            .tracking(3)
+            .foregroundStyle(.white)
+            .shadow(color: .black.opacity(0.7), radius: 8, x: 0, y: 2)
+            .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Filter Overlay
