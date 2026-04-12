@@ -1,27 +1,22 @@
-# Reescribir VerticalSnapPicker usando ScrollView nativo (como TextStyleCarousel)
+# Nuevo widget "Split Banner" con stats alineados izquierda/derecha
 
-## Problema
+## Nuevo widget de stats inspirado en el screenshot
 
-El `VerticalSnapPicker` usa un gesto manual (`DragGesture`) para simular el scroll, lo que se siente rígido y artificial. El `TextStyleCarousel` se siente fluido porque usa el `ScrollView` nativo de SwiftUI, que delega toda la física (inercia, momentum, bounce) al sistema.
+**Features**
 
-## Solución
+- Nuevo tipo de widget seleccionable llamado "Split Banner" disponible en el grid de stats del editor
+- Info del día alineada a la izquierda: día de la semana (SUNDAY), fecha corta (APR 12), hora (7:18 AM)
+- Stats del run alineados a la derecha: distancia (14.6 KM), ritmo (5:25/KM), duración (1H 19M)
+- Soporte para cambio entre KM y Millas
+- Ancho flexible que se adapta al contenido
 
-Reescribir el `VerticalSnapPicker` para usar **exactamente el mismo patrón** que `TextStyleCarousel`, pero en vertical:
+**Design**
 
-### Cambios técnicos
+- Tipografía **SF Rounded Black Italic** en mayúsculas — letras gruesas, redondeadas e inclinadas, idénticas al screenshot
+- Layout horizontal con dos columnas: izquierda y derecha separadas por un espaciado amplio
+- Cada columna tiene 3 líneas de texto apiladas verticalmente
+- Sin labels (TIME, DIST, etc.) — solo los valores directos como en el screenshot
+- Tamaño de texto grande y prominente (~18-20pt) para máximo impacto visual
+- Hereda el sistema de colores del widget (primaryColor) para que se adapte al estilo del canvas
+- Soporte para fondo glass cuando está activado
 
-- **Reemplazar `DragGesture` manual** → `ScrollView(.vertical)` nativo
-- **Usar `.scrollTargetBehavior(.viewAligned)`** — snap automático al item más cercano
-- **Usar `.scrollPosition(id:)`** — tracking nativo del item centrado
-- **Usar `.contentMargins(.vertical, ...)`** — centrar el primer/último item
-- **Usar `.scrollTargetLayout()`** en el contenedor interior
-- **Mantener haptics con `.sensoryFeedback(.impact, trigger:)`** en el `onChange` del ID scrolleado
-- **Mantener la misma interfaz pública** (`items`, `selectedItem`, `onSelect`, `rowContent`) para no romper nada
-
-### Resultado esperado
-
-- **Momentum natural** — un swipe fuerte recorre varios items antes de detenerse
-- **Bounce elástico** en los bordes (nativo del sistema)
-- **Deceleration suave** idéntica al `TextStyleCarousel`
-- **Haptic al cambiar de item** — impacto medio al pasar por cada uno
-- Sin cambios en ninguna otra vista que use `VerticalSnapPicker`

@@ -41,6 +41,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case goldenArch = "Golden Arch"
     case notesScreenshot = "Notes"
     case ancestralMedal = "Ancestral"
+    case splitBanner = "Split Banner"
 
     var id: String { rawValue }
 
@@ -80,12 +81,13 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .goldenArch: return "trophy.fill"
         case .notesScreenshot: return "note.text"
         case .ancestralMedal: return "crown.fill"
+        case .splitBanner: return "text.alignleft"
         }
     }
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch, .notesScreenshot, .ancestralMedal:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch, .notesScreenshot, .ancestralMedal, .splitBanner:
             return false
         default:
             return true
@@ -102,7 +104,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     var requiresHeartRate: Bool {
         switch self {
         case .avgHeartRate, .hrPulseDots: return true
-        case .weeklyKm, .lastWeekKm, .monthlyKm, .lastMonthKm, .elevationGain, .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts, .distanceWords, .fullBanner, .fullBannerBottom: return false
+        case .weeklyKm, .lastWeekKm, .monthlyKm, .lastMonthKm, .elevationGain, .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts, .distanceWords, .fullBanner, .fullBannerBottom, .splitBanner: return false
         default: return false
         }
     }
@@ -312,6 +314,7 @@ struct PlacedWidget: Identifiable {
     var ancestralUnitFilter: SplitsUnitFilter = .km
     var ancestralShowPace: Bool = true
     var ancestralShowTime: Bool = true
+    var splitBannerUnitFilter: SplitsUnitFilter = .km
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {

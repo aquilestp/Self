@@ -79,7 +79,8 @@ struct StatWidgetContentView: View, Equatable {
         lhs.notesUnitFilter == rhs.notesUnitFilter &&
         lhs.ancestralUnitFilter == rhs.ancestralUnitFilter &&
         lhs.ancestralShowPace == rhs.ancestralShowPace &&
-        lhs.ancestralShowTime == rhs.ancestralShowTime
+        lhs.ancestralShowTime == rhs.ancestralShowTime &&
+        lhs.splitBannerUnitFilter == rhs.splitBannerUnitFilter
     }
 
     let type: StatWidgetType
@@ -128,6 +129,7 @@ struct StatWidgetContentView: View, Equatable {
     var ancestralUnitFilter: SplitsUnitFilter = .km
     var ancestralShowPace: Bool = true
     var ancestralShowTime: Bool = true
+    var splitBannerUnitFilter: SplitsUnitFilter = .km
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -184,6 +186,7 @@ struct StatWidgetContentView: View, Equatable {
         case .goldenArch: goldenArchWidget
         case .notesScreenshot: notesScreenshotWidget
         case .ancestralMedal: ancestralMedalWidget
+        case .splitBanner: splitBannerWidget
         }
     }
 
@@ -2722,6 +2725,104 @@ struct StatWidgetContentView: View, Equatable {
         .drawingGroup()
     }
 
+    private static let splitBannerDayFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "EEEE"
+        return f
+    }()
+    private static let splitBannerDateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f
+    }()
+    private static let splitBannerTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "h:mm a"
+        return f
+    }()
+
+    private var splitBannerWidget: some View {
+        let isKm = splitBannerUnitFilter == .km
+        let dayText = activity.startDate.map { Self.splitBannerDayFormatter.string(from: $0).uppercased() } ?? "SUNDAY"
+        let dateText = activity.startDate.map { Self.splitBannerDateFormatter.string(from: $0).uppercased() } ?? activity.date.uppercased()
+        let timeText = activity.startDate.map { Self.splitBannerTimeFormatter.string(from: $0).uppercased() } ?? ""
+
+        let distValue: String = {
+            if !activity.hasDistance { return "--" }
+            if isKm {
+                let km = activity.distanceRaw / 1000.0
+                return String(format: "%.1f KM", km)
+            }
+            let mi = activity.distanceRaw / 1609.34
+            return String(format: "%.1f MI", mi)
+        }()
+        let paceValue: String = {
+            guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
+            let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
+            let unitDist: Double = isKm ? 1000.0 : 1609.34
+            let secPerUnit = unitDist / speed
+            let m = Int(secPerUnit) / 60
+            let s = Int(secPerUnit) % 60
+            return String(format: "%d:%02d/%@", m, s, isKm ? "KM" : "MI")
+        }()
+        let durationValue: String = {
+            let total = activity.movingTimeRaw
+            let h = total / 3600
+            let m = (total % 3600) / 60
+            if h > 0 {
+                return String(format: "%dH %02dM", h, m)
+            }
+            return String(format: "%dM", m)
+        }()
+
+        let font: Font = .system(size: 19, weight: .black, design: .rounded).italic()
+
+        return HStack(alignment: .top, spacing: 0) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(dayText)
+                    .font(font)
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                Text(dateText)
+                    .font(font)
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                if !timeText.isEmpty {
+                    Text(timeText)
+                        .font(font)
+                        .foregroundStyle(primaryColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                }
+            }
+
+            Spacer(minLength: 20)
+
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(distValue)
+                    .font(font)
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                Text(paceValue)
+                    .font(font)
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                Text(durationValue)
+                    .font(font)
+                    .foregroundStyle(primaryColor)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 14)
+        .frame(width: 300)
+    }
+
     private func topRowStatColumn(label: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(label)
@@ -3127,7 +3228,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter)
     }
 }
 

@@ -305,6 +305,8 @@ extension PhotoEditorView {
             miniNotesScreenshot
         case .ancestralMedal:
             miniAncestralMedal
+        case .splitBanner:
+            miniSplitBanner
         }
     }
 
@@ -970,6 +972,36 @@ extension PhotoEditorView {
                 .fill(.white)
         )
         .padding(.horizontal, 8)
+    }
+
+    var miniSplitBanner: some View {
+        let font: Font = .system(size: 7, weight: .black, design: .rounded).italic()
+        return HStack(alignment: .top, spacing: 0) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text("SUNDAY")
+                    .font(font)
+                    .foregroundStyle(.white)
+                Text(activity.date.uppercased())
+                    .font(font)
+                    .foregroundStyle(.white)
+                Text("7:18 AM")
+                    .font(font)
+                    .foregroundStyle(.white)
+            }
+            Spacer(minLength: 8)
+            VStack(alignment: .trailing, spacing: 1) {
+                Text(activity.distance.uppercased())
+                    .font(font)
+                    .foregroundStyle(.white)
+                Text(activity.pace.uppercased())
+                    .font(font)
+                    .foregroundStyle(.white)
+                Text(activity.duration.uppercased())
+                    .font(font)
+                    .foregroundStyle(.white)
+            }
+        }
+        .padding(.horizontal, 6)
     }
 
     var miniBlurredVerticalText: some View {

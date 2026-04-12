@@ -888,6 +888,8 @@ struct PhotoEditorView: View {
         let targetAncestralUnit = targetWidget?.ancestralUnitFilter ?? .km
         let targetAncestralShowPace = targetWidget?.ancestralShowPace ?? true
         let targetAncestralShowTime = targetWidget?.ancestralShowTime ?? true
+        let targetIsSplitBanner = targetWidget?.type == .splitBanner
+        let targetSplitBannerUnit = targetWidget?.splitBannerUnitFilter ?? .km
         let targetIsWhatsapp = targetWidget?.type == .whatsappMessage
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
@@ -897,7 +899,7 @@ struct PhotoEditorView: View {
         let paletteCount = WidgetPalette.allCases.count
 
         return VStack(alignment: .trailing, spacing: 8) {
-          if !targetIsWhatsapp && !targetIsGoldenArch && !targetIsAncestralMedal {
+          if !targetIsWhatsapp && !targetIsGoldenArch && !targetIsAncestralMedal && !targetIsSplitBanner {
             ForEach(Array(WidgetPalette.allCases.enumerated()), id: \.element.id) { index, palette in
                 let isActive = targetPalette == palette
                 Button {
@@ -1428,6 +1430,28 @@ struct PhotoEditorView: View {
                           let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         placedWidgets[idx].ancestralShowTime.toggle()
+                    }
+                    hapticLight.impactOccurred()
+                    resetPaletteHideTimer()
+                }
+            }
+
+            if targetIsSplitBanner {
+                Rectangle()
+                    .fill(Color.white.opacity(0.12))
+                    .frame(width: 20, height: 1)
+                    .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                    .opacity(showPaletteSelector ? 1 : 0)
+                    .animation(
+                        .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.04),
+                        value: showPaletteSelector
+                    )
+
+                unitToggleButton(currentFilter: targetSplitBannerUnit, delay: Double(paletteCount) * 0.04 + 0.06) {
+                    guard let id = paletteTargetWidgetId,
+                          let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        placedWidgets[idx].splitBannerUnitFilter = placedWidgets[idx].splitBannerUnitFilter == .km ? .miles : .km
                     }
                     hapticLight.impactOccurred()
                     resetPaletteHideTimer()
@@ -2551,7 +2575,7 @@ struct PhotoEditorView: View {
             activeFilterOverlay(size: canvasSize)
 
             ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText)
+                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, splitBannerUnitFilter: widget.splitBannerUnitFilter)
                     .scaleEffect(widget.scale)
                     .rotationEffect(widget.rotation)
                     .offset(x: widget.position.width, y: widget.position.height)
