@@ -31,6 +31,9 @@ enum FontRegistration {
             "Rubik80sFade-Regular",
             "RubikDistressed-Regular",
             "RubikGlitch-Regular",
+            "SedgwickAveDisplay-Regular",
+            "Sekuya-Regular",
+            "SixCaps-Regular",
         ]
 
         for fontName in fontNames {

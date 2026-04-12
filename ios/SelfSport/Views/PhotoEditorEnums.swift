@@ -438,6 +438,9 @@ nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
     case pressStart
     case bungee
     case jetbrainsMono
+    case sedgwickAve
+    case sekuya
+    case sixCaps
 
     var id: Int { rawValue }
 
@@ -449,6 +452,9 @@ nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
         case .pressStart: return "Pixel"
         case .bungee: return "Urban"
         case .jetbrainsMono: return "Mono"
+        case .sedgwickAve: return "Sedgwick"
+        case .sekuya: return "Sekuya"
+        case .sixCaps: return "Caps"
         }
     }
 
@@ -466,6 +472,12 @@ nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
             return .custom("Bungee-Regular", size: size)
         case .jetbrainsMono:
             return .custom("JetBrainsMono-Bold", size: size)
+        case .sedgwickAve:
+            return .custom("SedgwickAveDisplay-Regular", size: size)
+        case .sekuya:
+            return .custom("Sekuya-Regular", size: size)
+        case .sixCaps:
+            return .custom("SixCaps-Regular", size: size)
         }
     }
 
@@ -483,6 +495,12 @@ nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
             return .custom("Bungee-Regular", size: size)
         case .jetbrainsMono:
             return .custom("JetBrainsMono-Bold", size: size)
+        case .sedgwickAve:
+            return .custom("SedgwickAveDisplay-Regular", size: size)
+        case .sekuya:
+            return .custom("Sekuya-Regular", size: size)
+        case .sixCaps:
+            return .custom("SixCaps-Regular", size: size)
         }
     }
 
