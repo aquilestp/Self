@@ -1,17 +1,16 @@
-# Unificar los scroll pickers verticales en un solo componente reutilizable
+# Mejorar fluidez, haptics y sensación del VerticalSnapPicker
 
-## Problema actual
+## Problemas detectados
 
-Existen dos componentes casi idénticos (`BVTEffectScrollPicker` y `WhatsAppTextScrollPicker`) que comparten toda la lógica de arrastre, snap, haptics y desvanecimiento por distancia. La única diferencia es el contenido visual de cada fila y dimensiones menores.
+- El scroll no tiene resistencia en los bordes (se puede arrastrar infinitamente)
+- El haptic solo vibra al soltar el dedo, no mientras arrastras entre opciones
+- La animación de snap no se siente tan natural como antes
+- Swipes rápidos y lentos se sienten igual por el clamp a ±1
 
-## Solución
+## Mejoras
 
-Crear un **único componente genérico** que encapsule toda la mecánica compartida y permita personalizar solo la apariencia de cada fila desde afuera.
-
-## Cambios
-
-- **Nuevo componente genérico `VerticalSnapPicker`** — Contiene toda la lógica de arrastre, snap de 1 item a la vez, haptics, y efecto de desvanecimiento por distancia. Acepta una lista de items genéricos y un closure para renderizar cada fila
-- **Parámetros configurables** — Ancho del picker y número de items visibles se pueden personalizar por uso (130pt para efectos BVT, 167pt para presets WhatsApp)
-- **Se reemplazan ambos componentes existentes** — `BVTEffectScrollPicker` y `WhatsAppTextScrollPicker` se convierten en wrappers delgados (o se eliminan) que simplemente pasan su contenido al componente genérico
-- **Misma apariencia visual** — Cada stat mantiene exactamente su diseño actual (iconos, colores, tipografía), solo cambia la implementación interna
-- **Listo para futuros stats** — Si se agrega un nuevo stat con selector vertical, solo se necesita definir el contenido de la fila, sin duplicar la mecánica de scroll
+- **Rubber banding en los bordes** — Al arrastrar más allá del primer o último item, se aplica una resistencia progresiva (como en los scroll de iOS), haciendo que el componente "rebote" de vuelta suavemente
+- **Haptic durante el arrastre** — Cada vez que el dedo cruza la frontera de un item (sin soltar), se dispara un haptic ligero. Esto da la sensación de "engranaje" como los pickers nativos de iOS
+- **Snap basado en la distancia real** — En lugar de usar la predicción de velocidad limitada a ±1, se calcula el item más cercano al centro basándose en la posición real del dedo más un poco de momentum. Esto permite swipes rápidos que avanzan 2-3 items cuando tiene sentido
+- **Animación spring mejorada** — Se ajusta el spring para que el snap se sienta más "crisp" y rápido, similar a un UIPickerView nativo
+- **Se aplica a todos los pickers** — Como `BVTEffectScrollPicker` y `WhatsAppTextScrollPicker` ya usan `VerticalSnapPicker`, el cambio los mejora automáticamente a todos
