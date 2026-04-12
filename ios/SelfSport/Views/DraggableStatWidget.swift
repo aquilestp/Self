@@ -2333,49 +2333,47 @@ struct StatWidgetContentView: View, Equatable {
                 .frame(width: medalSize - 28, height: medalSize - 28)
 
             MedalCurvedText(
-                text: "★  MY FIRST  ★",
-                radius: halfSize - 18,
-                fontSize: 10,
+                text: "✦  MY FIRST  ✦",
+                radius: halfSize - 24,
+                fontSize: 11,
                 fontWeight: .heavy,
-                kerning: 1.5,
+                kerning: 1.2,
                 clockwise: true,
-                arcSpan: 160,
+                arcSpan: 140,
                 color: textColor.opacity(0.9)
             )
 
             MedalCurvedText(
-                text: "—  FINISHER  —",
-                radius: halfSize - 18,
-                fontSize: 8.5,
+                text: "FINISHER",
+                radius: halfSize - 22,
+                fontSize: 8,
                 fontWeight: .bold,
-                kerning: 1.8,
+                kerning: 2.5,
                 clockwise: false,
-                arcSpan: 130,
-                color: textColor.opacity(0.6)
+                arcSpan: 80,
+                color: textColor.opacity(0.55)
             )
 
             VStack(spacing: 0) {
-                Spacer().frame(height: 2)
-
                 Image(systemName: "figure.run")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(textColor.opacity(0.35))
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(textColor.opacity(0.3))
 
-                Spacer().frame(height: 2)
+                Spacer().frame(height: 1)
 
                 Text(goldenArchDistanceText)
-                    .font(.system(size: 42, weight: .black, design: .default).width(.compressed))
+                    .font(.system(size: 40, weight: .black, design: .default).width(.compressed))
                     .foregroundStyle(textColor.opacity(0.92))
                     .lineLimit(1)
                     .minimumScaleFactor(0.4)
                     .shadow(color: goldShine.opacity(0.4), radius: 1, x: 0, y: 1)
 
                 Text(goldenArchUnitLabel)
-                    .font(.system(size: 11, weight: .heavy, design: .default).width(.expanded))
+                    .font(.system(size: 10, weight: .heavy, design: .default).width(.expanded))
                     .tracking(5)
-                    .foregroundStyle(textColor.opacity(0.55))
+                    .foregroundStyle(textColor.opacity(0.5))
 
-                Spacer().frame(height: 3)
+                Spacer().frame(height: 2)
 
                 MedalBannerView(
                     text: goldenArchDateText,
@@ -2386,29 +2384,29 @@ struct StatWidgetContentView: View, Equatable {
                 )
 
                 if hasSubMetrics {
-                    Spacer().frame(height: 4)
+                    Spacer().frame(height: 2)
 
                     HStack(spacing: 0) {
                         if goldenArchShowPace, activity.hasDistance {
                             Text(goldenArchPaceText)
-                                .font(.system(size: 9, weight: .bold, design: .default))
-                                .foregroundStyle(textColor.opacity(0.55))
+                                .font(.system(size: 8, weight: .semibold, design: .default))
+                                .foregroundStyle(textColor.opacity(0.45))
                         }
                         if goldenArchShowPace && activity.hasDistance && goldenArchShowTime {
-                            Text("  ·  ")
-                                .font(.system(size: 7, weight: .black))
-                                .foregroundStyle(textColor.opacity(0.3))
+                            Text(" · ")
+                                .font(.system(size: 6, weight: .black))
+                                .foregroundStyle(textColor.opacity(0.25))
                         }
                         if goldenArchShowTime {
                             Text(activity.duration)
-                                .font(.system(size: 9, weight: .bold, design: .default))
-                                .foregroundStyle(textColor.opacity(0.55))
+                                .font(.system(size: 8, weight: .semibold, design: .default))
+                                .foregroundStyle(textColor.opacity(0.45))
                         }
                     }
                 }
             }
-            .frame(width: medalSize - 40)
-            .offset(y: 4)
+            .frame(width: medalSize - 44)
+            .offset(y: 2)
         }
         .frame(width: medalSize + 8, height: medalSize + 8)
     }

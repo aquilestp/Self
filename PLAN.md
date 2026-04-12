@@ -1,35 +1,27 @@
-# Rediseñar stat Golden Arch como medalla circular tipo badge conmemorativo
+# Arreglar textos del badge: "MY FIRST" con más estilo, pace/time sin sobreposición con "FINISHER"
 
 
-## Lo que se hará
+## Problemas identificados
 
-Transformar el stat "Golden Arch" de su forma actual (arco con pilares) a una **medalla circular premium** inspirada en la foto de referencia — una medalla dorada redonda con texto curvo, anillos decorativos, silueta de corredor, y fecha.
+1. **"MY FIRST"** — las estrellas (★) están muy cerca del borde del anillo, se recortan visualmente
+2. **Pace y Time** — se sobreponen con el texto curvo "FINISHER" en la parte inferior
+3. **"MY FIRST"** necesita más estilo/presencia
 
-### Diseño de la medalla circular
+## Cambios
 
-- **Forma**: Círculo completo (~170pt diámetro) reemplazando la forma de arco
-- **Borde exterior**: Anillo dorado grueso con gradiente metálico (borde elevado)
-- **Segundo anillo interior**: Línea decorativa fina dorada oscura separando el borde del cuerpo
-- **Cuerpo**: Relleno dorado con gradiente que simula metal pulido
-- **Texto curvo superior**: "★ MY FIRST ★" siguiendo el arco superior de la medalla (texto embebido negro)
-- **Distancia central grande**: Número grande (ej. "5.0") en negro con peso heavy
-- **Unidad debajo**: "KM" o "MI" en tracking expandido
-- **Banner/cinta central**: Pequeña cinta decorativa con la fecha de la actividad
-- **Silueta de corredor**: Ícono `figure.run` centrado como decoración
-- **Texto curvo inferior**: "- ¡LOGRADO! -" o "FINISHER" siguiendo el arco inferior
-- **Estrellas decorativas**: Pequeñas estrellas doradas oscuras como separadores
-- **Sub-métricas** (pace y tiempo): Debajo de la distancia, separadas por punto medio
+### Texto curvo "★ MY FIRST ★"
+- Reducir el radio del texto curvo para alejarlo del borde exterior (de 67pt a ~60pt)
+- Reducir el arco de extensión para que las letras no lleguen tan al borde lateral
+- Aumentar ligeramente el tamaño de fuente para darle más presencia y protagonismo
 
-### Detalles técnicos del estilo
+### Texto curvo "— FINISHER —"
+- Mover más hacia abajo (mayor radio) para separarlo del contenido central
+- Reducir el arco para que quede más compacto en la parte baja
 
-- Todos los colores fijos (dorado/negro) — sin cambio de color permitido
-- Texto embebido en negro sobre superficie dorada
-- Sombras sutiles para dar profundidad y sensación 3D
-- Gradiente metálico con highlights para simular metal real
-- El texto curvo se logra con Canvas o transformaciones rotacionales
+### Pace y Time
+- Moverlos justo debajo de la fecha (banner) pero por encima de la zona del texto curvo "FINISHER"
+- Reducir ligeramente el tamaño para que quepan sin conflicto
+- Ajustar el offset vertical del VStack central para centrar mejor todo el contenido
 
-### Archivos que se modificarán
-
-- El stat principal (widget grande en el editor de fotos)
-- La miniatura de preview del stat
-- Se reemplaza `MedalShape` por una forma circular con anillos
+### Ajuste general del VStack central
+- Recalcular los espaciados internos para que todo el contenido (runner icon → distancia → unidad → fecha → pace/time) quede centrado sin invadir las zonas de texto curvo superior e inferior
