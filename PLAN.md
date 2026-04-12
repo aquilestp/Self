@@ -1,27 +1,17 @@
-# Filtros de foto con swipe — Original, B&W, Dramatic
+# Arreglar selección del segundo item en los scroll pickers verticales
 
-## Features
+## Problema
 
-- **3 filtros de foto** siempre disponibles: Original (sin filtro), Blanco y Negro, y Dramatic
-- **Cambio por swipe** — deslizar horizontalmente sobre la foto/canvas cambia entre los filtros
-- **Nombre del filtro** aparece brevemente al centro del canvas al cambiar (ej: "B&W", "DRAMATIC"), se desvanece después de 1 segundo
-- **Compatible con filtros de ciudad/carrera** — los filtros de foto modifican la imagen base, mientras los de ciudad/carrera siguen funcionando como overlays encima
-- **Indicador de puntos** (dots) en la parte inferior del canvas mostrando qué filtro está activo
-- **Persistencia visual** — el filtro se aplica también al exportar/guardar la imagen
+Los selectores verticales de estilo (efectos BVT y presets WhatsApp) saltan del primer item al tercero cuando intentas seleccionar el segundo. Esto ocurre porque el scroll automático de iOS genera demasiada velocidad incluso con un gesto mínimo, y los items son muy pequeños (40pt) para que el "snap" funcione bien.
 
-## Design
+## Solución
 
-- **Swipe fluido** con animación spring al cambiar de filtro
-- **Nombre del filtro** en texto blanco con sombra, tamaño mediano, aparece centrado sobre el canvas con animación de fade in/out
-- **Dots indicadores** — 3 puntos pequeños debajo de la foto, el activo en blanco sólido, los demás en blanco semitransparente
-- **Haptic feedback** sutil al cambiar de filtro (selection feedback)
-- Los filtros se procesan con Core Image (GPU) para rendimiento óptimo
-- **B&W** usa el efecto Noir de Core Image (blanco y negro con alto contraste dramático)
-- **Dramatic** usa ajustes de contraste alto, sombras profundas y highlights reducidos para un look cinematográfico intenso
+Reemplazar el mecanismo de scroll nativo por un sistema de **arrastre manual con snap controlado**, donde nosotros decidimos exactamente a qué item se mueve según la distancia del dedo.
 
-## Screens / Changes
+## Cambios
 
-1. **Canvas del editor** — Al deslizar horizontalmente sobre la foto se cambia entre Original → B&W → Dramatic → (vuelve a Original)
-2. **Label flotante** — Al cambiar filtro aparece el nombre centrado por 1 segundo y desaparece con fade
-3. **Dots de filtro** — Aparecen en la parte inferior del canvas cuando hay un filtro activo (o siempre, mostrando los 3 puntos)
-4. **Exportación** — Al guardar o compartir, la imagen exportada incluye el filtro aplicado
+- **Nuevo comportamiento de selección** — En lugar de depender del scroll de iOS para decidir dónde parar, el componente calcula manualmente cuál es el item más cercano al centro basándose en cuánto movió el dedo el usuario
+- **Snap preciso** — Al soltar el dedo, el componente se mueve con una animación suave (spring) exactamente al item más cercano, sin importar la velocidad del gesto
+- **Mismo aspecto visual** — Se mantiene exactamente el mismo diseño: la máscara de desvanecimiento arriba/abajo, la cápsula de selección, los iconos y textos, y el efecto haptic al cambiar
+- **Se aplica a ambos componentes** — Tanto el selector de efectos BVT (lado derecho del canvas) como el selector de presets WhatsApp se actualizan con este nuevo mecanismo
+- **Swipe rápido funciona** — Un swipe rápido avanza solo 1 item a la vez (no se salta), garantizando control preciso

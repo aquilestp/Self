@@ -8,66 +8,81 @@ struct WhatsAppTextScrollPicker: View {
     private let itemHeight: CGFloat = 40
     private let visibleItems: Int = 5
 
-    @State private var scrolledID: String?
-    @State private var lastSelectedId: String?
+    @State private var selectedIndex: Int = 0
+    @State private var dragOffset: CGFloat = 0
 
     private let haptic = UIImpactFeedbackGenerator(style: .light)
 
+    private var currentOffset: CGFloat {
+        -CGFloat(selectedIndex) * itemHeight + dragOffset
+    }
+
     var body: some View {
         let totalHeight: CGFloat = itemHeight * CGFloat(visibleItems)
+        let centerY: CGFloat = totalHeight / 2
 
         VStack(spacing: 6) {
-            ScrollView(.vertical, showsIndicators: false) {
-                LazyVStack(spacing: 0) {
-                    Color.clear.frame(height: itemHeight * 2)
+            ZStack {
+                ForEach(Array(presets.enumerated()), id: \.offset) { idx, preset in
+                    let y = centerY + CGFloat(idx) * itemHeight + currentOffset - itemHeight / 2
+                    let distFromCenter = abs(y - centerY + itemHeight / 2)
+                    let maxDist = totalHeight / 2
+                    let normalizedDist = min(distFromCenter / maxDist, 1.0)
+                    let isSelected = idx == selectedIndex && dragOffset == 0
 
-                    ForEach(presets, id: \.self) { preset in
-                        presetRow(text: preset)
-                            .frame(height: itemHeight)
-                            .id(preset)
-                    }
-
-                    Color.clear.frame(height: itemHeight * 2)
+                    presetRow(text: preset, isSelected: isSelected)
+                        .frame(height: itemHeight)
+                        .frame(width: 167, alignment: .trailing)
+                        .opacity(1.0 - normalizedDist * 0.8)
+                        .position(x: 167 / 2, y: y)
                 }
-                .scrollTargetLayout()
             }
-            .scrollPosition(id: $scrolledID, anchor: .center)
-            .scrollTargetBehavior(.viewAligned)
-            .frame(height: totalHeight)
-            .frame(width: 167)
-            .mask(
-                VStack(spacing: 0) {
-                    LinearGradient(colors: [.clear, .white], startPoint: .top, endPoint: .bottom)
-                        .frame(height: itemHeight * 1.5)
-                    Rectangle().fill(.white)
-                    LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .bottom)
-                        .frame(height: itemHeight * 1.5)
-                }
+            .frame(width: 167, height: totalHeight)
+            .clipped()
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 5)
+                    .onChanged { value in
+                        dragOffset = value.translation.height
+                    }
+                    .onEnded { value in
+                        let projected = value.predictedEndTranslation.height
+                        let steps = -round(projected / itemHeight)
+                        let clampedSteps = max(-1, min(1, Int(steps)))
+                        let newIndex = max(0, min(presets.count - 1, selectedIndex + clampedSteps))
+
+                        let previousIndex = selectedIndex
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                            dragOffset = 0
+                            selectedIndex = newIndex
+                        }
+
+                        if newIndex != previousIndex {
+                            haptic.impactOccurred()
+                            onSelectPreset(presets[newIndex])
+                        }
+                    }
             )
             .onAppear {
-                let initialId: String
-                if presets.contains(currentText) {
-                    initialId = currentText
+                if let idx = presets.firstIndex(of: currentText) {
+                    selectedIndex = idx
                 } else {
-                    initialId = presets.first ?? ""
+                    selectedIndex = 0
                 }
-                scrolledID = initialId
-                lastSelectedId = initialId
             }
-            .onChange(of: scrolledID) { _, newValue in
-                guard let newValue, newValue != lastSelectedId else { return }
-                lastSelectedId = newValue
-                haptic.impactOccurred()
-                onSelectPreset(newValue)
+            .onChange(of: currentText) { _, newValue in
+                if let idx = presets.firstIndex(of: newValue) {
+                    guard idx != selectedIndex else { return }
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        selectedIndex = idx
+                    }
+                }
             }
-
         }
     }
 
     @ViewBuilder
-    private func presetRow(text: String) -> some View {
-        let isSelected = scrolledID == text
-
+    private func presetRow(text: String, isSelected: Bool) -> some View {
         Text(text)
             .font(.system(size: isSelected ? 12 : 10, weight: isSelected ? .semibold : .regular))
             .foregroundStyle(isSelected ? .white : .white.opacity(0.45))
@@ -87,7 +102,6 @@ struct WhatsAppTextScrollPicker: View {
                     }
                 }
             )
-            .frame(width: 167, alignment: .trailing)
             .animation(.easeOut(duration: 0.15), value: isSelected)
     }
 }

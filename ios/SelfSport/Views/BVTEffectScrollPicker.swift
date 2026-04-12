@@ -7,60 +7,78 @@ struct BVTEffectScrollPicker: View {
     private let itemHeight: CGFloat = 40
     private let visibleItems: Int = 5
 
-    @State private var scrolledID: Int?
-    @State private var lastSelectedId: Int?
+    @State private var selectedIndex: Int = 0
+    @State private var dragOffset: CGFloat = 0
 
     private let haptic = UIImpactFeedbackGenerator(style: .light)
 
+    private var allEffects: [BVTEffect] { BVTEffect.allCases }
+
+    private var currentOffset: CGFloat {
+        -CGFloat(selectedIndex) * itemHeight + dragOffset
+    }
+
     var body: some View {
         let totalHeight: CGFloat = itemHeight * CGFloat(visibleItems)
-        let allEffects = BVTEffect.allCases
+        let centerY: CGFloat = totalHeight / 2
 
-        ScrollView(.vertical, showsIndicators: false) {
-            LazyVStack(alignment: .trailing, spacing: 0) {
-                Color.clear.frame(height: itemHeight * 2)
+        ZStack {
+            ForEach(Array(allEffects.enumerated()), id: \.element.id) { idx, effect in
+                let y = centerY + CGFloat(idx) * itemHeight + currentOffset - itemHeight / 2
+                let distFromCenter = abs(y - centerY + itemHeight / 2)
+                let maxDist = totalHeight / 2
+                let normalizedDist = min(distFromCenter / maxDist, 1.0)
+                let isSelected = idx == selectedIndex && dragOffset == 0
 
-                ForEach(allEffects) { effect in
-                    effectRow(effect: effect)
-                        .frame(height: itemHeight)
-                        .id(effect.id)
-                }
-
-                Color.clear.frame(height: itemHeight * 2)
+                effectRow(effect: effect, isSelected: isSelected)
+                    .frame(height: itemHeight)
+                    .frame(width: 130, alignment: .trailing)
+                    .opacity(1.0 - normalizedDist * 0.8)
+                    .position(x: 65, y: y)
             }
-            .scrollTargetLayout()
         }
-        .scrollPosition(id: $scrolledID, anchor: .center)
-        .scrollTargetBehavior(.viewAligned)
-        .frame(height: totalHeight)
-        .frame(width: 130)
-        .mask(
-            VStack(spacing: 0) {
-                LinearGradient(colors: [.clear, .white], startPoint: .top, endPoint: .bottom)
-                    .frame(height: itemHeight * 1.5)
-                Rectangle().fill(.white)
-                LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .bottom)
-                    .frame(height: itemHeight * 1.5)
-            }
+        .frame(width: 130, height: totalHeight)
+        .clipped()
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 5)
+                .onChanged { value in
+                    dragOffset = value.translation.height
+                }
+                .onEnded { value in
+                    let projected = value.predictedEndTranslation.height
+                    let steps = -round(projected / itemHeight)
+                    let clampedSteps = max(-1, min(1, Int(steps)))
+                    let newIndex = max(0, min(allEffects.count - 1, selectedIndex + clampedSteps))
+
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        dragOffset = 0
+                        selectedIndex = newIndex
+                    }
+
+                    if newIndex != selectedIndex - clampedSteps + clampedSteps {
+                        haptic.impactOccurred()
+                        onSelectEffect(allEffects[newIndex])
+                    }
+                }
         )
         .onAppear {
-            scrolledID = currentEffect.id
-            lastSelectedId = currentEffect.id
+            if let idx = allEffects.firstIndex(of: currentEffect) {
+                selectedIndex = idx
+            }
         }
-        .onChange(of: scrolledID) { _, newValue in
-            guard let newValue, newValue != lastSelectedId else { return }
-            lastSelectedId = newValue
-            if let effect = BVTEffect(rawValue: newValue) {
-                haptic.impactOccurred()
-                onSelectEffect(effect)
+        .onChange(of: currentEffect) { _, newValue in
+            if let idx = allEffects.firstIndex(of: newValue) {
+                guard idx != selectedIndex else { return }
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    selectedIndex = idx
+                }
             }
         }
     }
 
     @ViewBuilder
-    private func effectRow(effect: BVTEffect) -> some View {
-        let isSelected = scrolledID == effect.id
-
+    private func effectRow(effect: BVTEffect, isSelected: Bool) -> some View {
         HStack(spacing: 6) {
             Image(systemName: effect.icon)
                 .font(.system(size: isSelected ? 12 : 10, weight: isSelected ? .semibold : .regular))
@@ -84,7 +102,6 @@ struct BVTEffectScrollPicker: View {
                 }
             }
         )
-        .frame(width: 130, alignment: .trailing)
         .animation(.easeOut(duration: 0.15), value: isSelected)
     }
 }
