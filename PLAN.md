@@ -1,11 +1,11 @@
-# Habilitar paleta de colores para el Split Banner widget
+# Agregar grupo SpecialFonts con MetalMania y Monofett
 
-## Cambio
+**Cambios:**
 
-Actualmente, cuando seleccionas el widget Split Banner, **no aparecen** las opciones de cambio de paleta de colores (classic, neon, aesthetic). Solo aparece el toggle de KM/Millas.
+- Crear una nueva carpeta llamada **SpecialFonts** dentro del proyecto (al mismo nivel que la carpeta Fonts existente)
+- Descargar y agregar los dos archivos de fuentes:
+  - **MetalMania-Regular.ttf**
+  - **Monofett-Regular.ttf**
+- Registrar ambas fuentes en la configuración de la app para que estén disponibles en toda la aplicación
+  - Se agregarán las entradas `SpecialFonts/MetalMania-Regular.ttf` y `SpecialFonts/Monofett-Regular.ttf` al listado de fuentes del Info.plist
 
-**Lo que se hará:**
-- Mostrar los círculos de paleta de colores (classic, neon, aesthetic) cuando el Split Banner esté seleccionado, igual que los demás widgets
-- El toggle de KM/Millas seguirá apareciendo debajo de las paletas, como ya funciona actualmente
-
-**Resultado:** Al tocar el Split Banner, se verán las paletas de colores arriba y el toggle de unidades abajo — comportamiento idéntico a widgets como Golden Arch o Ancestral Medal.
