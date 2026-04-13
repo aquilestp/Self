@@ -514,6 +514,11 @@ nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
 
 nonisolated enum SplitBannerFontStyle: Int, CaseIterable, Identifiable {
     case system = 0
+    case righteous
+    case bangers
+    case pressStart
+    case bungee
+    case jetbrainsMono
     case metalMania
     case monofett
     case newRocker
@@ -529,8 +534,13 @@ nonisolated enum SplitBannerFontStyle: Int, CaseIterable, Identifiable {
     var label: String {
         switch self {
         case .system: return "System"
+        case .righteous: return "Groovy"
+        case .bangers: return "Comic"
+        case .pressStart: return "Pixel"
+        case .bungee: return "Urban"
+        case .jetbrainsMono: return "Mono"
         case .metalMania: return "Metal"
-        case .monofett: return "Mono"
+        case .monofett: return "Monofett"
         case .newRocker: return "Rocker"
         case .rubik80sFade: return "80s"
         case .rubikDistressed: return "Distress"
@@ -545,6 +555,16 @@ nonisolated enum SplitBannerFontStyle: Int, CaseIterable, Identifiable {
         switch self {
         case .system:
             return .system(size: size, weight: .heavy, design: .default).italic().width(.expanded)
+        case .righteous:
+            return .custom("Righteous-Regular", size: size)
+        case .bangers:
+            return .custom("Bangers-Regular", size: size)
+        case .pressStart:
+            return .custom("PressStart2P-Regular", size: size * 0.55)
+        case .bungee:
+            return .custom("Bungee-Regular", size: size)
+        case .jetbrainsMono:
+            return .custom("JetBrainsMono-Bold", size: size)
         case .metalMania:
             return .custom("MetalMania-Regular", size: size)
         case .monofett:
