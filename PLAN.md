@@ -56,3 +56,42 @@ Eliminar código duplicado de formateo de distancia, pace, duración y fechas cr
 ---
 
 ## ✅ Fase 2 COMPLETADA
+
+---
+---
+
+# Fase 3: Extraer y Deduplicar PaletteSelector
+
+## Objetivo
+Extraer la vista `paletteSelectorView` (~650 líneas) de `PhotoEditorView.swift` a su propio archivo, eliminando 30+ repeticiones del patrón `guard let id / firstIndex`. **Sin cambios visuales ni de comportamiento.**
+
+---
+
+## Paso 1: Crear `PaletteSelectorView.swift`
+
+- [x] Vista independiente con props: `targetWidget`, `showPaletteSelector`, `waPresetTexts`, `updateWidget`, `resetHideTimer`
+- [x] `mutate()` — centraliza el patrón repetido (find widget → animate → haptic → reset timer)
+- [x] `separator(delay:)` — separador animado reutilizable
+- [x] `animatedButton(delay:action:label:)` — botón con scale/opacity animados
+- [x] `unitToggle()`, `visToggle()` — toggles genéricos reutilizables
+- [x] `circleButton()`, `textCircleButton()`, `paletteCircleLabel()`, `fontStyleLabel()` — labels reutilizables
+- [x] Secciones por tipo de widget: palette colors, glass, bestEfforts, splits, distanceWords, basicFields, boldImpact, heroStat, fullBanner, bvt, goldenArch, ancestralMedal, splitBanner, whatsapp, fontStyle
+
+---
+
+## Paso 2: Actualizar `PhotoEditorView.swift`
+
+- [x] Reemplazar uso de `paletteSelectorView` por `PaletteSelectorView(...)` con closure `updateWidget`
+- [x] Eliminar `paletteSelectorView` completo (~650 líneas)
+- [x] Eliminar `basicUnitFilterSection()`, `unitToggleButton()`, `visibilityToggleButton()`, `bvtEffectButton()`, `fontStyleButtonLabel()` (~115 líneas)
+- [x] Mantener `resetPaletteHideTimer()`, `showPaletteSelectorFor()`, `hidePaletteSelector()` en PhotoEditorView
+
+---
+
+## Build
+
+- [x] Compilación exitosa verificada
+
+---
+
+## ✅ Fase 3 COMPLETADA
