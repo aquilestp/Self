@@ -1,24 +1,58 @@
-# Split Banner: fuente Condensed Extra Bold Italic expanded + selector de SpecialFonts
+# Fase 2: Centralizar Utilidades de Formateo
 
+## Objetivo
+Eliminar código duplicado de formateo de distancia, pace, duración y fechas creando un archivo de utilidades compartido. **Sin cambios visuales ni de comportamiento.**
 
-**Cambios:**
+---
 
-1. **Fuente por defecto del Split Banner** — Cambiar la fuente del widget (canvas y drawer) de `.system rounded black italic` a **sistema Condensed Extra Bold Italic con width expanded** (`.system(size:19, weight:.heavy).italic().width(.expanded)`)
+## Paso 1: Crear `ActivityFormatting.swift`
 
-2. **Nuevo enum `SplitBannerFontStyle`** — Un enum con las opciones:
-   - **System** (default) — Condensed Extra Bold Italic expanded
-   - **MetalMania**
-   - **Monofett**
-   - **NewRocker**
-   - **Rubik80sFade**
-   - **RubikDistressed**
-   - **RubikGlitch**
-   - **SedgwickAve**
-   - **Sekuya**
-   - **SixCaps**
+- [x] Crear archivo en `Utilities/` con funciones estáticas puras
+- [x] `distanceWithUnit()`, `distanceValue()`, `distanceWithUnitUpper()`, `bannerDistance()`
+- [x] `paceSpaced()`, `pacePrime()`, `paceSlash()`, `paceSlashMixed()`
+- [x] `splitPace()` — promovido desde función privada
+- [x] `durationCompact()`, `durationExpanded()`, `durationShort()`
 
-3. **Nueva propiedad `splitBannerFontStyle`** — Añadida a `PlacedWidget`, `StatWidgetContentView`, y toda la cadena de parámetros (equatable, constructores del canvas y export)
+---
 
-4. **VerticalSnapPicker en el editor** — Cuando el Split Banner esté seleccionado, aparecerá un picker vertical (igual al de WhatsApp/BVT) debajo del botón de unidad, permitiendo cambiar entre los estilos de SpecialFonts
+## Paso 2: Crear `CachedDateFormatters.swift`
 
-5. **Drawer mini preview** — La mini vista del Split Banner también usará la fuente Condensed Extra Bold Italic expanded por defecto
+- [x] Crear enum con formateadores estáticos cacheados
+- [x] `bvtDate`, `timeShort`, `dayOfWeek`, `monthDay`, `notesDate`, `medalDate`
+
+---
+
+## Paso 3: Actualizar `StatWidgetContentView` en `DraggableStatWidget.swift`
+
+- [x] `basicDistanceText` → usa `ActivityFormatting`
+- [x] `basicPaceText` → usa `ActivityFormatting`
+- [x] `formatDurationCompact` → delega a `ActivityFormatting`
+- [x] `splitPaceString` → delega a `ActivityFormatting`
+- [x] `fullBannerWidget` / `fullBannerBottomWidget` inline calcs → `ActivityFormatting`
+- [x] `blurredVerticalTextWidget` inline calcs (dist, pace, duration) → `ActivityFormatting`
+- [x] `notesDistanceText`, `notesPaceText` → `ActivityFormatting`
+- [x] `goldenArchDistanceText`, `goldenArchPaceText` → `ActivityFormatting`
+- [x] `ancestralDistanceText`, `ancestralPaceText` → `ActivityFormatting`
+- [x] `splitBannerWidget` inline calcs (dist, pace, duration) → `ActivityFormatting`
+- [x] `bvtDateFormatter`, `bvtTimeFormatter` → `CachedDateFormatters`
+- [x] `waTimeFormatter` → `CachedDateFormatters`
+- [x] `splitBannerDayFormatter`, `splitBannerDateFormatter`, `splitBannerTimeFormatter` → `CachedDateFormatters`
+- [x] `notesDateText` → `CachedDateFormatters.notesDate`
+- [x] `goldenArchDateText` → `CachedDateFormatters.medalDate`
+- [x] `ancestralDateText` → `CachedDateFormatters.medalDate`
+
+---
+
+## Paso 4: Actualizar `EditorMiniPreviews.swift`
+
+- [x] 2 instancias de `activity.distanceRaw / 1000.0` → `ActivityFormatting.distanceValue()`
+
+---
+
+## Build
+
+- [x] Compilación exitosa verificada
+
+---
+
+## ✅ Fase 2 COMPLETADA

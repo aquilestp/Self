@@ -211,26 +211,14 @@ struct StatWidgetContentView: View, Equatable {
 
     private var basicDistanceText: String {
         if isBasicMiles {
-            let mi = activity.distanceRaw / 1609.34
-            return String(format: "%.2f mi", mi)
+            return ActivityFormatting.distanceWithUnit(activity.distanceRaw, unit: .miles, kmFormat: "%.1f km", miFormat: "%.2f mi")
         }
         return activity.distance
     }
 
     private var basicPaceText: String {
         guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
-        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-        if isBasicMiles {
-            let secPerMile = 1609.34 / speed
-            let m = Int(secPerMile) / 60
-            let s = Int(secPerMile) % 60
-            return String(format: "%d:%02d /mi", m, s)
-        } else {
-            let secPerKm = 1000.0 / speed
-            let m = Int(secPerKm) / 60
-            let s = Int(secPerKm) % 60
-            return String(format: "%d:%02d /km", m, s)
-        }
+        return ActivityFormatting.paceSpaced(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: isBasicMiles ? .miles : .km)
     }
 
     private var basicMetricItems: [StatDisplayItem] {
@@ -688,11 +676,7 @@ struct StatWidgetContentView: View, Equatable {
     }
 
     private func formatDurationCompact(_ seconds: Int) -> String {
-        let h = seconds / 3600
-        let m = (seconds % 3600) / 60
-        let s = seconds % 60
-        if h > 0 { return String(format: "%d:%02d:%02d", h, m, s) }
-        return String(format: "%d:%02d", m, s)
+        ActivityFormatting.durationCompact(seconds)
     }
 
     private var movingTimeCleanWidget: some View {
@@ -1378,11 +1362,7 @@ struct StatWidgetContentView: View, Equatable {
     }
 
     private func splitPaceString(speed: Double, unitDistance: Double) -> String {
-        guard speed > 0 else { return "--" }
-        let secPerUnit = unitDistance / speed
-        let m = Int(secPerUnit) / 60
-        let s = Int(secPerUnit) % 60
-        return String(format: "%d'%02d\"", m, s)
+        ActivityFormatting.splitPace(speed: speed, unitDistance: unitDistance)
     }
 
     private func splitsFastestWidget(filter: SplitsUnitFilter) -> some View {
@@ -1824,18 +1804,11 @@ struct StatWidgetContentView: View, Equatable {
         let isKm = fullBannerUnitFilter == .km
         let distValue: String = {
             if !activity.hasDistance { return "--" }
-            if isKm { return activity.distance }
-            let mi = activity.distanceRaw / 1609.34
-            return mi >= 100 ? String(format: "%.0f mi", mi) : String(format: "%.2f mi", mi)
+            return ActivityFormatting.bannerDistance(activity.distanceRaw, unit: fullBannerUnitFilter, fallbackKm: activity.distance)
         }()
         let paceValue: String = {
             guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
-            let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-            let unitDist: Double = isKm ? 1000.0 : 1609.34
-            let secPerUnit = unitDist / speed
-            let m = Int(secPerUnit) / 60
-            let s = Int(secPerUnit) % 60
-            return String(format: "%d'%02d\"", m, s)
+            return ActivityFormatting.pacePrime(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: fullBannerUnitFilter)
         }()
         let items: [(String, String, Bool)] = [
             ("TIME", activity.duration, fullBannerShowTime),
@@ -1870,18 +1843,11 @@ struct StatWidgetContentView: View, Equatable {
         let isKm = fullBannerUnitFilter == .km
         let distValue: String = {
             if !activity.hasDistance { return "--" }
-            if isKm { return activity.distance }
-            let mi = activity.distanceRaw / 1609.34
-            return mi >= 100 ? String(format: "%.0f mi", mi) : String(format: "%.2f mi", mi)
+            return ActivityFormatting.bannerDistance(activity.distanceRaw, unit: fullBannerUnitFilter, fallbackKm: activity.distance)
         }()
         let paceValue: String = {
             guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
-            let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-            let unitDist: Double = isKm ? 1000.0 : 1609.34
-            let secPerUnit = unitDist / speed
-            let m = Int(secPerUnit) / 60
-            let s = Int(secPerUnit) % 60
-            return String(format: "%d'%02d\"", m, s)
+            return ActivityFormatting.pacePrime(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: fullBannerUnitFilter)
         }()
         let items: [(String, String, Bool)] = [
             ("TIME", activity.duration, fullBannerShowTime),
@@ -1912,16 +1878,8 @@ struct StatWidgetContentView: View, Equatable {
         .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
     }
 
-    private static let bvtDateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "MMM d, yyyy"
-        return f
-    }()
-    private static let bvtTimeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "h:mm a"
-        return f
-    }()
+    private static let bvtDateFormatter = CachedDateFormatters.bvtDate
+    private static let bvtTimeFormatter = CachedDateFormatters.timeShort
 
     private var blurredVerticalTextWidget: some View {
         let isKm = bvtUnitFilter == .km
@@ -1938,26 +1896,13 @@ struct StatWidgetContentView: View, Equatable {
         let distText: String = {
             guard activity.hasDistance else { return "" }
             if isKm { return activity.distance.uppercased() }
-            let mi = activity.distanceRaw / 1609.34
-            return String(format: "%.1f MI", mi)
+            return ActivityFormatting.distanceWithUnitUpper(activity.distanceRaw, unit: .miles)
         }()
         let paceText: String = {
             guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "" }
-            let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-            let unitDist: Double = isKm ? 1000.0 : 1609.34
-            let secPerUnit = unitDist / speed
-            let m = Int(secPerUnit) / 60
-            let s = Int(secPerUnit) % 60
-            return isKm ? String(format: "%d:%02d/KM", m, s) : String(format: "%d:%02d/MI", m, s)
+            return ActivityFormatting.paceSlash(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: bvtUnitFilter)
         }()
-        let durationText: String = {
-            let totalSec = activity.movingTimeRaw
-            let h = totalSec / 3600
-            let m = (totalSec % 3600) / 60
-            let s = totalSec % 60
-            if h > 0 { return String(format: "%dH %dM %dS", h, m, s) }
-            return String(format: "%dM %dS", m, s)
-        }()
+        let durationText = ActivityFormatting.durationExpanded(activity.movingTimeRaw)
         let elevText = activity.elevationGain.uppercased()
         let calText: String = {
             guard let cal = activityDetail?.calories, cal > 0 else { return "" }
@@ -2203,11 +2148,7 @@ struct StatWidgetContentView: View, Equatable {
             )
     }
 
-    private static let waTimeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "h:mm a"
-        return f
-    }()
+    private static let waTimeFormatter = CachedDateFormatters.timeShort
 
     private var whatsappMessageWidget: some View {
         let timeText = activity.startDate.map { Self.waTimeFormatter.string(from: $0) } ?? "9:54 PM"
@@ -2250,35 +2191,17 @@ struct StatWidgetContentView: View, Equatable {
     private var notesIsMiles: Bool { notesUnitFilter == .miles }
 
     private var notesDistanceText: String {
-        if notesIsMiles {
-            let mi = activity.distanceRaw / 1609.34
-            return String(format: "%.1f mi", mi)
-        }
-        let km = activity.distanceRaw / 1000.0
-        return String(format: "%.1f km", km)
+        ActivityFormatting.distanceWithUnit(activity.distanceRaw, unit: notesIsMiles ? .miles : .km, kmFormat: "%.1f km", miFormat: "%.1f mi")
     }
 
     private var notesPaceText: String {
         guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
-        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-        if notesIsMiles {
-            let secPerMile = 1609.34 / speed
-            let m = Int(secPerMile) / 60
-            let s = Int(secPerMile) % 60
-            return String(format: "%d:%02d /mi", m, s)
-        } else {
-            let secPerKm = 1000.0 / speed
-            let m = Int(secPerKm) / 60
-            let s = Int(secPerKm) % 60
-            return String(format: "%d:%02d /km", m, s)
-        }
+        return ActivityFormatting.paceSpaced(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: notesIsMiles ? .miles : .km)
     }
 
     private var notesDateText: String {
         if let d = activity.startDate {
-            let f = DateFormatter()
-            f.dateFormat = "EEEE, MMM d, yyyy"
-            return f.string(from: d)
+            return CachedDateFormatters.notesDate.string(from: d)
         }
         return activity.date
     }
@@ -2355,12 +2278,7 @@ struct StatWidgetContentView: View, Equatable {
     private var goldenArchIsMiles: Bool { goldenArchUnitFilter == .miles }
 
     private var goldenArchDistanceText: String {
-        if goldenArchIsMiles {
-            let mi = activity.distanceRaw / 1609.34
-            return String(format: "%.2f", mi)
-        }
-        let km = activity.distanceRaw / 1000.0
-        return String(format: "%.1f", km)
+        ActivityFormatting.distanceValue(activity.distanceRaw, unit: goldenArchIsMiles ? .miles : .km, kmFormat: "%.1f", miFormat: "%.2f")
     }
 
     private var goldenArchUnitLabel: String {
@@ -2369,25 +2287,12 @@ struct StatWidgetContentView: View, Equatable {
 
     private var goldenArchPaceText: String {
         guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
-        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-        if goldenArchIsMiles {
-            let secPerMile = 1609.34 / speed
-            let m = Int(secPerMile) / 60
-            let s = Int(secPerMile) % 60
-            return String(format: "%d:%02d /mi", m, s)
-        } else {
-            let secPerKm = 1000.0 / speed
-            let m = Int(secPerKm) / 60
-            let s = Int(secPerKm) % 60
-            return String(format: "%d:%02d /km", m, s)
-        }
+        return ActivityFormatting.paceSpaced(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: goldenArchIsMiles ? .miles : .km)
     }
 
     private var goldenArchDateText: String {
         if let d = activity.startDate {
-            let f = DateFormatter()
-            f.dateFormat = "dd MMM yyyy"
-            return f.string(from: d).uppercased()
+            return CachedDateFormatters.medalDate.string(from: d).uppercased()
         }
         return activity.date.uppercased()
     }
@@ -2543,12 +2448,7 @@ struct StatWidgetContentView: View, Equatable {
     private var ancestralIsMiles: Bool { ancestralUnitFilter == .miles }
 
     private var ancestralDistanceText: String {
-        if ancestralIsMiles {
-            let mi = activity.distanceRaw / 1609.34
-            return String(format: "%.1f", mi)
-        }
-        let km = activity.distanceRaw / 1000.0
-        return String(format: "%.1f", km)
+        ActivityFormatting.distanceValue(activity.distanceRaw, unit: ancestralIsMiles ? .miles : .km)
     }
 
     private var ancestralUnitLabel: String {
@@ -2557,25 +2457,12 @@ struct StatWidgetContentView: View, Equatable {
 
     private var ancestralPaceText: String {
         guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
-        let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-        if ancestralIsMiles {
-            let secPerMile = 1609.34 / speed
-            let m = Int(secPerMile) / 60
-            let s = Int(secPerMile) % 60
-            return String(format: "%d:%02d /mi", m, s)
-        } else {
-            let secPerKm = 1000.0 / speed
-            let m = Int(secPerKm) / 60
-            let s = Int(secPerKm) % 60
-            return String(format: "%d:%02d /km", m, s)
-        }
+        return ActivityFormatting.paceSpaced(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: ancestralIsMiles ? .miles : .km)
     }
 
     private var ancestralDateText: String {
         if let d = activity.startDate {
-            let f = DateFormatter()
-            f.dateFormat = "dd MMM yyyy"
-            return f.string(from: d).uppercased()
+            return CachedDateFormatters.medalDate.string(from: d).uppercased()
         }
         return activity.date.uppercased()
     }
@@ -2725,21 +2612,9 @@ struct StatWidgetContentView: View, Equatable {
         .drawingGroup()
     }
 
-    private static let splitBannerDayFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "EEEE"
-        return f
-    }()
-    private static let splitBannerDateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "MMM d"
-        return f
-    }()
-    private static let splitBannerTimeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "h:mm a"
-        return f
-    }()
+    private static let splitBannerDayFormatter = CachedDateFormatters.dayOfWeek
+    private static let splitBannerDateFormatter = CachedDateFormatters.monthDay
+    private static let splitBannerTimeFormatter = CachedDateFormatters.timeShort
 
     private var splitBannerWidget: some View {
         let isKm = splitBannerUnitFilter == .km
@@ -2749,31 +2624,13 @@ struct StatWidgetContentView: View, Equatable {
 
         let distValue: String = {
             if !activity.hasDistance { return "--" }
-            if isKm {
-                let km = activity.distanceRaw / 1000.0
-                return String(format: "%.1f KM", km)
-            }
-            let mi = activity.distanceRaw / 1609.34
-            return String(format: "%.1f MI", mi)
+            return ActivityFormatting.distanceWithUnitUpper(activity.distanceRaw, unit: splitBannerUnitFilter)
         }()
         let paceValue: String = {
             guard activity.hasDistance, activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
-            let speed = activity.distanceRaw / Double(activity.movingTimeRaw)
-            let unitDist: Double = isKm ? 1000.0 : 1609.34
-            let secPerUnit = unitDist / speed
-            let m = Int(secPerUnit) / 60
-            let s = Int(secPerUnit) % 60
-            return String(format: "%d:%02d/%@", m, s, isKm ? "KM" : "MI")
+            return ActivityFormatting.paceSlashMixed(distanceRaw: activity.distanceRaw, movingTimeRaw: activity.movingTimeRaw, unit: splitBannerUnitFilter)
         }()
-        let durationValue: String = {
-            let total = activity.movingTimeRaw
-            let h = total / 3600
-            let m = (total % 3600) / 60
-            if h > 0 {
-                return String(format: "%dH %02dM", h, m)
-            }
-            return String(format: "%dM", m)
-        }()
+        let durationValue = ActivityFormatting.durationShort(activity.movingTimeRaw)
 
         let font: Font = splitBannerFontStyle.font(size: 19)
 
