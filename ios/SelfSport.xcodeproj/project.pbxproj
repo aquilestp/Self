@@ -196,6 +196,7 @@
 				};
 			};
 			buildConfigurationList = 105FC5752E9EAD3100EA8BCF /* Build configuration list for PBXProject "SelfSport" */;
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -204,6 +205,9 @@
 			);
 			mainGroup = 105FC5712E9EAD3100EA8BCF;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift.git" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 105FC57B2E9EAD3100EA8BCF /* Products */;
 			projectDirPath = "";
@@ -212,9 +216,6 @@
 				105FC5792E9EAD3100EA8BCF /* SelfSport */,
 				105FC5882E9EAD3200EA8BCF /* SelfSportTests */,
 				105FC5922E9EAD3200EA8BCF /* SelfSportUITests */,
-			);
-			packageReferences = (
-				XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 		};
 /* End PBXProject section */
@@ -421,14 +422,14 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIBackgroundModes = "(remote-notification)";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7jyfilw9jpnihyztmh5s;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.self-share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -459,14 +460,14 @@
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIBackgroundModes = "(remote-notification)";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7jyfilw9jpnihyztmh5s;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.self-share";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -488,7 +489,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7jyfilw9jpnihyztmh5s.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.self-share.tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -510,7 +511,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7jyfilw9jpnihyztmh5s.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.self-share.tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -530,7 +531,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7jyfilw9jpnihyztmh5s.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.self-share.uitests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -550,7 +551,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.rork.n7jyfilw9jpnihyztmh5s.uitests;
+				PRODUCT_BUNDLE_IDENTIFIER = "app.self-share.uitests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -604,7 +605,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+		XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift.git" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase-community/supabase-swift.git";
 			requirement = {
@@ -617,12 +618,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		XX04A861CE53D0FBA94CD8XX /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift.git" */;
 			productName = Supabase;
 		};
 		XXFDC8F5D5A6EFC791438EXX /* Auth */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			package = XX88BFB34CEE5C6D63127BXX /* XCRemoteSwiftPackageReference "supabase-swift.git" */;
 			productName = Auth;
 		};
 /* End XCSwiftPackageProductDependency section */
