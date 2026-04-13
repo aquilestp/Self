@@ -890,6 +890,7 @@ struct PhotoEditorView: View {
         let targetAncestralShowTime = targetWidget?.ancestralShowTime ?? true
         let targetIsSplitBanner = targetWidget?.type == .splitBanner
         let targetSplitBannerUnit = targetWidget?.splitBannerUnitFilter ?? .km
+        let targetSplitBannerFontStyle = targetWidget?.splitBannerFontStyle ?? .system
         let targetIsWhatsapp = targetWidget?.type == .whatsappMessage
         let fontPreviewText = targetWidget.map { w in
             w.type == .distanceWords ? "five" : (activity.hasDistance ? activity.primaryStat : activity.duration)
@@ -1456,6 +1457,24 @@ struct PhotoEditorView: View {
                     hapticLight.impactOccurred()
                     resetPaletteHideTimer()
                 }
+
+                SplitBannerFontScrollPicker(
+                    currentStyle: targetSplitBannerFontStyle,
+                    onSelectStyle: { style in
+                        guard let id = paletteTargetWidgetId,
+                              let idx = placedWidgets.firstIndex(where: { $0.id == id }) else { return }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                            placedWidgets[idx].splitBannerFontStyle = style
+                        }
+                        resetPaletteHideTimer()
+                    }
+                )
+                .scaleEffect(showPaletteSelector ? 1 : 0.3)
+                .opacity(showPaletteSelector ? 1 : 0)
+                .animation(
+                    .spring(response: 0.35, dampingFraction: 0.7).delay(Double(paletteCount) * 0.04 + 0.08),
+                    value: showPaletteSelector
+                )
             }
 
             if targetIsWhatsapp {
@@ -2575,7 +2594,7 @@ struct PhotoEditorView: View {
             activeFilterOverlay(size: canvasSize)
 
             ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, splitBannerUnitFilter: widget.splitBannerUnitFilter)
+                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, splitBannerUnitFilter: widget.splitBannerUnitFilter, splitBannerFontStyle: widget.splitBannerFontStyle)
                     .scaleEffect(widget.scale)
                     .rotationEffect(widget.rotation)
                     .offset(x: widget.position.width, y: widget.position.height)

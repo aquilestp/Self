@@ -983,7 +983,7 @@ extension PhotoEditorView {
     }
 
     var miniSplitBanner: some View {
-        let font: Font = .system(size: 7, weight: .black, design: .rounded).italic()
+        let font: Font = .system(size: 7, weight: .heavy, design: .default).italic().width(.expanded)
         return HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading, spacing: 1) {
                 Text("SUNDAY")

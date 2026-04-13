@@ -80,7 +80,8 @@ struct StatWidgetContentView: View, Equatable {
         lhs.ancestralUnitFilter == rhs.ancestralUnitFilter &&
         lhs.ancestralShowPace == rhs.ancestralShowPace &&
         lhs.ancestralShowTime == rhs.ancestralShowTime &&
-        lhs.splitBannerUnitFilter == rhs.splitBannerUnitFilter
+        lhs.splitBannerUnitFilter == rhs.splitBannerUnitFilter &&
+        lhs.splitBannerFontStyle == rhs.splitBannerFontStyle
     }
 
     let type: StatWidgetType
@@ -130,6 +131,7 @@ struct StatWidgetContentView: View, Equatable {
     var ancestralShowPace: Bool = true
     var ancestralShowTime: Bool = true
     var splitBannerUnitFilter: SplitsUnitFilter = .km
+    var splitBannerFontStyle: SplitBannerFontStyle = .system
 
     private var primaryColor: Color {
         colorStyle.currentColor
@@ -2773,7 +2775,7 @@ struct StatWidgetContentView: View, Equatable {
             return String(format: "%dM", m)
         }()
 
-        let font: Font = .system(size: 19, weight: .black, design: .rounded).italic()
+        let font: Font = splitBannerFontStyle.font(size: 19)
 
         return HStack(alignment: .top, spacing: 0) {
             VStack(alignment: .leading, spacing: 2) {
@@ -3226,7 +3228,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, goldenArchUnitFilter: widget.goldenArchUnitFilter, goldenArchShowPace: widget.goldenArchShowPace, goldenArchShowTime: widget.goldenArchShowTime, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter, splitBannerFontStyle: widget.splitBannerFontStyle)
     }
 }
 

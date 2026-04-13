@@ -1,19 +1,24 @@
-# Cambiar números de los 5 widgets a letra ancha (expanded) con italic
+# Split Banner: fuente Condensed Extra Bold Italic expanded + selector de SpecialFonts
 
-**Cambio**
 
-Los números de los 5 widgets actualmente usan estilo **condensado** (estrecho). Se cambiarán a estilo **expandido** (ancho) como en la imagen de referencia "14.7 KM", manteniendo italic y peso heavy/black.
+**Cambios:**
 
-**Widgets afectados:**
-1. Weekly KM (THIS WEEK)
-2. Last Week KM (LAST WEEK)
-3. Monthly KM (THIS MONTH)
-4. Last Month KM (LAST MONTH)
-5. Elevation Gain
+1. **Fuente por defecto del Split Banner** — Cambiar la fuente del widget (canvas y drawer) de `.system rounded black italic` a **sistema Condensed Extra Bold Italic con width expanded** (`.system(size:19, weight:.heavy).italic().width(.expanded)`)
 
-**Ajustes:**
-- Cambiar `.width(.condensed)` → `.width(.expanded)` en los 5 números grandes
-- Reducir ligeramente el tamaño de fuente (de 28→24 en los 4 de KM, de 36→30 en elevation) para que el texto expandido quepa sin desbordar el widget
-- Agregar `minimumScaleFactor` donde no exista para evitar overflow
-- Mismos cambios en las mini previews del editor (drawer)
-- Las áreas de gesto no se verán afectadas porque el texto mantiene `lineLimit(1)` y scale factor
+2. **Nuevo enum `SplitBannerFontStyle`** — Un enum con las opciones:
+   - **System** (default) — Condensed Extra Bold Italic expanded
+   - **MetalMania**
+   - **Monofett**
+   - **NewRocker**
+   - **Rubik80sFade**
+   - **RubikDistressed**
+   - **RubikGlitch**
+   - **SedgwickAve**
+   - **Sekuya**
+   - **SixCaps**
+
+3. **Nueva propiedad `splitBannerFontStyle`** — Añadida a `PlacedWidget`, `StatWidgetContentView`, y toda la cadena de parámetros (equatable, constructores del canvas y export)
+
+4. **VerticalSnapPicker en el editor** — Cuando el Split Banner esté seleccionado, aparecerá un picker vertical (igual al de WhatsApp/BVT) debajo del botón de unidad, permitiendo cambiar entre los estilos de SpecialFonts
+
+5. **Drawer mini preview** — La mini vista del Split Banner también usará la fuente Condensed Extra Bold Italic expanded por defecto

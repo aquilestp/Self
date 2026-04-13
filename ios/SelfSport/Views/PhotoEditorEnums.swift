@@ -315,6 +315,7 @@ struct PlacedWidget: Identifiable {
     var ancestralShowPace: Bool = true
     var ancestralShowTime: Bool = true
     var splitBannerUnitFilter: SplitsUnitFilter = .km
+    var splitBannerFontStyle: SplitBannerFontStyle = .system
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
@@ -508,6 +509,61 @@ nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
 
     var needsCompressedScale: Bool {
         self == .system
+    }
+}
+
+nonisolated enum SplitBannerFontStyle: Int, CaseIterable, Identifiable {
+    case system = 0
+    case metalMania
+    case monofett
+    case newRocker
+    case rubik80sFade
+    case rubikDistressed
+    case rubikGlitch
+    case sedgwickAve
+    case sekuya
+    case sixCaps
+
+    var id: Int { rawValue }
+
+    var label: String {
+        switch self {
+        case .system: return "System"
+        case .metalMania: return "Metal"
+        case .monofett: return "Mono"
+        case .newRocker: return "Rocker"
+        case .rubik80sFade: return "80s"
+        case .rubikDistressed: return "Distress"
+        case .rubikGlitch: return "Glitch"
+        case .sedgwickAve: return "Sedgwick"
+        case .sekuya: return "Sekuya"
+        case .sixCaps: return "Caps"
+        }
+    }
+
+    func font(size: CGFloat) -> Font {
+        switch self {
+        case .system:
+            return .system(size: size, weight: .heavy, design: .default).italic().width(.expanded)
+        case .metalMania:
+            return .custom("MetalMania-Regular", size: size)
+        case .monofett:
+            return .custom("Monofett-Regular", size: size)
+        case .newRocker:
+            return .custom("NewRocker-Regular", size: size)
+        case .rubik80sFade:
+            return .custom("Rubik80sFade-Regular", size: size)
+        case .rubikDistressed:
+            return .custom("RubikDistressed-Regular", size: size)
+        case .rubikGlitch:
+            return .custom("RubikGlitch-Regular", size: size)
+        case .sedgwickAve:
+            return .custom("SedgwickAveDisplay-Regular", size: size)
+        case .sekuya:
+            return .custom("Sekuya-Regular", size: size)
+        case .sixCaps:
+            return .custom("SixCaps-Regular", size: size)
+        }
     }
 }
 
