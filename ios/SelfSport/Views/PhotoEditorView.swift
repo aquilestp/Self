@@ -19,10 +19,10 @@ struct PhotoEditorView: View {
     let photo: UIImage
     let onClose: () -> Void
 
-    @State private var filterMode: FilterMode = .none
-    @State private var cityFilterIndex: Int = 0
-    @State private var raceFilterIndex: Int = 0
-    @State private var placedWidgets: [PlacedWidget] = []
+    @State var filterMode: FilterMode = .none
+    @State var cityFilterIndex: Int = 0
+    @State var raceFilterIndex: Int = 0
+    @State var placedWidgets: [PlacedWidget] = []
     @State private var placedTexts: [PlacedText] = []
     @State private var editingTextId: String? = nil
     @State private var editingTextContent: String = ""
@@ -34,8 +34,8 @@ struct PhotoEditorView: View {
     @State private var canvasGlobalOrigin: CGPoint = .zero
     @State var drawerState: DrawerState = .collapsed
     @State private var showInstagramAlert: Bool = false
-    @State private var drawerDragOffset: CGFloat = 0
-    @State private var locationService = LocationService()
+    @State var drawerDragOffset: CGFloat = 0
+    @State var locationService = LocationService()
     @State private var showLocationDeniedAlert: Bool = false
     @State private var isDraggingWidget: Bool = false
     @State private var draggingWidgetId: String? = nil
@@ -96,9 +96,9 @@ struct PhotoEditorView: View {
     @State var showVideoGeneration: Bool = false
     @State var videoPreviewImage: UIImage? = nil
     @State var includeStatsOverlay: Bool = true
-    @State private var dynamicCityFilters: [CityFilterRow] = []
-    @State private var isLoadingCityFilters: Bool = false
-    @State private var filterSwipeDirection: Edge = .trailing
+    @State var dynamicCityFilters: [CityFilterRow] = []
+    @State var isLoadingCityFilters: Bool = false
+    @State var filterSwipeDirection: Edge = .trailing
     @State var weeklyKmData: WeeklyKmData = .empty
     @State var lastWeekKmData: WeeklyKmData = .empty
     @State var monthlyKmData: MonthlyKmData = .empty
@@ -106,14 +106,14 @@ struct PhotoEditorView: View {
     @State private var activityDetail: StravaActivityDetail? = nil
     @State private var isLoadingDetail: Bool = false
     @State private var detailFetchTask: Task<Void, Never>? = nil
-    @State private var activePhotoFilter: PhotoFilterType = .original
+    @State var activePhotoFilter: PhotoFilterType = .original
     @State private var filteredPhotoCache: [PhotoFilterType: UIImage] = [:]
     @State private var showFilterLabel: Bool = false
-    @State private var filterLabelText: String = ""
+    @State var filterLabelText: String = ""
     @State private var filterLabelHideTask: Task<Void, Never>? = nil
     private let photoFilterService = PhotoFilterService()
     let grokService = GrokImageEditService()
-    private let cityFilterService = CityFilterService()
+    let cityFilterService = CityFilterService()
     private let weeklyKmService = WeeklyKmService()
     private let monthlyKmService = MonthlyKmService()
     private let detailService = SupabaseActivityDetailService()
@@ -161,18 +161,18 @@ struct PhotoEditorView: View {
         photo
     }
 
-    private let fallbackCityFilters = CityFilter.allCases
-    private let raceFilters = RaceFilter.allCases
+    let fallbackCityFilters = CityFilter.allCases
+    let raceFilters = RaceFilter.allCases
 
-    private var hasDynamicCityFilters: Bool {
+    var hasDynamicCityFilters: Bool {
         !dynamicCityFilters.isEmpty
     }
 
-    private var cityFilterCount: Int {
+    var cityFilterCount: Int {
         hasDynamicCityFilters ? dynamicCityFilters.count + 1 : fallbackCityFilters.count
     }
 
-    private var isNoFilterPosition: Bool {
+    var isNoFilterPosition: Bool {
         hasDynamicCityFilters && cityFilterIndex == dynamicCityFilters.count
     }
 
@@ -1093,230 +1093,7 @@ struct PhotoEditorView: View {
         }
     }
 
-    // MARK: - Filter Toggles
-
-    private var filterToggles: some View {
-        HStack(spacing: 8) {
-            filterToggleButton(label: locationService.cityName ?? "City", icon: "building.2.fill", mode: .city)
-        }
-        .padding(.horizontal, 14)
-    }
-
-    private func filterToggleButton(label: String, icon: String, mode: FilterMode) -> some View {
-        let isActive = filterMode == mode
-        return Button {
-            withAnimation(.snappy(duration: 0.3)) {
-                if filterMode == mode {
-                    filterMode = .none
-                } else {
-                    filterMode = mode
-                    if mode == .city { cityFilterIndex = 0 }
-                    if mode == .races { raceFilterIndex = 0 }
-                }
-            }
-        } label: {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                    .font(.system(size: 12, weight: .medium))
-                Text(label)
-                    .font(.system(size: 13, weight: .semibold))
-            }
-            .foregroundStyle(isActive ? .white : .white.opacity(0.7))
-            .padding(.horizontal, 16)
-            .frame(height: 36)
-            .background(
-                isActive
-                    ? AnyShapeStyle(Color.white.opacity(0.22))
-                    : AnyShapeStyle(Color.white.opacity(0.08)),
-                in: .capsule
-            )
-            .background(.ultraThinMaterial, in: .capsule)
-            .overlay(
-                Capsule()
-                    .stroke(isActive ? Color.white.opacity(0.35) : Color.white.opacity(0.1), lineWidth: 0.5)
-            )
-        }
-        .buttonStyle(.plain)
-        .sensoryFeedback(.selection, trigger: isActive)
-        .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 2)
-    }
-
-    // MARK: - Photo Filter Views
-
-    private var photoFilterDotsView: some View {
-        let allFilters = PhotoFilterType.allCases
-        return HStack(spacing: 6) {
-            ForEach(Array(allFilters.enumerated()), id: \.element) { idx, filter in
-                let isActive = filter == activePhotoFilter
-                Circle()
-                    .fill(isActive ? Color.white : Color.white.opacity(0.35))
-                    .frame(width: isActive ? 8 : 6, height: isActive ? 8 : 6)
-                    .animation(.easeInOut(duration: 0.2), value: activePhotoFilter)
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
-        .background(.black.opacity(0.25), in: .capsule)
-    }
-
-    private var photoFilterLabelView: some View {
-        Text(filterLabelText)
-            .font(.system(size: 22, weight: .bold))
-            .tracking(3)
-            .foregroundStyle(.white)
-            .shadow(color: .black.opacity(0.7), radius: 8, x: 0, y: 2)
-            .shadow(color: .black.opacity(0.4), radius: 3, x: 0, y: 1)
-    }
-
-    // MARK: - Filter Overlay
-
-    @ViewBuilder
-    private func activeFilterOverlay(size: CGSize) -> some View {
-        switch filterMode {
-        case .none:
-            EmptyView()
-        case .city:
-            Group {
-                if hasDynamicCityFilters {
-                    if cityFilterIndex < dynamicCityFilters.count {
-                        DynamicCityOverlay(
-                            size: size,
-                            overlayURL: dynamicCityFilters[cityFilterIndex].overlayURL
-                        )
-                    } else {
-                        EmptyView()
-                    }
-                } else {
-                    let filter = fallbackCityFilters[cityFilterIndex]
-                    switch filter {
-                    case .none: EmptyView()
-                    case .skyline: CityOverlay_Skyline(size: size)
-                    case .postcard: CityOverlay_Postcard(size: size, activity: activity)
-                    case .neon: CityOverlay_Neon(size: size, activity: activity)
-                    case .stamp: CityOverlay_Stamp(size: size, activity: activity)
-                    case .gps: CityOverlay_GPS(size: size, activity: activity)
-                    }
-                }
-            }
-        case .races:
-            let filter = raceFilters[raceFilterIndex]
-            Group {
-                switch filter {
-                case .none: EmptyView()
-                case .bibNumber: RaceOverlay_Bib(size: size)
-                case .finisher: RaceOverlay_Finisher(size: size, activity: activity)
-                case .medal: RaceOverlay_Medal(size: size, activity: activity)
-                case .raceRoute: RaceOverlay_Route(size: size, activity: activity)
-                case .racePoster: RaceOverlay_Poster(size: size, activity: activity)
-                }
-            }
-        }
-    }
-
-    private var filterOverlayId: String {
-        switch filterMode {
-        case .none: return "filter_none"
-        case .city: return "filter_city_\(cityFilterIndex)"
-        case .races: return "filter_race_\(raceFilterIndex)"
-        }
-    }
-
-    // MARK: - Filter Dots
-
-    private var filterDots: some View {
-        let count: Int
-        let currentIndex: Int
-
-        switch filterMode {
-        case .none:
-            if hasDynamicCityFilters {
-                count = cityFilterCount
-                currentIndex = cityFilterIndex
-            } else {
-                count = 0
-                currentIndex = 0
-            }
-        case .city:
-            count = cityFilterCount
-            currentIndex = cityFilterIndex
-        case .races:
-            count = raceFilters.count
-            currentIndex = raceFilterIndex
-        }
-
-        return HStack(spacing: 6) {
-            ForEach(0..<count, id: \.self) { index in
-                Circle()
-                    .fill(index == currentIndex ? Color.white : Color.white.opacity(0.35))
-                    .frame(width: index == currentIndex ? 8 : 6, height: index == currentIndex ? 8 : 6)
-                    .animation(.easeInOut(duration: 0.2), value: currentIndex)
-                    .onTapGesture {
-                        withAnimation(.snappy(duration: 0.3)) {
-                            setFilterIndex(index)
-                        }
-                    }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(.black.opacity(0.3), in: .capsule)
-        .background(.ultraThinMaterial.opacity(0.5), in: .capsule)
-    }
-
-    private func advanceFilter(by delta: Int) {
-        switch filterMode {
-        case .none:
-            if hasDynamicCityFilters {
-                guard !dynamicCityFilters.isEmpty else { return }
-                if delta > 0 {
-                    cityFilterIndex = 0
-                } else {
-                    cityFilterIndex = dynamicCityFilters.count - 1
-                }
-                filterMode = .city
-            }
-        case .city:
-            let total = cityFilterCount
-            guard total > 0 else { return }
-            cityFilterIndex = ((cityFilterIndex + delta) % total + total) % total
-        case .races:
-            let newIndex = raceFilterIndex + delta
-            if newIndex >= 0 && newIndex < raceFilters.count {
-                raceFilterIndex = newIndex
-            }
-        }
-    }
-
-    private func setFilterIndex(_ index: Int) {
-        switch filterMode {
-        case .none:
-            if hasDynamicCityFilters {
-                cityFilterIndex = index
-                filterMode = .city
-            }
-        case .city: cityFilterIndex = index
-        case .races: raceFilterIndex = index
-        }
-    }
-
-    private func loadDynamicCityFilters(lat: Double, lng: Double) async {
-        isLoadingCityFilters = true
-        do {
-            let filters = try await cityFilterService.fetchNearbyFilters(latitude: lat, longitude: lng)
-            dynamicCityFilters = filters
-            if !filters.isEmpty {
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
-                    filterSwipeDirection = .trailing
-                    filterMode = .city
-                    cityFilterIndex = 0
-                }
-            }
-        } catch {
-            print("[CityFilters] Error loading filters: \(error)")
-            dynamicCityFilters = []
-        }
-        isLoadingCityFilters = false
-    }
+    // MARK: - Filters (see EditorFiltersOverlay.swift)
 
     // MARK: - Bottom Section
 
@@ -1391,196 +1168,7 @@ struct PhotoEditorView: View {
         .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 4)
     }
 
-    private var expandedDrawer: some View {
-        GeometryReader { geo in
-            let isExpanded = drawerState == .expanded
-            let drawerHeight = isExpanded ? geo.size.height * 0.75 : 0
-
-            VStack(spacing: 0) {
-                Spacer(minLength: 0)
-
-                VStack(spacing: 0) {
-                    Capsule()
-                        .fill(.white.opacity(0.35))
-                        .frame(width: 36, height: 4)
-                        .padding(.top, 10)
-                        .padding(.bottom, 6)
-
-
-
-                    if isExpanded {
-                        expandedGrid
-                            .transition(.opacity)
-                    } else {
-                        compactStatsList
-                            .transition(.opacity)
-                    }
-                }
-                .frame(height: isExpanded ? drawerHeight : nil)
-                .background(.black.opacity(0.55))
-                .background(.ultraThinMaterial)
-                .clipShape(.rect(topLeadingRadius: 20, topTrailingRadius: 20))
-                .contentShape(.rect(topLeadingRadius: 20, topTrailingRadius: 20))
-                .onTapGesture {
-                    if drawerState == .open {
-                        withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
-                            drawerState = .expanded
-                        }
-                    }
-                }
-                .offset(y: drawerDragOffset)
-                .gesture(drawerDragGesture)
-            }
-        }
-    }
-
-    private var activeWidgetTypes: Set<StatWidgetType> {
-        Set(placedWidgets.map(\.type))
-    }
-
-    private var gridStatTypes: [StatWidgetType] {
-        StatWidgetType.allCases.filter { $0 != .fullBanner && $0 != .fullBannerBottom }
-    }
-
-    private var compactStatsList: some View {
-        let activeTypes = activeWidgetTypes
-        let types = gridStatTypes
-        return VStack(spacing: 10) {
-            LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
-                spacing: 10
-            ) {
-                ForEach(Array(types.prefix(6))) { type in
-                    widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
-                }
-            }
-            .padding(.horizontal, 14)
-
-            fullWidthThumbnail(type: .fullBanner, isActive: activeTypes.contains(.fullBanner))
-                .padding(.horizontal, 14)
-
-            fullWidthThumbnail(type: .fullBannerBottom, isActive: activeTypes.contains(.fullBannerBottom))
-                .padding(.horizontal, 14)
-                .padding(.bottom, 14)
-        }
-        .frame(maxHeight: 262, alignment: .top)
-        .clipped()
-    }
-
-    private var expandedGrid: some View {
-        let activeTypes = activeWidgetTypes
-        let types = gridStatTypes
-        let firstTwo = Array(types.prefix(6))
-        let rest = Array(types.dropFirst(6))
-        return ScrollView(.vertical, showsIndicators: false) {
-            VStack(spacing: 10) {
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
-                    spacing: 10
-                ) {
-                    ForEach(firstTwo) { type in
-                        widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
-                    }
-                }
-
-                fullWidthThumbnail(type: .fullBanner, isActive: activeTypes.contains(.fullBanner))
-
-                fullWidthThumbnail(type: .fullBannerBottom, isActive: activeTypes.contains(.fullBannerBottom))
-
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
-                    spacing: 10
-                ) {
-                    ForEach(rest) { type in
-                        widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
-                    }
-                }
-            }
-            .padding(.horizontal, 14)
-            .padding(.bottom, 20)
-        }
-    }
-
-    private var drawerDragGesture: some Gesture {
-        DragGesture(minimumDistance: 12)
-            .onChanged { value in
-                let translation = value.translation.height
-                if drawerState == .open {
-                    drawerDragOffset = translation < 0 ? translation * 0.5 : translation
-                } else if drawerState == .expanded {
-                    drawerDragOffset = translation > 0 ? translation * 0.5 : 0
-                }
-            }
-            .onEnded { value in
-                let translation = value.translation.height
-                let velocity = value.predictedEndTranslation.height
-                withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
-                    drawerDragOffset = 0
-                    if drawerState == .open {
-                        if translation < -50 || velocity < -200 {
-                            drawerState = .expanded
-                        } else if translation > 60 || velocity > 300 {
-                            drawerState = .collapsed
-                        }
-                    } else if drawerState == .expanded {
-                        if translation > 50 || velocity > 200 {
-                            drawerState = .open
-                        }
-                    }
-                }
-            }
-    }
-
-    private func widgetThumbnail(type: StatWidgetType, isActive: Bool, large: Bool = false) -> some View {
-        let h: CGFloat = large ? 80 : 72
-        return Button {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                toggleWidget(type)
-            }
-        } label: {
-            VStack(spacing: 6) {
-                miniWidgetPreview(type: type)
-            }
-            .frame(maxWidth: large ? .infinity : nil)
-            .frame(width: large ? nil : 119, height: h)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(isActive ? Color.white.opacity(0.18) : Color.white.opacity(0.06))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(isActive ? Color.white.opacity(0.4) : Color.white.opacity(0.1), lineWidth: 0.5)
-            )
-            .scaleEffect(isActive ? 0.95 : 1.0)
-        }
-        .buttonStyle(.plain)
-        .sensoryFeedback(.selection, trigger: isActive)
-    }
-
-    private func fullWidthThumbnail(type: StatWidgetType, isActive: Bool) -> some View {
-        Button {
-            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                toggleWidget(type)
-            }
-        } label: {
-            VStack(spacing: 6) {
-                miniWidgetPreview(type: type)
-            }
-            .frame(maxWidth: .infinity)
-            .frame(height: 94)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(isActive ? Color.white.opacity(0.18) : Color.white.opacity(0.06))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(isActive ? Color.white.opacity(0.4) : Color.white.opacity(0.1), lineWidth: 0.5)
-            )
-            .scaleEffect(isActive ? 0.95 : 1.0)
-        }
-        .buttonStyle(.plain)
-        .sensoryFeedback(.selection, trigger: isActive)
-    }
+    // MARK: - Drawer (see EditorDrawerView.swift)
 
     // MARK: - Share Bar
 
@@ -1721,7 +1309,7 @@ struct PhotoEditorView: View {
         }
     }
 
-    private func toggleWidget(_ type: StatWidgetType) {
+    func toggleWidget(_ type: StatWidgetType) {
         if let index = placedWidgets.firstIndex(where: { $0.type == type }) {
             placedWidgets.remove(at: index)
         } else {

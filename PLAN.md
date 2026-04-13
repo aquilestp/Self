@@ -95,3 +95,48 @@ Extraer la vista `paletteSelectorView` (~650 líneas) de `PhotoEditorView.swift`
 ---
 
 ## ✅ Fase 3 COMPLETADA
+
+---
+---
+
+# Fase 4: Extraer Drawer y Filtros a Extensiones
+
+## Objetivo
+Extraer el drawer de stats (~190 líneas) y la lógica de filtros/overlays (~225 líneas) de `PhotoEditorView.swift` a archivos de extensión dedicados. **Sin cambios visuales ni de comportamiento.**
+
+---
+
+## Paso 1: Crear `EditorDrawerView.swift`
+
+- [x] Extension con: `expandedDrawer`, `compactStatsList`, `expandedGrid`
+- [x] `drawerDragGesture` — gesture completo extraído
+- [x] `widgetThumbnail()`, `fullWidthThumbnail()` — thumbnails del drawer
+- [x] `activeWidgetTypes`, `gridStatTypes` — computed properties
+
+---
+
+## Paso 2: Crear `EditorFiltersOverlay.swift`
+
+- [x] Extension con: `filterToggles`, `filterToggleButton()`
+- [x] `photoFilterDotsView`, `photoFilterLabelView`
+- [x] `activeFilterOverlay()`, `filterOverlayId`
+- [x] `filterDots`, `advanceFilter()`, `setFilterIndex()`
+- [x] `loadDynamicCityFilters()` — async loading
+
+---
+
+## Paso 3: Actualizar `PhotoEditorView.swift`
+
+- [x] Eliminar ~415 líneas de código duplicado (ahora en extensiones)
+- [x] Cambiar ~18 `private` a `internal` para accesibilidad desde extensiones
+- [x] PhotoEditorView: 1842 → 1430 líneas (-22%)
+
+---
+
+## Build
+
+- [x] Compilación exitosa verificada
+
+---
+
+## ✅ Fase 4 COMPLETADA
