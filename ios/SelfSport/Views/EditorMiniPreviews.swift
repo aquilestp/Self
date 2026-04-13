@@ -358,8 +358,10 @@ extension PhotoEditorView {
         let maxDaily = max(data.dailyKm.max() ?? 1.0, 0.1)
         return VStack(spacing: 3) {
             Text(String(format: "%.1f", data.totalKm))
-                .font(.system(size: 14, weight: .heavy).width(.condensed).italic())
+                .font(.system(size: 12, weight: .black).width(.expanded).italic())
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             HStack(alignment: .bottom, spacing: 2.5) {
                 ForEach(0..<7, id: \.self) { i in
                     let km = data.dailyKm[i]
@@ -388,8 +390,10 @@ extension PhotoEditorView {
         let maxDaily = max(data.dailyKm.max() ?? 1.0, 0.1)
         return VStack(spacing: 3) {
             Text(String(format: "%.1f", data.totalKm))
-                .font(.system(size: 14, weight: .heavy).width(.condensed).italic())
+                .font(.system(size: 12, weight: .black).width(.expanded).italic())
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             HStack(alignment: .bottom, spacing: 2.5) {
                 ForEach(0..<7, id: \.self) { i in
                     let km = data.dailyKm[i]
@@ -417,8 +421,10 @@ extension PhotoEditorView {
         let maxDaily = max(data.dailyKm.prefix(data.daysInMonth).max() ?? 1.0, 0.1)
         return VStack(spacing: 3) {
             Text(String(format: "%.1f", data.totalKm))
-                .font(.system(size: 14, weight: .heavy).width(.condensed).italic())
+                .font(.system(size: 12, weight: .black).width(.expanded).italic())
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             HStack(alignment: .bottom, spacing: 1) {
                 ForEach(0..<data.daysInMonth, id: \.self) { i in
                     let km = data.dailyKm[i]
@@ -442,8 +448,10 @@ extension PhotoEditorView {
         let maxDaily = max(data.dailyKm.prefix(data.daysInMonth).max() ?? 1.0, 0.1)
         return VStack(spacing: 3) {
             Text(String(format: "%.1f", data.totalKm))
-                .font(.system(size: 14, weight: .heavy).width(.condensed).italic())
+                .font(.system(size: 12, weight: .black).width(.expanded).italic())
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             HStack(alignment: .bottom, spacing: 1) {
                 ForEach(0..<data.daysInMonth, id: \.self) { i in
                     let km = data.dailyKm[i]
@@ -467,7 +475,7 @@ extension PhotoEditorView {
         return VStack(spacing: 2) {
             HStack(alignment: .firstTextBaseline, spacing: 1) {
                 Text(elev)
-                    .font(.system(size: 14, weight: .heavy).width(.condensed).italic())
+                    .font(.system(size: 12, weight: .black).width(.expanded).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)

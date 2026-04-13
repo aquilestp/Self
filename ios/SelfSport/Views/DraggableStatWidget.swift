@@ -885,10 +885,10 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", weeklyKmData.totalKm))
-                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
+                    .font(.system(size: 24, weight: .black).width(.expanded).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
                 Text("KMs THIS WEEK")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
@@ -925,10 +925,10 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", lastWeekKmData.totalKm))
-                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
+                    .font(.system(size: 24, weight: .black).width(.expanded).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
                 Text("KMs LAST WEEK")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
@@ -964,10 +964,10 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", data.totalKm))
-                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
+                    .font(.system(size: 24, weight: .black).width(.expanded).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
                 Text("KMs \(data.monthLabel.isEmpty ? "THIS MONTH" : data.monthLabel)")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
@@ -1010,10 +1010,10 @@ struct StatWidgetContentView: View, Equatable {
         return VStack(spacing: 6) {
             VStack(spacing: 1) {
                 Text(String(format: "%.1f", data.totalKm))
-                    .font(.system(size: 28, weight: .heavy).width(.condensed).italic())
+                    .font(.system(size: 24, weight: .black).width(.expanded).italic())
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .minimumScaleFactor(0.5)
                 Text("KMs \(data.monthLabel.isEmpty ? "LAST MONTH" : data.monthLabel)")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
@@ -1065,7 +1065,7 @@ struct StatWidgetContentView: View, Equatable {
                     .font(.system(size: 11, weight: .bold))
                     .foregroundStyle(primaryColor.opacity(0.50))
                 Text(elev)
-                    .font(.system(size: 36, weight: .heavy).width(.condensed).italic())
+                    .font(.system(size: 30, weight: .black).width(.expanded).italic())
                     .tracking(-1)
                     .foregroundStyle(primaryColor)
                     .lineLimit(1)
