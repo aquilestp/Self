@@ -72,11 +72,11 @@ extension PhotoEditorView {
                 ) { label, value in
                     HStack {
                         Text(label)
-                            .font(.system(size: 6, weight: .medium))
+                            .font(.system(size: 6, weight: .semibold).italic().width(.expanded))
                             .foregroundStyle(.white.opacity(0.45))
                         Spacer()
                         Text(value)
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(.system(size: 8, weight: .heavy).italic().width(.expanded))
                             .foregroundStyle(.white)
                     }
                 }

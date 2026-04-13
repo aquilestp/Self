@@ -416,11 +416,11 @@ struct StatWidgetContentView: View, Equatable {
             ForEach(rows) { row in
                 HStack {
                     Text(row.label)
-                        .font(.system(size: 10, weight: .medium))
+                        .font(.system(size: 10, weight: .semibold).italic().width(.expanded))
                         .foregroundStyle(secondaryColor)
                     Spacer()
                     Text(row.value)
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.system(size: 14, weight: .heavy).italic().width(.expanded))
                         .foregroundStyle(primaryColor)
                         .multilineTextAlignment(.trailing)
                 }
