@@ -1,13 +1,13 @@
-# Preservar el APNs token al desconectar y reconectar Strava
+# Arreglar el guardado del APNs token en la base de datos
 
 **Problema**
+- El token de notificaciones push (APNs) nunca se guarda en la base de datos
+- Cuando Strava envía una actividad nueva, el servidor no puede enviar la notificación push porque no tiene el token
 
-- Al desconectar Strava, se borra toda la fila de la base de datos, incluyendo el token de notificaciones push (`apns_token`)
-- Al reconectar, el token no se puede recuperar ni de la base de datos (fue borrado) ni de memoria (puede estar vacío)
+**Solución (3 cambios):**
 
-**Solución**
+1. **Guardar el token de forma más robusta** — Cuando Apple entrega el token de notificaciones, se guarda explícitamente en almacenamiento local del dispositivo (no depender del mecanismo actual que puede fallar)
 
-1. Guardar el APNs token en almacenamiento local del dispositivo cada vez que se recibe de Apple
-2. Al reconectar Strava y guardar los tokens, usar el token guardado localmente como respaldo
-3. Esto asegura que el token de notificaciones push siempre se preserve, sin importar cuántas veces se desconecte y reconecte Strava
+2. **Siempre incluir el token al sincronizar con Strava** — Después de guardar los tokens de Strava en la base de datos (cuando la fila ya existe), hacer una actualización separada para asegurar que el token de notificaciones se guarde en esa fila
 
+3. **Reintentar el guardado del token cuando la sesión esté lista** — Si al momento de recibir el token de Apple no hay sesión activa, guardarlo localmente y reintentarlo cuando la app detecte que el usuario ya está logueado. También reintentar cada vez que la app vuelve al primer plano.

@@ -24,6 +24,15 @@ struct SelfSportApp: App {
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
                     BackgroundRefreshService.scheduleNextRefresh()
                 }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    Task {
+                        await SupabaseTokenService().ensureAPNsTokenSynced()
+                    }
+                }
+                .task {
+                    try? await Task.sleep(for: .seconds(2))
+                    await SupabaseTokenService().ensureAPNsTokenSynced()
+                }
         }
     }
 }

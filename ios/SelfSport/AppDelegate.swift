@@ -31,7 +31,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         print("[APNs] Device token registered: \(token.prefix(16))...")
         Task { @MainActor in
-            NotificationService.shared.deviceToken = token
+            NotificationService.shared.setDeviceToken(token)
             print("[APNs] Syncing token to Supabase...")
             await SupabaseTokenService().syncAPNsToken(token)
             print("[APNs] Token sync complete")

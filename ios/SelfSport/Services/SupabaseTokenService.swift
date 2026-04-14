@@ -36,7 +36,7 @@ final class SupabaseTokenService {
         print("[TokenSync] Syncing tokens for user: \(userId), athleteId: \(athleteId?.description ?? "nil")")
 
         let existingApns = await fetchExistingAPNsToken(userId: userId)
-        let apns = NotificationService.shared.deviceToken ?? NotificationService.shared.persistedDeviceToken ?? existingApns
+        let apns = NotificationService.shared.resolvedToken() ?? existingApns
         print("[TokenSync] Preserving apns_token: \(apns?.prefix(16).description ?? "nil")")
 
         var data: [String: AnyJSON] = [
@@ -68,25 +68,30 @@ final class SupabaseTokenService {
 
     func syncAPNsToken(_ apnsToken: String) async {
         guard let userId = await currentUserId() else {
-            print("[TokenSync] ERROR: No Supabase user session — cannot sync APNs token")
+            print("[TokenSync] No Supabase session yet — APNs token saved locally, will retry later")
             return
         }
 
-        let data: [String: AnyJSON] = [
-            "user_id": .string(userId),
-            "apns_token": .string(apnsToken),
-            "updated_at": .string(ISO8601DateFormatter().string(from: Date())),
-        ]
+        print("[TokenSync] Updating apns_token for user: \(userId)")
 
         do {
             try await supabase
                 .from(table)
-                .upsert(data, onConflict: "user_id")
+                .update(["apns_token": AnyJSON.string(apnsToken), "updated_at": AnyJSON.string(ISO8601DateFormatter().string(from: Date()))])
+                .eq("user_id", value: userId)
                 .execute()
-            print("[TokenSync] SUCCESS: APNs token synced")
+            print("[TokenSync] SUCCESS: APNs token updated via UPDATE")
         } catch {
-            print("[TokenSync] ERROR: APNs token upsert failed — \(error)")
+            print("[TokenSync] UPDATE failed (row may not exist yet): \(error)")
         }
+    }
+
+    func ensureAPNsTokenSynced() async {
+        guard let token = NotificationService.shared.resolvedToken() else {
+            print("[TokenSync] No APNs token available to sync")
+            return
+        }
+        await syncAPNsToken(token)
     }
 
     func deleteTokens() async {

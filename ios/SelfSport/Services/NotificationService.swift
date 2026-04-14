@@ -7,17 +7,16 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
 
     var isAuthorized: Bool = false
     private static let apnsTokenKey = "saved_apns_device_token"
+    private(set) var deviceToken: String?
 
-    var deviceToken: String? {
-        didSet {
-            if let deviceToken {
-                UserDefaults.standard.set(deviceToken, forKey: Self.apnsTokenKey)
-            }
-        }
+    func setDeviceToken(_ token: String) {
+        deviceToken = token
+        UserDefaults.standard.set(token, forKey: Self.apnsTokenKey)
+        print("[APNs] Token saved to memory + UserDefaults")
     }
 
-    var persistedDeviceToken: String? {
-        UserDefaults.standard.string(forKey: Self.apnsTokenKey)
+    func resolvedToken() -> String? {
+        deviceToken ?? UserDefaults.standard.string(forKey: Self.apnsTokenKey)
     }
     var hasBeenPrompted: Bool {
         get { UserDefaults.standard.bool(forKey: "notifications_prompted") }
