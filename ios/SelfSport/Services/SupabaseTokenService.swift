@@ -36,7 +36,7 @@ final class SupabaseTokenService {
         print("[TokenSync] Syncing tokens for user: \(userId), athleteId: \(athleteId?.description ?? "nil")")
 
         let existingApns = await fetchExistingAPNsToken(userId: userId)
-        let apns = NotificationService.shared.deviceToken ?? existingApns
+        let apns = NotificationService.shared.deviceToken ?? NotificationService.shared.persistedDeviceToken ?? existingApns
         print("[TokenSync] Preserving apns_token: \(apns?.prefix(16).description ?? "nil")")
 
         var data: [String: AnyJSON] = [
