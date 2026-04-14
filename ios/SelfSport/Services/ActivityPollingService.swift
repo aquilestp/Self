@@ -45,6 +45,16 @@ final class ActivityPollingService {
             newActivitiesCount = stravaActivities.count
             onNewActivities?(stravaActivities)
 
+            for activity in stravaActivities {
+                let distanceKm = String(format: "%.2f", activity.distance / 1000)
+                let type = activity.sportType ?? activity.type
+                await NotificationService.shared.scheduleLocalNotification(
+                    title: "Nueva actividad sincronizada",
+                    body: "\(activity.name) — \(type) · \(distanceKm) km",
+                    identifier: "webhook_activity_\(activity.id)"
+                )
+            }
+
             try await markWebhookActivitiesAsSeen(webhookActivities)
 
             if let newest = webhookActivities.first?.startDateLocal {

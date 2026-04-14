@@ -72,17 +72,54 @@ final class SupabaseTokenService {
             return
         }
 
-        print("[TokenSync] Updating apns_token for user: \(userId)")
+        print("[TokenSync] Syncing apns_token for user: \(userId), token: \(apnsToken.prefix(16))...")
 
+        let existing = await fetchExistingRow(userId: userId)
+
+        if let existing {
+            do {
+                try await supabase
+                    .from(table)
+                    .update(["apns_token": AnyJSON.string(apnsToken), "updated_at": AnyJSON.string(ISO8601DateFormatter().string(from: Date()))])
+                    .eq("user_id", value: userId)
+                    .execute()
+                print("[TokenSync] SUCCESS: APNs token updated (row existed, athlete=\(existing.stravaAthleteId?.description ?? "nil"))")
+            } catch {
+                print("[TokenSync] UPDATE failed: \(error)")
+            }
+        } else {
+            print("[TokenSync] No existing row — creating via UPSERT")
+            do {
+                let data: [String: AnyJSON] = [
+                    "user_id": .string(userId),
+                    "apns_token": .string(apnsToken),
+                    "access_token": .string(""),
+                    "refresh_token": .string(""),
+                    "expires_at": .integer(0),
+                    "updated_at": .string(ISO8601DateFormatter().string(from: Date())),
+                ]
+                try await supabase
+                    .from(table)
+                    .upsert(data, onConflict: "user_id")
+                    .execute()
+                print("[TokenSync] SUCCESS: APNs token saved via UPSERT (new row)")
+            } catch {
+                print("[TokenSync] UPSERT failed: \(error)")
+            }
+        }
+    }
+
+    private func fetchExistingRow(userId: String) async -> SupabaseStravaTokenRow? {
         do {
-            try await supabase
+            let rows: [SupabaseStravaTokenRow] = try await supabase
                 .from(table)
-                .update(["apns_token": AnyJSON.string(apnsToken), "updated_at": AnyJSON.string(ISO8601DateFormatter().string(from: Date()))])
+                .select()
                 .eq("user_id", value: userId)
                 .execute()
-            print("[TokenSync] SUCCESS: APNs token updated via UPDATE")
+                .value
+            return rows.first
         } catch {
-            print("[TokenSync] UPDATE failed (row may not exist yet): \(error)")
+            return nil
         }
     }
 
