@@ -113,7 +113,7 @@ async function sendPushNotification(
     },
   });
 
-  const url = `https://api.push.apple.com/3/device/${deviceToken}`;
+  const url = `https://api.sandbox.push.apple.com/3/device/${deviceToken}`;
 
   try {
     const res = await fetch(url, {
@@ -128,9 +128,11 @@ async function sendPushNotification(
       body: payload,
     });
 
+    const resBody = await res.text();
     if (!res.ok) {
-      const errBody = await res.text();
-      console.error(`APNs error ${res.status}: ${errBody}`);
+      console.error(`[Push] APNs error ${res.status}: ${resBody}`);
+    } else {
+      console.log(`[Push] APNs SUCCESS ${res.status}`);
     }
   } catch (e) {
     console.error("APNs send failed:", e);
@@ -221,14 +223,18 @@ async function fetchAndStoreActivity(
     .from("strava_activities")
     .upsert(row, { onConflict: "user_id,strava_activity_id" });
 
+  console.log(`[Push] shouldNotify=${shouldNotify}, apns_token=${tokenRow.apns_token ? tokenRow.apns_token.substring(0, 10) + '...' : 'NULL'}`);
   if (shouldNotify && tokenRow.apns_token) {
     const distanceKm = (activity.distance / 1000).toFixed(2);
     const activityType = activity.sport_type ?? activity.type ?? "Activity";
+    console.log(`[Push] Sending push for activity: ${activity.name}`);
     await sendPushNotification(
       tokenRow.apns_token,
       "Nueva actividad sincronizada",
       `${activity.name} — ${activityType} · ${distanceKm} km`,
     );
+  } else if (shouldNotify && !tokenRow.apns_token) {
+    console.warn("[Push] SKIPPED — no apns_token in strava_tokens row");
   }
 }
 
