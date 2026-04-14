@@ -114,6 +114,7 @@ final class StravaService {
         }
 
         let tokenResponse = try JSONDecoder().decode(StravaTokenResponse.self, from: data)
+        print("[Strava] Token exchange success — athleteId: \(tokenResponse.athlete?.id.description ?? "nil"), expiresAt: \(tokenResponse.expiresAt)")
         saveTokens(tokenResponse)
         await tokenSync.syncTokens(
             accessToken: tokenResponse.accessToken,

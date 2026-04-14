@@ -29,7 +29,11 @@ final class SupabaseTokenService {
     }
 
     func syncTokens(accessToken: String, refreshToken: String, expiresAt: Int, athleteId: Int? = nil) async {
-        guard let userId = await currentUserId() else { return }
+        guard let userId = await currentUserId() else {
+            print("[TokenSync] ERROR: No Supabase user session — cannot sync tokens")
+            return
+        }
+        print("[TokenSync] Syncing tokens for user: \(userId), athleteId: \(athleteId?.description ?? "nil")")
 
         var data: [String: AnyJSON] = [
             "user_id": .string(userId),
@@ -48,13 +52,17 @@ final class SupabaseTokenService {
                 .from(table)
                 .upsert(data, onConflict: "user_id")
                 .execute()
+            print("[TokenSync] SUCCESS: Tokens synced to Supabase")
         } catch {
-            // Silent — tokens still work locally via Keychain
+            print("[TokenSync] ERROR: Upsert failed — \(error)")
         }
     }
 
     func syncAPNsToken(_ apnsToken: String) async {
-        guard let userId = await currentUserId() else { return }
+        guard let userId = await currentUserId() else {
+            print("[TokenSync] ERROR: No Supabase user session — cannot sync APNs token")
+            return
+        }
 
         let data: [String: AnyJSON] = [
             "user_id": .string(userId),
@@ -67,12 +75,18 @@ final class SupabaseTokenService {
                 .from(table)
                 .upsert(data, onConflict: "user_id")
                 .execute()
+            print("[TokenSync] SUCCESS: APNs token synced")
         } catch {
+            print("[TokenSync] ERROR: APNs token upsert failed — \(error)")
         }
     }
 
     func deleteTokens() async {
-        guard let userId = await currentUserId() else { return }
+        guard let userId = await currentUserId() else {
+            print("[TokenSync] ERROR: No Supabase user session — cannot delete tokens")
+            return
+        }
+        print("[TokenSync] Deleting tokens for user: \(userId)")
         do {
             try await supabase
                 .from(table)
@@ -80,7 +94,7 @@ final class SupabaseTokenService {
                 .eq("user_id", value: userId)
                 .execute()
         } catch {
-            // Silent
+            print("[TokenSync] ERROR: Delete failed — \(error)")
         }
     }
 }
