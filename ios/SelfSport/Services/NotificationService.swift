@@ -9,14 +9,26 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     private static let apnsTokenKey = "saved_apns_device_token"
     private(set) var deviceToken: String?
 
+    func loadPersistedToken() {
+        if let saved = UserDefaults.standard.string(forKey: Self.apnsTokenKey), !saved.isEmpty {
+            deviceToken = saved
+            print("[APNs] Loaded persisted token from UserDefaults: \(saved.prefix(16))...")
+        } else {
+            print("[APNs] No persisted token in UserDefaults")
+        }
+    }
+
     func setDeviceToken(_ token: String) {
         deviceToken = token
         UserDefaults.standard.set(token, forKey: Self.apnsTokenKey)
-        print("[APNs] Token saved to memory + UserDefaults")
+        UserDefaults.standard.synchronize()
+        print("[APNs] Token saved to memory + UserDefaults: \(token.prefix(16))...")
     }
 
     func resolvedToken() -> String? {
-        deviceToken ?? UserDefaults.standard.string(forKey: Self.apnsTokenKey)
+        if let t = deviceToken, !t.isEmpty { return t }
+        if let t = UserDefaults.standard.string(forKey: Self.apnsTokenKey), !t.isEmpty { return t }
+        return nil
     }
     var hasBeenPrompted: Bool {
         get { UserDefaults.standard.bool(forKey: "notifications_prompted") }
@@ -27,6 +39,7 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
 
     private override init() {
         super.init()
+        loadPersistedToken()
         Task { await refreshAuthorizationStatus() }
     }
 

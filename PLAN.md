@@ -1,13 +1,16 @@
-# Arreglar el guardado del APNs token en la base de datos
+# Arreglar definitivamente el guardado del APNs token
 
-**Problema**
-- El token de notificaciones push (APNs) nunca se guarda en la base de datos
-- Cuando Strava envía una actividad nueva, el servidor no puede enviar la notificación push porque no tiene el token
+**Problema raíz**
+- Al desconectar Strava, se borra la fila completa de la base de datos
+- Al reconectar, `syncAPNsToken` usa UPDATE que no hace nada si la fila no existe aún
+- No hay ningún mecanismo que sincronice el token DESPUÉS de que Strava se conecte exitosamente
 
-**Solución (3 cambios):**
+**Solución (4 cambios concretos):**
 
-1. **Guardar el token de forma más robusta** — Cuando Apple entrega el token de notificaciones, se guarda explícitamente en almacenamiento local del dispositivo (no depender del mecanismo actual que puede fallar)
+1. **Cargar el token de UserDefaults al iniciar** — Cuando la app arranca, el servicio de notificaciones carga automáticamente el token guardado previamente en la memoria, para que esté disponible inmediatamente
 
-2. **Siempre incluir el token al sincronizar con Strava** — Después de guardar los tokens de Strava en la base de datos (cuando la fila ya existe), hacer una actualización separada para asegurar que el token de notificaciones se guarde en esa fila
+2. **Después de conectar Strava, forzar la sincronización del token** — Justo después de guardar los tokens de Strava en la base de datos, esperar 2 segundos (para dar tiempo a que Apple devuelva el token si es la primera vez) y luego sincronizar el token de notificaciones. También forzar que Apple re-entregue el token de notificaciones
 
-3. **Reintentar el guardado del token cuando la sesión esté lista** — Si al momento de recibir el token de Apple no hay sesión activa, guardarlo localmente y reintentarlo cuando la app detecte que el usuario ya está logueado. También reintentar cada vez que la app vuelve al primer plano.
+3. **Hacer la sincronización del token más agresiva** — Si el primer intento falla (porque el token aún no llegó), reintentar automáticamente 3 veces con esperas de 3 segundos entre cada intento
+
+4. **Agregar logs claros** — Imprimir en consola exactamente qué está pasando en cada paso para poder diagnosticar si el problema persiste

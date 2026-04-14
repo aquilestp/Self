@@ -86,12 +86,19 @@ final class SupabaseTokenService {
         }
     }
 
-    func ensureAPNsTokenSynced() async {
-        guard let token = NotificationService.shared.resolvedToken() else {
-            print("[TokenSync] No APNs token available to sync")
-            return
+    func ensureAPNsTokenSynced(retries: Int = 3) async {
+        for attempt in 1...retries {
+            if let token = NotificationService.shared.resolvedToken() {
+                print("[TokenSync] ensureAPNsTokenSynced attempt \(attempt)/\(retries) — token: \(token.prefix(16))...")
+                await syncAPNsToken(token)
+                return
+            }
+            print("[TokenSync] ensureAPNsTokenSynced attempt \(attempt)/\(retries) — no token yet, waiting 3s...")
+            if attempt < retries {
+                try? await Task.sleep(for: .seconds(3))
+            }
         }
-        await syncAPNsToken(token)
+        print("[TokenSync] ensureAPNsTokenSynced FAILED after \(retries) attempts — no APNs token available")
     }
 
     func deleteTokens() async {

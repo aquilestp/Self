@@ -122,6 +122,13 @@ final class StravaService {
             expiresAt: tokenResponse.expiresAt,
             athleteId: tokenResponse.athlete?.id
         )
+
+        print("[Strava] Re-registering for remote notifications to ensure fresh APNs token...")
+        await UIApplication.shared.registerForRemoteNotifications()
+
+        print("[Strava] Waiting 2s then syncing APNs token to DB...")
+        try? await Task.sleep(for: .seconds(2))
+        await tokenSync.ensureAPNsTokenSynced(retries: 5)
     }
 
     func refreshTokenIfNeeded(force: Bool = false) async throws {
