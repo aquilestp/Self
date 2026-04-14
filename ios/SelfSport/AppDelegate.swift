@@ -9,20 +9,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         Task { @MainActor in
             UNUserNotificationCenter.current().delegate = NotificationService.shared
             let settings = await UNUserNotificationCenter.current().notificationSettings()
-            print("[AppDelegate] Notification auth status on launch: \(settings.authorizationStatus.rawValue)")
+            print("[AppDelegate] 🚀 Launch — notification auth status: \(settings.authorizationStatus.rawValue)")
+            print("[AppDelegate] 🚀 Existing APNs token in memory: \(NotificationService.shared.deviceToken?.prefix(16).description ?? "NIL")")
+            print("[AppDelegate] 🚀 Existing APNs token in UserDefaults: \(UserDefaults.standard.string(forKey: "saved_apns_device_token")?.prefix(16).description ?? "NIL")")
+            
             switch settings.authorizationStatus {
             case .authorized, .provisional:
-                print("[AppDelegate] Already authorized — calling registerForRemoteNotifications()")
+                print("[AppDelegate] ✅ Already authorized — registering for remote notifications NOW")
                 application.registerForRemoteNotifications()
             case .notDetermined:
-                print("[AppDelegate] Not determined — requesting authorization...")
+                print("[AppDelegate] ❓ Not determined — requesting authorization...")
                 let granted = await NotificationService.shared.requestAuthorization()
                 if granted {
-                    print("[AppDelegate] Granted — calling registerForRemoteNotifications()")
+                    print("[AppDelegate] ✅ Granted — registering for remote notifications NOW")
                     application.registerForRemoteNotifications()
+                } else {
+                    print("[AppDelegate] ❌ Authorization denied by user")
                 }
             default:
-                print("[AppDelegate] Auth status denied/restricted — NOT registering for push")
+                print("[AppDelegate] ⛔ Auth status denied/restricted (\(settings.authorizationStatus.rawValue)) — NOT registering")
             }
         }
         return true
@@ -33,9 +38,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        print("[AppDelegate] ✅ didRegisterForRemoteNotificationsWithDeviceToken: \(token.prefix(20))...")
+        print("[AppDelegate] ✅✅✅ didRegisterForRemoteNotificationsWithDeviceToken: \(token.prefix(20))...")
+        print("[AppDelegate] ✅✅✅ FULL TOKEN LENGTH: \(token.count) chars")
         Task { @MainActor in
             NotificationService.shared.setDeviceToken(token)
+            print("[AppDelegate] Token saved to NotificationService — now syncing to DB...")
             await SupabaseTokenService.shared.syncAPNsTokenToDB()
         }
     }
@@ -44,8 +51,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        print("[AppDelegate] ❌ didFailToRegisterForRemoteNotifications: \(error.localizedDescription)")
-        print("[AppDelegate] ❌ NSError domain=\((error as NSError).domain) code=\((error as NSError).code)")
+        let nsError = error as NSError
+        print("[AppDelegate] ❌❌❌ didFailToRegisterForRemoteNotifications")
+        print("[AppDelegate] ❌❌❌ Error: \(error.localizedDescription)")
+        print("[AppDelegate] ❌❌❌ Domain: \(nsError.domain), Code: \(nsError.code)")
+        print("[AppDelegate] ❌❌❌ Full error: \(nsError)")
         Task { @MainActor in
             NotificationService.shared.setRegistrationError(error)
         }

@@ -17,7 +17,8 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         deviceToken = token
         UserDefaults.standard.set(token, forKey: Self.apnsTokenKey)
         UserDefaults.standard.synchronize()
-        print("[APNs] ✅ Token SET — \(token.prefix(20))... (isNew=\(isNew))")
+        registrationError = nil
+        print("[APNs] ✅ Token SET — \(token.prefix(20))... (isNew=\(isNew), length=\(token.count))")
         if isNew {
             NotificationCenter.default.post(name: apnsTokenDidChangeNotification, object: token)
         }
@@ -33,6 +34,7 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         if let t = deviceToken, !t.isEmpty { return t }
         if let t = UserDefaults.standard.string(forKey: Self.apnsTokenKey), !t.isEmpty {
             deviceToken = t
+            print("[APNs] 🔄 Loaded token from UserDefaults: \(t.prefix(16))...")
             return t
         }
         return nil
@@ -49,9 +51,9 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
         super.init()
         if let saved = UserDefaults.standard.string(forKey: Self.apnsTokenKey), !saved.isEmpty {
             deviceToken = saved
-            print("[APNs] Loaded persisted token: \(saved.prefix(20))...")
+            print("[APNs] 🚀 Init — loaded persisted token: \(saved.prefix(20))... (length=\(saved.count))")
         } else {
-            print("[APNs] No persisted token in UserDefaults")
+            print("[APNs] 🚀 Init — NO persisted token in UserDefaults")
         }
         Task { await refreshAuthorizationStatus() }
     }
@@ -59,7 +61,7 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
     func refreshAuthorizationStatus() async {
         let settings = await center.notificationSettings()
         isAuthorized = settings.authorizationStatus == .authorized
-        print("[APNs] Authorization status: \(settings.authorizationStatus.rawValue) (authorized=\(isAuthorized))")
+        print("[APNs] Authorization: \(settings.authorizationStatus.rawValue) (authorized=\(isAuthorized))")
     }
 
     func requestAuthorization() async -> Bool {
@@ -82,13 +84,23 @@ final class NotificationService: NSObject, UNUserNotificationCenterDelegate {
 
     func reRegisterForPush() async {
         let settings = await center.notificationSettings()
-        print("[APNs] reRegister — auth status: \(settings.authorizationStatus.rawValue)")
+        print("[APNs] reRegister — auth=\(settings.authorizationStatus.rawValue), currentToken=\(deviceToken?.prefix(16).description ?? "NIL")")
         if settings.authorizationStatus == .authorized {
-            print("[APNs] Calling registerForRemoteNotifications()...")
+            print("[APNs] ✅ Calling registerForRemoteNotifications()...")
             await UIApplication.shared.registerForRemoteNotifications()
         } else {
-            print("[APNs] ⚠️ Not authorized — cannot register for push")
+            print("[APNs] ⚠️ Not authorized (status=\(settings.authorizationStatus.rawValue)) — cannot register for push")
         }
+    }
+
+    func printDiagnostics() {
+        print("[APNs] === DIAGNOSTICS ===")
+        print("[APNs] deviceToken in memory: \(deviceToken?.prefix(20).description ?? "NIL")")
+        print("[APNs] deviceToken in UserDefaults: \(UserDefaults.standard.string(forKey: Self.apnsTokenKey)?.prefix(20).description ?? "NIL")")
+        print("[APNs] isAuthorized: \(isAuthorized)")
+        print("[APNs] registrationError: \(registrationError ?? "none")")
+        print("[APNs] hasBeenPrompted: \(hasBeenPrompted)")
+        print("[APNs] ===================")
     }
 
     func scheduleLocalNotification(
