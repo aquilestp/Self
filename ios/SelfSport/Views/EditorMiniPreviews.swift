@@ -56,12 +56,15 @@ extension PhotoEditorView {
                     .font(.system(size: 8, weight: .black, design: .default).width(.expanded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
+                    .truncationMode(.tail)
                 Text("\(activity.primaryStat) · \(activity.date)")
                     .font(.system(size: 5, weight: .bold, design: .default).width(.expanded))
                     .foregroundStyle(.white.opacity(0.5))
                     .lineLimit(1)
+                    .truncationMode(.tail)
             }
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
+            .padding(.leading, 5)
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
         case .stack:
             VStack(spacing: 2) {
                 ForEach(
@@ -79,7 +82,7 @@ extension PhotoEditorView {
                             .font(.system(size: 8, weight: .heavy).italic().width(.expanded))
                             .foregroundStyle(.white)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.6)
+                            .truncationMode(.tail)
                     }
                 }
             }
@@ -91,6 +94,7 @@ extension PhotoEditorView {
                     .tracking(1.5)
                     .foregroundStyle(.white.opacity(0.5))
                     .lineLimit(1)
+                    .truncationMode(.tail)
                 Text(activity.primaryStat.uppercased())
                     .font(.system(size: 15, weight: .black, design: .default).width(.expanded))
                     .tracking(-1)
@@ -114,7 +118,8 @@ extension PhotoEditorView {
                     }
                 }
             }
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
+            .padding(.leading, 5)
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
         case .impact:
             VStack(alignment: .leading, spacing: -2) {
                 Text(activity.title.uppercased())
@@ -122,6 +127,7 @@ extension PhotoEditorView {
                     .tracking(1.5)
                     .foregroundStyle(.white.opacity(0.45))
                     .lineLimit(1)
+                    .truncationMode(.tail)
                 Text(activity.primaryStat.uppercased())
                     .font(.system(size: 16, weight: .black, design: .default).width(.expanded))
                     .tracking(-1.5)
@@ -149,7 +155,8 @@ extension PhotoEditorView {
                     }
                 }
             }
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
+            .padding(.leading, 5)
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
         case .poster:
             VStack(alignment: .leading, spacing: 0) {
                 Text(activity.title.uppercased())
@@ -157,6 +164,7 @@ extension PhotoEditorView {
                     .tracking(1.5)
                     .foregroundStyle(.white.opacity(0.45))
                     .lineLimit(1)
+                    .truncationMode(.tail)
                 Text(activity.primaryStat.uppercased())
                     .font(.system(size: 16, weight: .black, design: .default).width(.expanded))
                     .tracking(-1.2)
@@ -182,7 +190,8 @@ extension PhotoEditorView {
                     }
                 }
             }
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .center)
+            .padding(.leading, 5)
+            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
         case .routeClean:
             ZStack {
                 if activity.linePoints.count >= 2 {
