@@ -78,6 +78,8 @@ extension PhotoEditorView {
                         Text(value)
                             .font(.system(size: 8, weight: .heavy).italic().width(.expanded))
                             .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
                     }
                 }
             }
@@ -319,7 +321,8 @@ extension PhotoEditorView {
             Text(value)
                 .font(.system(size: 9, weight: .regular, design: .serif).italic())
                 .foregroundStyle(.white)
-                .minimumScaleFactor(0.7)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
     }
 

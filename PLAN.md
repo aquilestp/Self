@@ -1,75 +1,14 @@
-# Fase 5 — Dividir DraggableStatWidget.swift en 8 archivos por familia
+# Fix activity name overflow in widget drawer previews
 
-## Objetivo
 
-Reducir `DraggableStatWidget.swift` de **3,269 líneas a ~800 líneas** (~75% de reducción), mejorando tiempos de compilación incremental y navegación del código.
+**Problem**
+When an activity has a long name (e.g. "Evening Weight Training"), the mini widget previews in the drawer break their layout because the activity title text has no truncation limit — it wraps onto multiple lines and pushes other stats out of alignment.
 
-## Estrategia
+**Fix**
+Two small changes in the widget mini-preview file:
 
-Usar **extensiones de `StatWidgetContentView**` en archivos separados — el patrón Swift nativo para dividir tipos grandes sin romcar nada. El archivo principal conserva la declaración, propiedades, `body` switch y tipos compartidos.
+- [x] **`miniStat` helper** — add `lineLimit(1)` to the value text so any stat value (including activity title used as "TYPE") is always capped to a single line with `...` truncation
+- [x] **Stack widget case** — add `lineLimit(1)` to the value text in the `HStack` rows so "Activity: Evening Weight Tra..." stays on one line and doesn't push adjacent content out of alignment
 
----
-
-## Archivos nuevos a crear
-
-### 1. `StatWidgetContentView+BasicWidgets.swift` (~350 líneas)
-
-Widgets: `distance`, `distPace`, `threeStats`, `titleCard`, `stack`, `bold`, `impact`, `poster`, `heroStat`, `wide`, `tower`
-
-- Helpers compartidos: `topRowStatColumn`, `statColumn`, `basicMetadataText`, `basicMetricItems`, `basicPaceText`
-
-### 2. `StatWidgetContentView+RouteAndTime.swift` (~420 líneas)
-
-Widgets: `routeClean`, `movingTimeClean`, `elapsedTimeClean`, `avgHeartRate`, `hrPulseDots`, `elevationGain`
-
-- Helpers: `heartRateBPM`, `heartRateZone`, `efficiencyRatio`, `routeTightSize`, `elevationNumeric`
-
-### 3. `StatWidgetContentView+Charts.swift` (~170 líneas)
-
-Widgets: `weeklyKm`, `lastWeekKm`, `monthlyKm`, `lastMonthKm`
-
-### 4. `StatWidgetContentView+Splits.swift` (~540 líneas)
-
-Widgets: `splits`, `splitsTable`, `splitsFastest`, `splitsBars`
-
-- Helpers: `splitsContent`, `splitsTableContent`, `splitsFastestContent`, `splitsBarsContent`, `splitPaceString`
-- Shared helpers de loading: `detailShimmer`, `detailEmptyState`
-
-### 5. `StatWidgetContentView+Efforts.swift` (~150 líneas)
-
-Widgets: `bestEfforts`, `distanceWords`
-
-- Helpers: `bestEffortsContent`, `effortDistanceLabel`, `formatEffortTime`
-
-### 6. `StatWidgetContentView+Banners.swift` (~180 líneas)
-
-Widgets: `fullBanner`, `fullBannerBottom`, `splitBanner`
-
-### 7. `StatWidgetContentView+BVT.swift` (~270 líneas)
-
-Widget: `blurredVerticalText` con todos sus efectos (glow, stroke, glitch, wave, etc.)
-
-- Helpers: `bvtStyledLine`, `bvtStrokedLine`
-
-### 8. `StatWidgetContentView+Novelty.swift` (~530 líneas)
-
-Widgets: `whatsappMessage`, `notesScreenshot`, `goldenArch`, `ancestralMedal`
-
-- Helpers: textos de formato para cada widget, `MedalBannerView`, `MedalCurvedText`, `MedalStarDots`
-
----
-
-## Archivo principal `DraggableStatWidget.swift` conserva (~800 líneas)
-
-- `SplitMix64`, `ExportEnvironmentKey`, `StatDisplayItem` (tipos auxiliares)
-- Declaración completa de `StatWidgetContentView`: propiedades + `Equatable` + `body` switch
-- Colores: `primaryColor`, `secondaryColor`, `tertiaryColor`, `dimColor`, `dividerColor`
-- `DraggableStatWidget` struct completo
-- `RouteTraceShape` shape
-
----
-
-## Resultado esperado
-
-> **Sin cambios de comportamiento** — extensiones en Swift comparten el mismo tipo, no hay cambios en la API pública ni en el uso desde `PhotoEditorView` o `WelcomeOnboardingView`.
-
+**Result**
+All widget thumbnails in the drawer will maintain their correct layout regardless of how long the activity name is. Long names will show as "Evening Weight Tra..." cleanly.
