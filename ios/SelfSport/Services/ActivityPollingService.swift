@@ -45,14 +45,6 @@ final class ActivityPollingService {
             newActivitiesCount = stravaActivities.count
             onNewActivities?(stravaActivities)
 
-            for activity in stravaActivities {
-                await NotificationService.shared.scheduleLocalNotification(
-                    title: "New activity synced",
-                    body: activity.name,
-                    identifier: "webhook_activity_\(activity.id)"
-                )
-            }
-
             try await markWebhookActivitiesAsSeen(webhookActivities)
 
             if let newest = webhookActivities.first?.startDateLocal {

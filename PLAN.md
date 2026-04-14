@@ -1,28 +1,18 @@
-# Arreglar Push Notifications — Agregar columna y corregir endpoint
+# Arreglar notificaciones push de Strava
 
-## Problema encontrado
+**Problema detectado:**
 
-La columna `apns_token` **no existe** en la tabla `strava_tokens` de Supabase. Esto causa que:
-1. El token del dispositivo nunca se guarda
-2. El webhook nunca envía la notificación push (porque el token es siempre vacío)
+- La app tiene el entorno de notificaciones push configurado como "development" (sandbox), pero la edge function de Supabase envía al servidor de **producción** de Apple. Esto causa que el push nunca llegue.
+- Además, hay un servicio de polling que envía notificaciones locales duplicadas cuando la app está abierta — esa es la "notificación interna" que ves.
 
-Además, el endpoint de APNs usa la URL de **producción**, pero tu app está instalada como build de desarrollo, lo cual requiere el endpoint **sandbox**.
+**Cambios:**
 
-## Pasos para arreglar
+1. **Cambiar el entorno de push a producción** — para que el token APNs que el dispositivo genera sea compatible con el servidor de producción que usa la edge function
+2. **Quitar la notificación local duplicada del polling** — el polling seguirá sincronizando actividades en segundo plano, pero ya no enviará una notificación local redundante (la push real desde la edge function se encargará de eso)
+3. **Agregar logging mejorado** — para que puedas verificar en consola que el token APNs se está guardando correctamente en Supabase
 
-### Paso 1 — Agregar columna en Supabase (lo haces tú manualmente)
-Ve al **SQL Editor** de Supabase y ejecuta:
-```sql
-ALTER TABLE strava_tokens ADD COLUMN IF NOT EXISTS apns_token TEXT;
-```
+**Resultado esperado:**
 
-### Paso 2 — Corregir endpoint de APNs en la Edge Function
-Cambiar la URL de `api.push.apple.com` a `api.sandbox.push.apple.com` en la función `strava-webhook`, ya que tu app usa build de desarrollo.
+- Cuando crees una actividad en Strava, la edge function enviará un push REAL que llegará aunque el teléfono esté bloqueado
+- Ya no verás la notificación interna duplicada
 
-> **Nota:** Cuando publiques en TestFlight/App Store, deberás cambiar a `api.push.apple.com`.
-
-### Paso 3 — Verificar que el token se sincroniza
-Después de los cambios anteriores, la app debería:
-1. Registrar el device token al abrir
-2. Guardarlo en la columna `apns_token` de `strava_tokens`
-3. El webhook lo lee y envía la push al endpoint sandbox correctamente
