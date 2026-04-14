@@ -34,7 +34,7 @@ final class StravaService {
     private let baseURL: String = "https://www.strava.com"
     private let apiURL: String = "https://www.strava.com/api/v3"
     private var activeRefreshTask: Task<Void, Error>?
-    private let tokenSync = SupabaseTokenService()
+    private let tokenSync = SupabaseTokenService.shared
 
     var isConnected: Bool {
         KeychainHelper.loadString(forKey: StravaKeys.accessToken) != nil
@@ -116,6 +116,12 @@ final class StravaService {
         let tokenResponse = try JSONDecoder().decode(StravaTokenResponse.self, from: data)
         print("[Strava] Token exchange success — athleteId: \(tokenResponse.athlete?.id.description ?? "nil"), expiresAt: \(tokenResponse.expiresAt)")
         saveTokens(tokenResponse)
+
+        print("[Strava] Re-registering for push BEFORE syncTokens to maximize chance of having APNs token...")
+        await NotificationService.shared.reRegisterForPush()
+        try? await Task.sleep(for: .seconds(1))
+
+        print("[Strava] APNs token at sync time: \(NotificationService.shared.resolvedToken()?.prefix(16).description ?? "NIL")")
         await tokenSync.syncTokens(
             accessToken: tokenResponse.accessToken,
             refreshToken: tokenResponse.refreshToken,
@@ -123,12 +129,8 @@ final class StravaService {
             athleteId: tokenResponse.athlete?.id
         )
 
-        print("[Strava] Re-registering for remote notifications to ensure fresh APNs token...")
-        await UIApplication.shared.registerForRemoteNotifications()
-
-        print("[Strava] Waiting 2s then syncing APNs token to DB...")
-        try? await Task.sleep(for: .seconds(2))
-        await tokenSync.ensureAPNsTokenSynced(retries: 5)
+        print("[Strava] Post-sync: ensuring APNs token in DB (retries=5, delay=3s)...")
+        await tokenSync.ensureAPNsTokenSynced(retries: 5, delaySeconds: 3)
     }
 
     func refreshTokenIfNeeded(force: Bool = false) async throws {

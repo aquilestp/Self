@@ -1,23 +1,23 @@
-# Arreglar notificaciones push y restaurar notificaciones locales
+# Rediseño completo del sistema de sincronización del APNs token
 
-**Problemas encontrados:**
+**Problema raíz**
 
-1. **Las notificaciones internas (locales) fueron eliminadas** — En un cambio anterior se quitó el código que enviaba notificaciones locales cuando se detectaban actividades nuevas vía webhook. Por eso ya no llegan ni siquiera las internas.
-2. **El token de notificaciones no se guarda en la base de datos** — `syncAPNsToken` usa UPDATE que no hace nada si la fila no existe todavía (después de desconectar/reconectar Strava). Necesita usar UPSERT.
-3. **No hay reintento al volver al primer plano** — Si el token no se guardó, no hay un mecanismo agresivo de reintento.
+- El token de notificaciones push (APNs) nunca llega a la base de datos
+- El sistema actual depende de que el token esté disponible en un momento específico — si no lo está, se pierde
+- No hay forma de saber si el dispositivo realmente obtuvo el token de Apple o si falló silenciosamente
 
----
+**Solución: Sistema reactivo de sincronización**
 
-**Cambios en la app:**
+En vez de intentar sincronizar el token en momentos específicos, el nuevo sistema lo sincronizará automáticamente **cada vez que ambas condiciones se cumplan**: el token existe Y hay una fila en la base de datos.
 
-1. [x] **Restaurar notificaciones locales** — Volver a agregar el envío de notificaciones locales en el servicio de polling cuando se detectan actividades nuevas. Esto garantiza que siempre lleguen notificaciones aunque el push externo falle.
-2. [x] **Cambiar `syncAPNsToken` de UPDATE a UPSERT** — Para que funcione incluso si la fila no existe todavía en la tabla. Así el token siempre se guarda correctamente.
-3. [x] **Agregar reintento más agresivo** — Después de conectar Strava, reintentar la sincronización del token 5 veces con 3 segundos entre cada intento. También reintentar cada vez que la app vuelve al primer plano.
-
----
-
-**Edge function actualizada (para que copies y hagas deploy en Supabase):**
-
-1. [x] **Intentar AMBOS entornos de APNs** — La edge function intentará enviar primero al servidor de producción, y si falla con "BadDeviceToken", reintentará con el servidor sandbox. Esto cubre tanto builds de TestFlight como de desarrollo.
-2. [x] **Mejor manejo de errores** — Logs más detallados en cada paso para diagnosticar si hay problemas con la firma JWT, el token, o la conexión con Apple.
+1. **Observador reactivo del token** — Cuando Apple devuelve el token de notificaciones push, el sistema intentará guardarlo en la base de datos inmediatamente. Si no puede (porque el usuario no está logueado o no hay fila), lo guarda localmente y lo reintenta después.
+2. **Sincronización en cada escritura a la base de datos** — Cada vez que se crea o actualiza la fila de Strava en la base de datos, se incluye el token de notificaciones si está disponible. Esto cubre el caso donde el token llegó primero.
+3. **Sincronización después del login** — Cuando el usuario inicia sesión (con Apple o Google), el sistema sincroniza el token inmediatamente.
+4. **Sincronización después de conectar Strava** — Después de la conexión con Strava, se espera hasta 20 segundos (con reintentos) para asegurar que el token se guarde.
+5. **Re-registro proactivo** — Cada vez que la app vuelve al primer plano, se le pide a Apple que devuelva el token de nuevo (por si falló antes).
+6. **Logs de diagnóstico visibles** — Se agregan logs extensos para saber exactamente:
+  - Si Apple devolvió el token o si falló (y por qué)
+  - Si la sesión de Supabase existe cuando se intenta sincronizar
+  - Si la fila de strava_tokens existe
+  - El resultado de cada intento de sincronización
 

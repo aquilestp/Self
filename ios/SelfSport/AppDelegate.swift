@@ -9,16 +9,20 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         Task { @MainActor in
             UNUserNotificationCenter.current().delegate = NotificationService.shared
             let settings = await UNUserNotificationCenter.current().notificationSettings()
+            print("[AppDelegate] Notification auth status on launch: \(settings.authorizationStatus.rawValue)")
             switch settings.authorizationStatus {
             case .authorized, .provisional:
+                print("[AppDelegate] Already authorized — calling registerForRemoteNotifications()")
                 application.registerForRemoteNotifications()
             case .notDetermined:
+                print("[AppDelegate] Not determined — requesting authorization...")
                 let granted = await NotificationService.shared.requestAuthorization()
                 if granted {
+                    print("[AppDelegate] Granted — calling registerForRemoteNotifications()")
                     application.registerForRemoteNotifications()
                 }
             default:
-                break
+                print("[AppDelegate] Auth status denied/restricted — NOT registering for push")
             }
         }
         return true
@@ -29,12 +33,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-        print("[APNs] Device token registered: \(token.prefix(16))...")
+        print("[AppDelegate] ✅ didRegisterForRemoteNotificationsWithDeviceToken: \(token.prefix(20))...")
         Task { @MainActor in
             NotificationService.shared.setDeviceToken(token)
-            print("[APNs] Syncing token to Supabase...")
-            await SupabaseTokenService().syncAPNsToken(token)
-            print("[APNs] Token sync complete")
+            await SupabaseTokenService.shared.syncAPNsTokenToDB()
         }
     }
 
@@ -42,6 +44,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-        print("Failed to register for remote notifications: \(error.localizedDescription)")
+        print("[AppDelegate] ❌ didFailToRegisterForRemoteNotifications: \(error.localizedDescription)")
+        print("[AppDelegate] ❌ NSError domain=\((error as NSError).domain) code=\((error as NSError).code)")
+        Task { @MainActor in
+            NotificationService.shared.setRegistrationError(error)
+        }
     }
 }

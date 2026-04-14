@@ -26,12 +26,24 @@ struct SelfSportApp: App {
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                     Task {
-                        await SupabaseTokenService().ensureAPNsTokenSynced()
+                        print("[App] Foreground — re-registering for push + syncing APNs token")
+                        await NotificationService.shared.reRegisterForPush()
+                        try? await Task.sleep(for: .seconds(1))
+                        await SupabaseTokenService.shared.syncAPNsTokenToDB()
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: apnsTokenDidChangeNotification)) { notification in
+                    if let token = notification.object as? String {
+                        print("[App] APNs token changed notification — syncing to DB: \(token.prefix(16))...")
+                        Task {
+                            await SupabaseTokenService.shared.syncAPNsTokenToDB()
+                        }
                     }
                 }
                 .task {
-                    try? await Task.sleep(for: .seconds(2))
-                    await SupabaseTokenService().ensureAPNsTokenSynced()
+                    try? await Task.sleep(for: .seconds(3))
+                    print("[App] Initial delayed APNs sync — token=\(NotificationService.shared.resolvedToken()?.prefix(16).description ?? "NIL")")
+                    await SupabaseTokenService.shared.syncAPNsTokenToDB()
                 }
         }
     }
