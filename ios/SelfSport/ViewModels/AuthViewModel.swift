@@ -138,6 +138,24 @@ final class AuthViewModel {
         isGoogleLoading = false
     }
 
+    func signInWithEmail(email: String, password: String) async {
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let session = try await supabase.auth.signIn(
+                email: email,
+                password: password
+            )
+            isAuthenticated = true
+            await fetchProfile(userId: session.user.id)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isLoading = false
+    }
+
     func signOut() async {
         do {
             try await supabase.auth.signOut()

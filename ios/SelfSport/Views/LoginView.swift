@@ -4,6 +4,9 @@ import AuthenticationServices
 struct LoginView: View {
     @Bindable var authViewModel: AuthViewModel
     var onBack: (() -> Void)? = nil
+    @State private var showDevLogin: Bool = false
+    @State private var devEmail: String = ""
+    @State private var devPassword: String = ""
 
     var body: some View {
         GeometryReader { proxy in
@@ -89,11 +92,60 @@ struct LoginView: View {
                         .padding(.top, 16)
                 }
 
-                Text("SHARE YOUR SELF")
-                    .font(.footnote.weight(.medium))
-                    .tracking(8)
-                    .foregroundStyle(.white.opacity(0.34))
-                    .padding(.top, 28)
+                if showDevLogin {
+                    VStack(spacing: 12) {
+                        TextField("Email", text: $devEmail)
+                            .textContentType(.emailAddress)
+                            .keyboardType(.emailAddress)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.7))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .background(.white.opacity(0.06), in: .rect(cornerRadius: 8))
+
+                        SecureField("Password", text: $devPassword)
+                            .textContentType(.password)
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.7))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .background(.white.opacity(0.06), in: .rect(cornerRadius: 8))
+
+                        Button {
+                            Task {
+                                await authViewModel.signInWithEmail(email: devEmail, password: devPassword)
+                            }
+                        } label: {
+                            Text("Sign In")
+                                .font(.caption.weight(.medium))
+                                .foregroundStyle(.white.opacity(0.5))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                        }
+                        .buttonStyle(.plain)
+                        .background(.white.opacity(0.06), in: .rect(cornerRadius: 8))
+                        .disabled(devEmail.isEmpty || devPassword.isEmpty)
+                    }
+                    .frame(maxWidth: 240)
+                    .padding(.top, 20)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+
+                Spacer(minLength: 16)
+
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        showDevLogin.toggle()
+                    }
+                } label: {
+                    Text(showDevLogin ? "Hide" : "Developer Access")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.18))
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 12)
 
                 Spacer(minLength: 0)
             }
