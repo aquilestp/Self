@@ -6,6 +6,11 @@ const STRAVA_VERIFY_TOKEN = Deno.env.get("STRAVA_VERIFY_TOKEN") ?? "SELFSPORT_WE
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+const APNS_KEY_P8 = Deno.env.get("APNS_KEY_P8") ?? "";
+const APNS_KEY_ID = Deno.env.get("APNS_KEY_ID") ?? "";
+const APNS_TEAM_ID = Deno.env.get("APNS_TEAM_ID") ?? "";
+const APNS_BUNDLE_ID = Deno.env.get("APNS_BUNDLE_ID") ?? "app.rork.fitlogin-mobile";
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 interface StravaWebhookEvent {
@@ -24,7 +29,115 @@ interface StravaTokenRow {
   access_token: string;
   refresh_token: string;
   expires_at: number;
+  apns_token?: string | null;
 }
+
+// ─── APNs JWT Authentication ───
+
+function base64UrlEncode(data: Uint8Array): string {
+  let binary = "";
+  for (const byte of data) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function base64UrlEncodeStr(str: string): string {
+  return base64UrlEncode(new TextEncoder().encode(str));
+}
+
+let cachedApnsJwt: { token: string; issuedAt: number } | null = null;
+
+async function getApnsJwt(): Promise<string | null> {
+  if (!APNS_KEY_P8 || !APNS_KEY_ID || !APNS_TEAM_ID) return null;
+
+  const now = Math.floor(Date.now() / 1000);
+
+  if (cachedApnsJwt && now - cachedApnsJwt.issuedAt < 3000) {
+    return cachedApnsJwt.token;
+  }
+
+  try {
+    const pemContents = APNS_KEY_P8
+      .replace("-----BEGIN PRIVATE KEY-----", "")
+      .replace("-----END PRIVATE KEY-----", "")
+      .replace(/\s/g, "");
+
+    const keyData = Uint8Array.from(atob(pemContents), (c) => c.charCodeAt(0));
+
+    const privateKey = await crypto.subtle.importKey(
+      "pkcs8",
+      keyData,
+      { name: "ECDSA", namedCurve: "P-256" },
+      false,
+      ["sign"],
+    );
+
+    const header = base64UrlEncodeStr(JSON.stringify({ alg: "ES256", kid: APNS_KEY_ID }));
+    const payload = base64UrlEncodeStr(JSON.stringify({ iss: APNS_TEAM_ID, iat: now }));
+    const signingInput = `${header}.${payload}`;
+
+    const signature = await crypto.subtle.sign(
+      { name: "ECDSA", hash: "SHA-256" },
+      privateKey,
+      new TextEncoder().encode(signingInput),
+    );
+
+    const rawSig = new Uint8Array(signature);
+    const token = `${signingInput}.${base64UrlEncode(rawSig)}`;
+
+    cachedApnsJwt = { token, issuedAt: now };
+    return token;
+  } catch (e) {
+    console.error("Failed to generate APNs JWT:", e);
+    return null;
+  }
+}
+
+async function sendPushNotification(
+  deviceToken: string,
+  title: string,
+  body: string,
+): Promise<void> {
+  const jwt = await getApnsJwt();
+  if (!jwt) {
+    console.error("APNs JWT not available — skipping push");
+    return;
+  }
+
+  const payload = JSON.stringify({
+    aps: {
+      alert: { title, body },
+      sound: "default",
+      "mutable-content": 1,
+    },
+  });
+
+  const url = `https://api.push.apple.com/3/device/${deviceToken}`;
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        authorization: `bearer ${jwt}`,
+        "apns-topic": APNS_BUNDLE_ID,
+        "apns-push-type": "alert",
+        "apns-priority": "10",
+        "content-type": "application/json",
+      },
+      body: payload,
+    });
+
+    if (!res.ok) {
+      const errBody = await res.text();
+      console.error(`APNs error ${res.status}: ${errBody}`);
+    }
+  } catch (e) {
+    console.error("APNs send failed:", e);
+  }
+}
+
+// ─── Strava Token Management ───
 
 async function refreshStravaToken(row: StravaTokenRow): Promise<string | null> {
   const res = await fetch("https://www.strava.com/oauth/token", {
@@ -58,9 +171,12 @@ async function getValidAccessToken(row: StravaTokenRow): Promise<string | null> 
   return await refreshStravaToken(row);
 }
 
+// ─── Activity Handling ───
+
 async function fetchAndStoreActivity(
   stravaActivityId: number,
   ownerStravaId: number,
+  shouldNotify: boolean,
 ) {
   const { data: tokenRow } = await supabase
     .from("strava_tokens")
@@ -104,6 +220,16 @@ async function fetchAndStoreActivity(
   await supabase
     .from("strava_activities")
     .upsert(row, { onConflict: "user_id,strava_activity_id" });
+
+  if (shouldNotify && tokenRow.apns_token) {
+    const distanceKm = (activity.distance / 1000).toFixed(2);
+    const activityType = activity.sport_type ?? activity.type ?? "Activity";
+    await sendPushNotification(
+      tokenRow.apns_token,
+      "Nueva actividad sincronizada",
+      `${activity.name} — ${activityType} · ${distanceKm} km`,
+    );
+  }
 }
 
 async function deleteActivity(stravaActivityId: number, ownerStravaId: number) {
@@ -137,6 +263,8 @@ async function handleDeauthorization(ownerStravaId: number) {
     .eq("strava_athlete_id", ownerStravaId);
 }
 
+// ─── HTTP Handler ───
+
 Deno.serve(async (req) => {
   if (req.method === "GET") {
     const url = new URL(req.url);
@@ -159,8 +287,10 @@ Deno.serve(async (req) => {
       const event: StravaWebhookEvent = await req.json();
 
       if (event.object_type === "activity") {
-        if (event.aspect_type === "create" || event.aspect_type === "update") {
-          await fetchAndStoreActivity(event.object_id, event.owner_id);
+        if (event.aspect_type === "create") {
+          await fetchAndStoreActivity(event.object_id, event.owner_id, true);
+        } else if (event.aspect_type === "update") {
+          await fetchAndStoreActivity(event.object_id, event.owner_id, false);
         } else if (event.aspect_type === "delete") {
           await deleteActivity(event.object_id, event.owner_id);
         }

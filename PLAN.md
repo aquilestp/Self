@@ -1,31 +1,33 @@
-# Fix stats drawer widget text alignment — left padding + right truncation
+# Strava Webhooks + Push Notifications en tiempo real
 
-## Problem
+## Plan completo en 3 fases
 
-Widgets that use a horizontal scale effect (`x: 1.5`) with `anchor: .center` push content equally to the left **and** right. This shoves text behind the left border of the tile, breaking left alignment. The fix is surgical — change the anchor and guard every title line.
+### Fase 1: Configurar APNs key en Supabase
+- Guardar tu APNs key (.p8) como secrets en tu proyecto de Supabase con estos nombres:
+  - `APNS_KEY_P8` — el contenido de tu archivo .p8
+  - `APNS_KEY_ID` — el Key ID de Apple (10 caracteres)
+  - `APNS_TEAM_ID` — tu Team ID de Apple Developer
+  - `APNS_BUNDLE_ID` — el bundle ID de tu app (ej: `app.rork.fitlogin-mobile`)
+- Esto se hace desde el dashboard de Supabase → Edge Functions → Secrets
 
-## Changes
+### Fase 2: Actualizar la Edge Function del webhook
+- Agregar lógica de envío de push notifications vía APNs directamente desde la Edge Function `strava-webhook`
+- Cuando llega un evento `create` de una actividad:
+  1. Guarda la actividad en la base de datos (ya funciona)
+  2. Busca el `apns_token` del usuario en la tabla `strava_tokens`
+  3. Genera un JWT firmado con la key .p8 para autenticarse con APNs
+  4. Envía la push notification al dispositivo del usuario con el nombre de la actividad
+- La notificación mostrará: **"Nueva actividad sincronizada"** con el nombre de la actividad como cuerpo
 
-### 1 · `EditorMiniPreviews.swift` — 4 widgets with scale effect
+### Fase 3: Crear la suscripción del webhook en Strava
+- Te daré el comando `curl` exacto para crear la suscripción:
+  - URL del callback: la URL de tu Edge Function de Supabase
+  - Verify token: `SELFSPORT_WEBHOOK_VERIFY` (ya configurado en tu código)
+  - Client ID y Client Secret de Strava
+- Strava enviará un GET de validación a tu Edge Function, que ya está preparada para responder con el `hub.challenge`
+- Una vez validada, la suscripción queda activa y empezarás a recibir eventos en tiempo real
 
-For **titleCard**, **bold**, **impact**, and **poster**:
-
-- Change `scaleEffect(x: 1.5, y: 1.0, anchor: .center)` → `scaleEffect(x: 1.5, y: 1.0, anchor: .leading)`  
-Scale now expands **only to the right**; the left edge stays pinned to the tile border
-- Add `.padding(.leading, 6)` to each of those `VStack`s so there is always a visible gap between the left border and the first character
-- Add `.truncationMode(.tail)` to every `Text(activity.title…)` that is missing it (some already have `lineLimit(1)` but no explicit tail mode)
-
-### 2 · `EditorMiniPreviews.swift` — `.stack` widget
-
-The `HStack` row that shows `"Activity" / activity.title` already has `lineLimit(1)`, but `minimumScaleFactor(0.6)` lets it shrink instead of truncating. Remove `minimumScaleFactor` from the **value** text and add `.truncationMode(.tail)` so long names show `"..."` instead of squishing.
-
-### 3 · `EditorDrawerView.swift` — thumbnail containers
-
-Inside `widgetThumbnail` and `fullWidthThumbnail`, change the inner `VStack` alignment to `.leading` and add `.padding(.leading, 8)` so every mini-preview that is naturally left-aligned (distance, distPace, etc.) also gets the consistent left gap without relying on each individual preview to handle it.
-
-## Result
-
-- Text always starts with visible space from the left border
-- Long activity names truncate with `"..."` flush to the right border
-- No content escapes the tile on either side
-
+### Cambios en la app iOS
+- Sin cambios mayores — la app ya registra el token APNs y lo sincroniza a Supabase
+- El polling existente seguirá como respaldo por si la push no llega
+- Cuando la push llegue, la app la mostrará como banner nativo de iOS
