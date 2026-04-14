@@ -1,14 +1,13 @@
 # Fix activity name overflow in widget drawer previews
 
-
 **Problem**
-When an activity has a long name (e.g. "Evening Weight Training"), the mini widget previews in the drawer break their layout because the activity title text has no truncation limit — it wraps onto multiple lines and pushes other stats out of alignment.
+When an activity has a long name, the mini widget previews in the drawer overflow their containers.
 
 **Fix**
-Two small changes in the widget mini-preview file:
 
-- [x] **`miniStat` helper** — add `lineLimit(1)` to the value text so any stat value (including activity title used as "TYPE") is always capped to a single line with `...` truncation
-- [x] **Stack widget case** — add `lineLimit(1)` to the value text in the `HStack` rows so "Activity: Evening Weight Tra..." stays on one line and doesn't push adjacent content out of alignment
-
-**Result**
-All widget thumbnails in the drawer will maintain their correct layout regardless of how long the activity name is. Long names will show as "Evening Weight Tra..." cleanly.
+- [x] `miniStat` helper — `lineLimit(1)` on value text
+- [x] Stack widget case — `lineLimit(1)` on value text
+- [x] `.bold` else branch — `lineLimit(1)` + `truncationMode(.tail)` on `activity.title`
+- [x] `.impact` else branch — `lineLimit(1)` + `truncationMode(.tail)` on `activity.title`
+- [x] `widgetThumbnail` container — `.clipShape(.rect(cornerRadius: 14))` to hard-clip any overflow
+- [x] `fullWidthThumbnail` container — `.clipShape(.rect(cornerRadius: 14))` to hard-clip any overflow

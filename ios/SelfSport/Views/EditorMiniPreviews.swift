@@ -109,6 +109,8 @@ extension PhotoEditorView {
                         Text(activity.title.uppercased())
                             .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
                             .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                 }
             }
@@ -142,6 +144,8 @@ extension PhotoEditorView {
                         Text(activity.title.uppercased())
                             .font(.system(size: 5, weight: .black, design: .default).width(.expanded))
                             .foregroundStyle(.white.opacity(0.8))
+                            .lineLimit(1)
+                            .truncationMode(.tail)
                     }
                 }
             }

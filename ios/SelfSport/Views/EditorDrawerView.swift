@@ -160,6 +160,7 @@ extension PhotoEditorView {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(isActive ? Color.white.opacity(0.4) : Color.white.opacity(0.1), lineWidth: 0.5)
             )
+            .clipShape(.rect(cornerRadius: 14))
             .scaleEffect(isActive ? 0.95 : 1.0)
         }
         .buttonStyle(.plain)
@@ -185,6 +186,7 @@ extension PhotoEditorView {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(isActive ? Color.white.opacity(0.4) : Color.white.opacity(0.1), lineWidth: 0.5)
             )
+            .clipShape(.rect(cornerRadius: 14))
             .scaleEffect(isActive ? 0.95 : 1.0)
         }
         .buttonStyle(.plain)
