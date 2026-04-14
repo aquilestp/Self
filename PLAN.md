@@ -1,18 +1,16 @@
-# Arreglar notificaciones push de Strava
+# Corregir sincronización del token APNs en strava_tokens
 
-**Problema detectado:**
+## Problema
+Cada vez que se sincronizan los tokens de Strava (al conectar, refrescar token, etc.), el campo `apns_token` se sobreescribe con NULL porque no se incluye en los datos del upsert. Esto causa que la edge function no pueda enviar push notifications.
 
-- La app tiene el entorno de notificaciones push configurado como "development" (sandbox), pero la edge function de Supabase envía al servidor de **producción** de Apple. Esto causa que el push nunca llegue.
-- Además, hay un servicio de polling que envía notificaciones locales duplicadas cuando la app está abierta — esa es la "notificación interna" que ves.
+## Solución
 
-**Cambios:**
+**Cambio 1: Preservar el `apns_token` al sincronizar tokens de Strava**
+- Antes de hacer upsert de tokens de Strava, leer la fila existente para obtener el `apns_token` actual
+- Incluir el `apns_token` existente en el upsert para no perderlo
+- Si hay un `deviceToken` en memoria (NotificationService.shared), usar ese como respaldo
 
-1. **Cambiar el entorno de push a producción** — para que el token APNs que el dispositivo genera sea compatible con el servidor de producción que usa la edge function
-2. **Quitar la notificación local duplicada del polling** — el polling seguirá sincronizando actividades en segundo plano, pero ya no enviará una notificación local redundante (la push real desde la edge function se encargará de eso)
-3. **Agregar logging mejorado** — para que puedas verificar en consola que el token APNs se está guardando correctamente en Supabase
+**Cambio 2: Re-sincronizar el `apns_token` después de conectar Strava**
+- Después de cada `syncTokens`, si hay un token APNs disponible en memoria, llamar también a `syncAPNsToken` para asegurar que no se pierda
 
-**Resultado esperado:**
-
-- Cuando crees una actividad en Strava, la edge function enviará un push REAL que llegará aunque el teléfono esté bloqueado
-- Ya no verás la notificación interna duplicada
-
+Esto garantiza que el campo `apns_token` siempre tenga valor en la tabla, y la edge function podrá enviar la push notification al dispositivo bloqueado.

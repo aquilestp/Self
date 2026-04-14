@@ -35,6 +35,10 @@ final class SupabaseTokenService {
         }
         print("[TokenSync] Syncing tokens for user: \(userId), athleteId: \(athleteId?.description ?? "nil")")
 
+        let existingApns = await fetchExistingAPNsToken(userId: userId)
+        let apns = NotificationService.shared.deviceToken ?? existingApns
+        print("[TokenSync] Preserving apns_token: \(apns?.prefix(16).description ?? "nil")")
+
         var data: [String: AnyJSON] = [
             "user_id": .string(userId),
             "access_token": .string(accessToken),
@@ -47,12 +51,16 @@ final class SupabaseTokenService {
             data["strava_athlete_id"] = .integer(athleteId)
         }
 
+        if let apns {
+            data["apns_token"] = .string(apns)
+        }
+
         do {
             try await supabase
                 .from(table)
                 .upsert(data, onConflict: "user_id")
                 .execute()
-            print("[TokenSync] SUCCESS: Tokens synced to Supabase")
+            print("[TokenSync] SUCCESS: Tokens synced to Supabase (apns_token preserved)")
         } catch {
             print("[TokenSync] ERROR: Upsert failed — \(error)")
         }
@@ -95,6 +103,21 @@ final class SupabaseTokenService {
                 .execute()
         } catch {
             print("[TokenSync] ERROR: Delete failed — \(error)")
+        }
+    }
+
+    private func fetchExistingAPNsToken(userId: String) async -> String? {
+        do {
+            let rows: [SupabaseStravaTokenRow] = try await supabase
+                .from(table)
+                .select()
+                .eq("user_id", value: userId)
+                .execute()
+                .value
+            return rows.first?.apnsToken
+        } catch {
+            print("[TokenSync] Could not fetch existing apns_token: \(error)")
+            return nil
         }
     }
 }
