@@ -24,8 +24,6 @@ final class AuthViewModel {
                     if let session {
                         isAuthenticated = true
                         await fetchProfile(userId: session.user.id)
-                        print("[Auth] initialSession with user — syncing APNs token to DB")
-                        await SupabaseTokenService.shared.syncAPNsTokenToDB()
                     } else {
                         isAuthenticated = false
                     }
@@ -35,8 +33,7 @@ final class AuthViewModel {
                     if let session {
                         await fetchProfile(userId: session.user.id)
                     }
-                    print("[Auth] signedIn/tokenRefreshed — syncing APNs token to DB")
-                    await SupabaseTokenService.shared.syncAPNsTokenToDB()
+
                 case .signedOut:
                     isAuthenticated = false
                     userProfile = nil

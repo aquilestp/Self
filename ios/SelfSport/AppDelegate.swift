@@ -42,8 +42,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         print("[AppDelegate] ✅✅✅ FULL TOKEN LENGTH: \(token.count) chars")
         Task { @MainActor in
             NotificationService.shared.setDeviceToken(token)
-            print("[AppDelegate] Token saved to NotificationService — now syncing to DB...")
-            await SupabaseTokenService.shared.syncAPNsTokenToDB()
         }
     }
 

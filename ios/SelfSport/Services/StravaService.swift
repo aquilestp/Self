@@ -117,21 +117,12 @@ final class StravaService {
         print("[Strava] ✅ Token exchange success — athleteId: \(tokenResponse.athlete?.id.description ?? "nil"), expiresAt: \(tokenResponse.expiresAt)")
         saveTokens(tokenResponse)
 
-        print("[Strava] 🔄 Re-registering for push BEFORE syncTokens...")
-        print("[Strava] APNs token BEFORE re-register: \(NotificationService.shared.resolvedToken()?.prefix(16).description ?? "NIL")")
-        await NotificationService.shared.reRegisterForPush()
-        try? await Task.sleep(for: .seconds(2))
-        print("[Strava] APNs token AFTER re-register + 2s wait: \(NotificationService.shared.resolvedToken()?.prefix(16).description ?? "NIL")")
-
         await tokenSync.syncTokens(
             accessToken: tokenResponse.accessToken,
             refreshToken: tokenResponse.refreshToken,
             expiresAt: tokenResponse.expiresAt,
             athleteId: tokenResponse.athlete?.id
         )
-
-        print("[Strava] 🔄 Post-sync: ensuring APNs token in DB (retries=10, delay=2s)...")
-        await tokenSync.ensureAPNsTokenSynced(retries: 10, delaySeconds: 2)
     }
 
     func refreshTokenIfNeeded(force: Bool = false) async throws {
