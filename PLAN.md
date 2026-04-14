@@ -1,142 +1,75 @@
-# Fase 2: Centralizar Utilidades de Formateo
+# Fase 5 — Dividir DraggableStatWidget.swift en 8 archivos por familia
 
 ## Objetivo
-Eliminar código duplicado de formateo de distancia, pace, duración y fechas creando un archivo de utilidades compartido. **Sin cambios visuales ni de comportamiento.**
+
+Reducir `DraggableStatWidget.swift` de **3,269 líneas a ~800 líneas** (~75% de reducción), mejorando tiempos de compilación incremental y navegación del código.
+
+## Estrategia
+
+Usar **extensiones de `StatWidgetContentView**` en archivos separados — el patrón Swift nativo para dividir tipos grandes sin romcar nada. El archivo principal conserva la declaración, propiedades, `body` switch y tipos compartidos.
 
 ---
 
-## Paso 1: Crear `ActivityFormatting.swift`
+## Archivos nuevos a crear
 
-- [x] Crear archivo en `Utilities/` con funciones estáticas puras
-- [x] `distanceWithUnit()`, `distanceValue()`, `distanceWithUnitUpper()`, `bannerDistance()`
-- [x] `paceSpaced()`, `pacePrime()`, `paceSlash()`, `paceSlashMixed()`
-- [x] `splitPace()` — promovido desde función privada
-- [x] `durationCompact()`, `durationExpanded()`, `durationShort()`
+### 1. `StatWidgetContentView+BasicWidgets.swift` (~350 líneas)
 
----
+Widgets: `distance`, `distPace`, `threeStats`, `titleCard`, `stack`, `bold`, `impact`, `poster`, `heroStat`, `wide`, `tower`
 
-## Paso 2: Crear `CachedDateFormatters.swift`
+- Helpers compartidos: `topRowStatColumn`, `statColumn`, `basicMetadataText`, `basicMetricItems`, `basicPaceText`
 
-- [x] Crear enum con formateadores estáticos cacheados
-- [x] `bvtDate`, `timeShort`, `dayOfWeek`, `monthDay`, `notesDate`, `medalDate`
+### 2. `StatWidgetContentView+RouteAndTime.swift` (~420 líneas)
 
----
+Widgets: `routeClean`, `movingTimeClean`, `elapsedTimeClean`, `avgHeartRate`, `hrPulseDots`, `elevationGain`
 
-## Paso 3: Actualizar `StatWidgetContentView` en `DraggableStatWidget.swift`
+- Helpers: `heartRateBPM`, `heartRateZone`, `efficiencyRatio`, `routeTightSize`, `elevationNumeric`
 
-- [x] `basicDistanceText` → usa `ActivityFormatting`
-- [x] `basicPaceText` → usa `ActivityFormatting`
-- [x] `formatDurationCompact` → delega a `ActivityFormatting`
-- [x] `splitPaceString` → delega a `ActivityFormatting`
-- [x] `fullBannerWidget` / `fullBannerBottomWidget` inline calcs → `ActivityFormatting`
-- [x] `blurredVerticalTextWidget` inline calcs (dist, pace, duration) → `ActivityFormatting`
-- [x] `notesDistanceText`, `notesPaceText` → `ActivityFormatting`
-- [x] `goldenArchDistanceText`, `goldenArchPaceText` → `ActivityFormatting`
-- [x] `ancestralDistanceText`, `ancestralPaceText` → `ActivityFormatting`
-- [x] `splitBannerWidget` inline calcs (dist, pace, duration) → `ActivityFormatting`
-- [x] `bvtDateFormatter`, `bvtTimeFormatter` → `CachedDateFormatters`
-- [x] `waTimeFormatter` → `CachedDateFormatters`
-- [x] `splitBannerDayFormatter`, `splitBannerDateFormatter`, `splitBannerTimeFormatter` → `CachedDateFormatters`
-- [x] `notesDateText` → `CachedDateFormatters.notesDate`
-- [x] `goldenArchDateText` → `CachedDateFormatters.medalDate`
-- [x] `ancestralDateText` → `CachedDateFormatters.medalDate`
+### 3. `StatWidgetContentView+Charts.swift` (~170 líneas)
 
----
+Widgets: `weeklyKm`, `lastWeekKm`, `monthlyKm`, `lastMonthKm`
 
-## Paso 4: Actualizar `EditorMiniPreviews.swift`
+### 4. `StatWidgetContentView+Splits.swift` (~540 líneas)
 
-- [x] 2 instancias de `activity.distanceRaw / 1000.0` → `ActivityFormatting.distanceValue()`
+Widgets: `splits`, `splitsTable`, `splitsFastest`, `splitsBars`
 
----
+- Helpers: `splitsContent`, `splitsTableContent`, `splitsFastestContent`, `splitsBarsContent`, `splitPaceString`
+- Shared helpers de loading: `detailShimmer`, `detailEmptyState`
 
-## Build
+### 5. `StatWidgetContentView+Efforts.swift` (~150 líneas)
 
-- [x] Compilación exitosa verificada
+Widgets: `bestEfforts`, `distanceWords`
 
----
+- Helpers: `bestEffortsContent`, `effortDistanceLabel`, `formatEffortTime`
 
-## ✅ Fase 2 COMPLETADA
+### 6. `StatWidgetContentView+Banners.swift` (~180 líneas)
 
----
----
+Widgets: `fullBanner`, `fullBannerBottom`, `splitBanner`
 
-# Fase 3: Extraer y Deduplicar PaletteSelector
+### 7. `StatWidgetContentView+BVT.swift` (~270 líneas)
 
-## Objetivo
-Extraer la vista `paletteSelectorView` (~650 líneas) de `PhotoEditorView.swift` a su propio archivo, eliminando 30+ repeticiones del patrón `guard let id / firstIndex`. **Sin cambios visuales ni de comportamiento.**
+Widget: `blurredVerticalText` con todos sus efectos (glow, stroke, glitch, wave, etc.)
+
+- Helpers: `bvtStyledLine`, `bvtStrokedLine`
+
+### 8. `StatWidgetContentView+Novelty.swift` (~530 líneas)
+
+Widgets: `whatsappMessage`, `notesScreenshot`, `goldenArch`, `ancestralMedal`
+
+- Helpers: textos de formato para cada widget, `MedalBannerView`, `MedalCurvedText`, `MedalStarDots`
 
 ---
 
-## Paso 1: Crear `PaletteSelectorView.swift`
+## Archivo principal `DraggableStatWidget.swift` conserva (~800 líneas)
 
-- [x] Vista independiente con props: `targetWidget`, `showPaletteSelector`, `waPresetTexts`, `updateWidget`, `resetHideTimer`
-- [x] `mutate()` — centraliza el patrón repetido (find widget → animate → haptic → reset timer)
-- [x] `separator(delay:)` — separador animado reutilizable
-- [x] `animatedButton(delay:action:label:)` — botón con scale/opacity animados
-- [x] `unitToggle()`, `visToggle()` — toggles genéricos reutilizables
-- [x] `circleButton()`, `textCircleButton()`, `paletteCircleLabel()`, `fontStyleLabel()` — labels reutilizables
-- [x] Secciones por tipo de widget: palette colors, glass, bestEfforts, splits, distanceWords, basicFields, boldImpact, heroStat, fullBanner, bvt, goldenArch, ancestralMedal, splitBanner, whatsapp, fontStyle
+- `SplitMix64`, `ExportEnvironmentKey`, `StatDisplayItem` (tipos auxiliares)
+- Declaración completa de `StatWidgetContentView`: propiedades + `Equatable` + `body` switch
+- Colores: `primaryColor`, `secondaryColor`, `tertiaryColor`, `dimColor`, `dividerColor`
+- `DraggableStatWidget` struct completo
+- `RouteTraceShape` shape
 
 ---
 
-## Paso 2: Actualizar `PhotoEditorView.swift`
+## Resultado esperado
 
-- [x] Reemplazar uso de `paletteSelectorView` por `PaletteSelectorView(...)` con closure `updateWidget`
-- [x] Eliminar `paletteSelectorView` completo (~650 líneas)
-- [x] Eliminar `basicUnitFilterSection()`, `unitToggleButton()`, `visibilityToggleButton()`, `bvtEffectButton()`, `fontStyleButtonLabel()` (~115 líneas)
-- [x] Mantener `resetPaletteHideTimer()`, `showPaletteSelectorFor()`, `hidePaletteSelector()` en PhotoEditorView
+> **Sin cambios de comportamiento** — extensiones en Swift comparten el mismo tipo, no hay cambios en la API pública ni en el uso desde `PhotoEditorView` o `WelcomeOnboardingView`.
 
----
-
-## Build
-
-- [x] Compilación exitosa verificada
-
----
-
-## ✅ Fase 3 COMPLETADA
-
----
----
-
-# Fase 4: Extraer Drawer y Filtros a Extensiones
-
-## Objetivo
-Extraer el drawer de stats (~190 líneas) y la lógica de filtros/overlays (~225 líneas) de `PhotoEditorView.swift` a archivos de extensión dedicados. **Sin cambios visuales ni de comportamiento.**
-
----
-
-## Paso 1: Crear `EditorDrawerView.swift`
-
-- [x] Extension con: `expandedDrawer`, `compactStatsList`, `expandedGrid`
-- [x] `drawerDragGesture` — gesture completo extraído
-- [x] `widgetThumbnail()`, `fullWidthThumbnail()` — thumbnails del drawer
-- [x] `activeWidgetTypes`, `gridStatTypes` — computed properties
-
----
-
-## Paso 2: Crear `EditorFiltersOverlay.swift`
-
-- [x] Extension con: `filterToggles`, `filterToggleButton()`
-- [x] `photoFilterDotsView`, `photoFilterLabelView`
-- [x] `activeFilterOverlay()`, `filterOverlayId`
-- [x] `filterDots`, `advanceFilter()`, `setFilterIndex()`
-- [x] `loadDynamicCityFilters()` — async loading
-
----
-
-## Paso 3: Actualizar `PhotoEditorView.swift`
-
-- [x] Eliminar ~415 líneas de código duplicado (ahora en extensiones)
-- [x] Cambiar ~18 `private` a `internal` para accesibilidad desde extensiones
-- [x] PhotoEditorView: 1842 → 1430 líneas (-22%)
-
----
-
-## Build
-
-- [x] Compilación exitosa verificada
-
----
-
-## ✅ Fase 4 COMPLETADA
