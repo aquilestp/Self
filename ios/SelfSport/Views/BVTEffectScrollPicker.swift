@@ -39,15 +39,6 @@ struct BVTEffectScrollPicker: View {
             )
             .animation(.easeOut(duration: 0.15), value: isSelected)
         }
-        .background {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(.black.opacity(0.4))
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(.white.opacity(0.1), lineWidth: 0.5)
-                )
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+
     }
 }

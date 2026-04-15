@@ -1,14 +1,15 @@
-# Glass gradient background for font style picker
+# Rediseñar fondo del panel de estilos lateral
 
+**Cambios:**
 
-## What changes
+1. **Eliminar los dos fondos sólidos actuales:**
+  - El fondo principal del panel (`PaletteSelectorView`) que tiene material + gradiente blanco
+  - El fondo oscuro sólido del picker de fonts/efectos (`BVTEffectScrollPicker` y `SplitBannerFontScrollPicker`)
+2. **Nuevo fondo único sutil:**
+  - Un solo fondo que cubre toda la altura del panel de controles
+  - Casi completamente transparente hacia la izquierda (centro de la pantalla)
+  - Ligeramente visible hacia la derecha (borde de la pantalla)
+  - Sin bordes redondeados en el lado derecho (pegado al borde)
+  - Bordes redondeados solo en el lado izquierdo
+  - Efecto de gradiente muy sutil usando solo opacidad mínima, sin material grueso
 
-The font style scroll picker's background will go from a uniform dark panel to a **directional glass effect**:
-
-**Background gradient (left → right):**
-- **Left edge (inner / toward the photo):** fully transparent — the material blur shows through cleanly, revealing the photo behind it
-- **Right edge (outer / screen edge):** solid dark (~60% black) — anchors the panel visually at the edge
-
-**Glass layer:** the existing `ultraThinMaterial` blur is kept underneath, so the transparent left side genuinely shows a frosted-glass view of whatever is behind it.
-
-**Border:** the stroke around the panel also fades — nearly invisible on the left, slightly more visible on the right — so the whole component feels like it's emerging from the photo rather than sitting on top of it.

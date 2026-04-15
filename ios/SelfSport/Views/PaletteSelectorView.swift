@@ -49,25 +49,17 @@ struct PaletteSelectorView: View {
             .fill(
                 LinearGradient(
                     stops: [
-                        .init(color: .clear, location: 0),
-                        .init(color: .white.opacity(0.35), location: 1)
+                        .init(color: .clear, location: 0.0),
+                        .init(color: .black.opacity(0.03), location: 0.3),
+                        .init(color: .black.opacity(0.12), location: 0.7),
+                        .init(color: .black.opacity(0.25), location: 1.0)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
                 )
             )
-            .background(
-                .ultraThinMaterial,
-                in: UnevenRoundedRectangle(
-                    topLeadingRadius: 14,
-                    bottomLeadingRadius: 14,
-                    bottomTrailingRadius: 0,
-                    topTrailingRadius: 0
-                )
-            )
             .allowsHitTesting(false)
         }
-        .shadow(color: .black.opacity(0.4), radius: 8, x: 0, y: 4)
     }
 
     // MARK: - Palette Color Buttons
