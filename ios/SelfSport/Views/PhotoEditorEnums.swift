@@ -87,7 +87,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .notesScreenshot, .ancestralMedal, .splitBanner, .cityActivity:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .notesScreenshot, .ancestralMedal, .splitBanner:
             return false
         default:
             return true

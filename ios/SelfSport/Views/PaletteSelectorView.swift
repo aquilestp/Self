@@ -350,6 +350,16 @@ struct PaletteSelectorView: View {
             unitToggle(current: current, delay: baseDelay + 0.06) {
                 mutate { $0.cityActivityUnitFilter = $0.cityActivityUnitFilter == .km ? .miles : .km }
             }
+            separator(delay: baseDelay + 0.10)
+            visToggle(icon: "ruler", isOn: widget?.showDistance ?? true, delay: baseDelay + 0.12) {
+                mutate { $0.showDistance.toggle() }
+            }
+            visToggle(icon: "speedometer", isOn: widget?.showPace ?? true, delay: baseDelay + 0.15) {
+                mutate { $0.showPace.toggle() }
+            }
+            visToggle(icon: "clock", isOn: widget?.showTime ?? true, delay: baseDelay + 0.18) {
+                mutate { $0.showTime.toggle() }
+            }
         }
     }
 

@@ -98,12 +98,19 @@ extension StatWidgetContentView {
 
             Spacer().frame(height: 16)
 
-            HStack(alignment: .top, spacing: 20) {
-                if activity.hasDistance {
-                    cityActivityStatColumn(label: "Distance", value: cityActivityDistanceText)
-                    cityActivityStatColumn(label: "Pace", value: cityActivityPaceText)
+            let showAnyIndicator = (activity.hasDistance && showDistance) || (activity.hasDistance && showPace) || showTime
+            if showAnyIndicator {
+                HStack(alignment: .top, spacing: 20) {
+                    if activity.hasDistance && showDistance {
+                        cityActivityStatColumn(label: "Distance", value: cityActivityDistanceText)
+                    }
+                    if activity.hasDistance && showPace {
+                        cityActivityStatColumn(label: "Pace", value: cityActivityPaceText)
+                    }
+                    if showTime {
+                        cityActivityStatColumn(label: "Time", value: activity.duration)
+                    }
                 }
-                cityActivityStatColumn(label: "Time", value: activity.duration)
             }
         }
         .padding(.horizontal, 20)
