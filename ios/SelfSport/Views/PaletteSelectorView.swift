@@ -38,7 +38,7 @@ struct PaletteSelectorView: View {
         }
         .padding(.vertical, 10)
         .padding(.leading, 6)
-        .padding(.trailing, 4)
+        .padding(.trailing, 0)
         .background {
             UnevenRoundedRectangle(
                 topLeadingRadius: 14,
@@ -50,9 +50,9 @@ struct PaletteSelectorView: View {
                 LinearGradient(
                     stops: [
                         .init(color: .clear, location: 0.0),
-                        .init(color: .black.opacity(0.03), location: 0.3),
-                        .init(color: .black.opacity(0.12), location: 0.7),
-                        .init(color: .black.opacity(0.25), location: 1.0)
+                        .init(color: .white.opacity(0.03), location: 0.3),
+                        .init(color: .white.opacity(0.12), location: 0.7),
+                        .init(color: .white.opacity(0.25), location: 1.0)
                     ],
                     startPoint: .leading,
                     endPoint: .trailing
