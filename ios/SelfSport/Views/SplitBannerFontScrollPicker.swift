@@ -39,8 +39,8 @@ struct SplitBannerFontScrollPicker: View {
                     LinearGradient(
                         stops: [
                             .init(color: .clear, location: 0.0),
-                            .init(color: .black.opacity(0.15), location: 0.35),
-                            .init(color: .black.opacity(0.58), location: 1.0)
+                            .init(color: .black.opacity(0.03), location: 0.35),
+                            .init(color: .black.opacity(0.12), location: 1.0)
                         ],
                         startPoint: .leading,
                         endPoint: .trailing

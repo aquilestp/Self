@@ -294,6 +294,7 @@ struct PaletteSelectorView: View {
                     mutate { $0.splitBannerFontStyle = style }
                 }
             )
+            .offset(x: 12)
             .scaleEffect(showPaletteSelector ? 1 : 0.3)
             .opacity(showPaletteSelector ? 1 : 0)
             .animation(
