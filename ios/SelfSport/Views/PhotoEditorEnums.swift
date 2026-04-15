@@ -41,6 +41,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case notesScreenshot = "Notes"
     case ancestralMedal = "Ancestral"
     case splitBanner = "Split Banner"
+    case cityActivity = "City Activity"
 
     var id: String { rawValue }
 
@@ -80,12 +81,13 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .notesScreenshot: return "note.text"
         case .ancestralMedal: return "crown.fill"
         case .splitBanner: return "text.alignleft"
+        case .cityActivity: return "mappin.circle.fill"
         }
     }
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .notesScreenshot, .ancestralMedal, .splitBanner:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .notesScreenshot, .ancestralMedal, .splitBanner, .cityActivity:
             return false
         default:
             return true
@@ -109,7 +111,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
 
     var requiresDetail: Bool {
         switch self {
-        case .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts, .blurredVerticalText: return true
+        case .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts, .blurredVerticalText, .cityActivity: return true
         default: return false
         }
     }
@@ -308,6 +310,7 @@ struct PlacedWidget: Identifiable {
     var ancestralShowTime: Bool = true
     var splitBannerUnitFilter: SplitsUnitFilter = .km
     var splitBannerFontStyle: SplitBannerFontStyle = .system
+    var cityActivityUnitFilter: SplitsUnitFilter = .km
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {

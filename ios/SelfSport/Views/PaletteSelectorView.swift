@@ -28,6 +28,7 @@ struct PaletteSelectorView: View {
             ancestralMedalSection
             splitBannerSection
             whatsappSection
+            cityActivitySection
         }
         .padding(.vertical, 10)
         .padding(.leading, 6)
@@ -335,6 +336,20 @@ struct PaletteSelectorView: View {
                 .spring(response: 0.35, dampingFraction: 0.7).delay(baseDelay + 0.06),
                 value: showPaletteSelector
             )
+        }
+    }
+
+    // MARK: - City Activity
+
+    @ViewBuilder
+    private var cityActivitySection: some View {
+        if widget?.type == .cityActivity {
+            let baseDelay = Double(paletteCount) * 0.04
+            let current = widget?.cityActivityUnitFilter ?? .km
+            separator(delay: baseDelay + 0.04)
+            unitToggle(current: current, delay: baseDelay + 0.06) {
+                mutate { $0.cityActivityUnitFilter = $0.cityActivityUnitFilter == .km ? .miles : .km }
+            }
         }
     }
 

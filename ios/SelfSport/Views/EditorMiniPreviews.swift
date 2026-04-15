@@ -320,6 +320,8 @@ extension PhotoEditorView {
             miniAncestralMedal
         case .splitBanner:
             miniSplitBanner
+        case .cityActivity:
+            miniCityActivity
         }
     }
 
@@ -1033,6 +1035,27 @@ extension PhotoEditorView {
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
                 .foregroundStyle(.white.opacity(0.4))
+        }
+    }
+
+    var miniCityActivity: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text("Today at 6:32 AM")
+                .font(.system(size: 6, weight: .regular, design: .serif))
+                .foregroundStyle(.white.opacity(0.5))
+                .lineLimit(1)
+            Text(activity.activityType.lowercased().contains("ride") ? "City Ride" : "City Run")
+                .font(.system(size: 13, weight: .bold, design: .serif))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            HStack(spacing: 5) {
+                if activity.hasDistance {
+                    miniStat(label: "Dist", value: activity.distance)
+                    miniStat(label: "Pace", value: activity.pace)
+                }
+                miniStat(label: "Time", value: activity.duration)
+            }
         }
     }
 }
