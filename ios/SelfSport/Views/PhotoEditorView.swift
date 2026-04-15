@@ -1011,43 +1011,27 @@ struct PhotoEditorView: View {
         HStack(spacing: 8) {
             if paletteTargetWidgetId == nil {
                 Button { showAIAnimateOptions = true } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: "sparkles")
-                            .font(.system(size: 11, weight: .medium))
-                            .symbolEffect(.pulse.wholeSymbol, options: .repeating.speed(0.6), value: selfAiGlowPhase)
-                        Text("Self ai")
-                            .font(.system(size: 13, weight: .bold))
-                    }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .frame(height: 36)
-                    .background(
-                        LinearGradient(
-                            colors: [Color.white.opacity(0.12), Color.white.opacity(0.04)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ),
-                        in: .capsule
-                    )
-                    .background(.black.opacity(0.7), in: .capsule)
-
+                    Text("Self ai")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 14)
+                        .frame(height: 36)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    selfAiGlowColors[selfAiGlowColorIndex].opacity(0.85),
+                                    selfAiGlowColors[(selfAiGlowColorIndex + 1) % selfAiGlowColors.count].opacity(0.75)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            in: .capsule
+                        )
+                        .background(.black.opacity(0.5), in: .capsule)
                 }
                 .buttonStyle(.plain)
-                .background(
-                    Capsule()
-                        .fill(selfAiGlowColors[selfAiGlowColorIndex].opacity(selfAiGlowPhase ? 0.7 : 0.0))
-                        .blur(radius: selfAiGlowPhase ? 22 : 12)
-                        .scaleEffect(selfAiGlowPhase ? 1.3 : 1.0)
-                )
-                .background(
-                    Capsule()
-                        .fill(selfAiGlowColors[(selfAiGlowColorIndex + 1) % selfAiGlowColors.count].opacity(selfAiGlowPhase ? 0.2 : 0.0))
-                        .blur(radius: selfAiGlowPhase ? 28 : 14)
-                        .scaleEffect(selfAiGlowPhase ? 1.4 : 1.0)
-                )
-                .shadow(color: selfAiGlowColors[selfAiGlowColorIndex].opacity(selfAiGlowPhase ? 0.6 : 0.05), radius: selfAiGlowPhase ? 20 : 4, x: 0, y: 0)
-                .shadow(color: selfAiGlowColors[(selfAiGlowColorIndex + 1) % selfAiGlowColors.count].opacity(selfAiGlowPhase ? 0.15 : 0.0), radius: selfAiGlowPhase ? 24 : 6, x: 0, y: 0)
-                .shadow(color: .black.opacity(selfAiGlowPhase ? 0.1 : 0.4), radius: selfAiGlowPhase ? 4 : 10, x: 0, y: selfAiGlowPhase ? 1 : 3)
+                .shadow(color: selfAiGlowColors[selfAiGlowColorIndex].opacity(0.45), radius: 10, x: 0, y: 0)
+                .shadow(color: .black.opacity(0.3), radius: 6, x: 0, y: 2)
                 .animation(.easeInOut(duration: 1.8), value: selfAiGlowColorIndex)
                 .confirmationDialog("Self ai", isPresented: $showAIAnimateOptions, titleVisibility: .visible) {
                     Button("Edit current image") {
@@ -1079,9 +1063,6 @@ struct PhotoEditorView: View {
                             ProgressView()
                                 .tint(.white)
                                 .scaleEffect(0.65)
-                        } else {
-                            Image(systemName: locationService.cityName != nil ? "location.fill" : "mappin.and.ellipse")
-                                .font(.system(size: 11, weight: .medium))
                         }
                         Text(locationService.cityName ?? "Location")
                             .font(.system(size: 13, weight: .semibold))
