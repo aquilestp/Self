@@ -32,27 +32,6 @@ struct PaletteSelectorView: View {
         .padding(.vertical, 10)
         .padding(.leading, 6)
         .padding(.trailing, 12)
-        .background {
-            UnevenRoundedRectangle(
-                topLeadingRadius: 14,
-                bottomLeadingRadius: 14,
-                bottomTrailingRadius: 0,
-                topTrailingRadius: 0
-            )
-            .fill(
-                LinearGradient(
-                    stops: [
-                        .init(color: .clear, location: 0.0),
-                        .init(color: .white.opacity(0.03), location: 0.3),
-                        .init(color: .white.opacity(0.12), location: 0.7),
-                        .init(color: .white.opacity(0.25), location: 1.0)
-                    ],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-            )
-            .allowsHitTesting(false)
-        }
     }
 
     // MARK: - Palette Color Buttons
