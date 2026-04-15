@@ -618,7 +618,6 @@ struct PhotoEditorView: View {
                     resetHideTimer: { resetPaletteHideTimer() }
                 )
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-                    .padding(.trailing, 12)
                     .offset(y: -60)
                     .allowsHitTesting(true)
                     .transition(.opacity)
