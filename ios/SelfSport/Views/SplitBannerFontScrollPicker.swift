@@ -35,25 +35,40 @@ struct SplitBannerFontScrollPicker: View {
         }
         .background {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(
+                .fill(.ultraThinMaterial)
+                .mask {
                     LinearGradient(
                         stops: [
                             .init(color: .clear, location: 0.0),
-                            .init(color: .black.opacity(0.03), location: 0.35),
-                            .init(color: .black.opacity(0.12), location: 1.0)
+                            .init(color: .black.opacity(0.3), location: 0.4),
+                            .init(color: .black, location: 1.0)
                         ],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
-                )
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+                .overlay {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                stops: [
+                                    .init(color: .clear, location: 0.0),
+                                    .init(color: .black.opacity(0.2), location: 0.5),
+                                    .init(color: .black.opacity(0.55), location: 1.0)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                }
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .stroke(
                             LinearGradient(
                                 stops: [
-                                    .init(color: .white.opacity(0.04), location: 0.0),
-                                    .init(color: .white.opacity(0.18), location: 1.0)
+                                    .init(color: .clear, location: 0.0),
+                                    .init(color: .white.opacity(0.12), location: 0.5),
+                                    .init(color: .white.opacity(0.25), location: 1.0)
                                 ],
                                 startPoint: .leading,
                                 endPoint: .trailing
