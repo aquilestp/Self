@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import CoreLocation
 
 struct PhotoEditorView: View {
     static let waPresetTexts: [String] = [
@@ -106,6 +107,7 @@ struct PhotoEditorView: View {
     @State private var activityDetail: StravaActivityDetail? = nil
     @State private var isLoadingDetail: Bool = false
     @State private var detailFetchTask: Task<Void, Never>? = nil
+    @State private var geocodedActivityCity: String? = nil
     @State var activePhotoFilter: PhotoFilterType = .original
     @State private var filteredPhotoCache: [PhotoFilterType: UIImage] = [:]
     @State private var showFilterLabel: Bool = false
@@ -934,7 +936,8 @@ struct PhotoEditorView: View {
                 monthlyKmData: monthlyKmData,
                 lastMonthKmData: lastMonthKmData,
                 activityDetail: activityDetail,
-                isLoadingDetail: isLoadingDetail
+                isLoadingDetail: isLoadingDetail,
+                geocodedActivityCity: geocodedActivityCity
             )
         }
             }
@@ -1361,16 +1364,31 @@ struct PhotoEditorView: View {
                 if let cached = try await detailService.fetchCachedDetail(stravaActivityId: stravaId) {
                     activityDetail = cached
                     isLoadingDetail = false
+                    await geocodeCityIfNeeded(from: cached)
                     return
                 }
                 let detail = try await stravaService.fetchActivityDetail(id: stravaId)
                 activityDetail = detail
                 try? await detailService.upsertDetail(detail)
+                await geocodeCityIfNeeded(from: detail)
             } catch {
                 // keep nil — widgets show empty state
             }
             isLoadingDetail = false
         }
+    }
+
+    private func geocodeCityIfNeeded(from detail: StravaActivityDetail) async {
+        if let city = detail.locationCity, !city.isEmpty {
+            geocodedActivityCity = city
+            return
+        }
+        guard let coords = detail.startLatlng, coords.count >= 2 else { return }
+        let location = CLLocation(latitude: coords[0], longitude: coords[1])
+        let geocoder = CLGeocoder()
+        guard let placemarks = try? await geocoder.reverseGeocodeLocation(location),
+              let city = placemarks.first?.locality ?? placemarks.first?.subAdministrativeArea else { return }
+        geocodedActivityCity = city
     }
 
     func captureCanvas() async -> UIImage? {

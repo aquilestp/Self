@@ -28,6 +28,7 @@ nonisolated struct StravaActivityDetail: Codable, Sendable, Equatable {
     let locationCity: String?
     let locationState: String?
     let locationCountry: String?
+    let startLatlng: [Double]?
     let segmentEfforts: [StravaSegmentEffort]?
     let bestEfforts: [StravaBestEffort]?
     let splitsMetric: [StravaSplit]?
@@ -57,6 +58,7 @@ nonisolated struct StravaActivityDetail: Codable, Sendable, Equatable {
         case locationCity = "location_city"
         case locationState = "location_state"
         case locationCountry = "location_country"
+        case startLatlng = "start_latlng"
         case segmentEfforts = "segment_efforts"
         case bestEfforts = "best_efforts"
         case splitsMetric = "splits_metric"

@@ -5,8 +5,8 @@ extension StatWidgetContentView {
     private var cityActivityIsMiles: Bool { cityActivityUnitFilter == .miles }
 
     private var cityActivityTitle: String {
-        let city = activityDetail?.locationCity
         let typeLabel = cityActivityTypeLabel
+        let city = geocodedActivityCity ?? activityDetail?.locationCity
         if let city, !city.isEmpty {
             return "\(city) \(typeLabel)"
         }
@@ -98,12 +98,10 @@ extension StatWidgetContentView {
 
             Spacer().frame(height: 16)
 
-            HStack(alignment: .top, spacing: 0) {
+            HStack(alignment: .top, spacing: 20) {
                 if activity.hasDistance {
                     cityActivityStatColumn(label: "Distance", value: cityActivityDistanceText)
-                    cityActivityDivider
                     cityActivityStatColumn(label: "Pace", value: cityActivityPaceText)
-                    cityActivityDivider
                 }
                 cityActivityStatColumn(label: "Time", value: activity.duration)
             }
@@ -111,14 +109,6 @@ extension StatWidgetContentView {
         .padding(.horizontal, 20)
         .padding(.vertical, 16)
         .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
-    }
-
-    private var cityActivityDivider: some View {
-        Rectangle()
-            .fill(dividerColor)
-            .frame(width: 1, height: 36)
-            .padding(.horizontal, 14)
-            .padding(.top, 8)
     }
 
     private func cityActivityStatColumn(label: String, value: String) -> some View {
