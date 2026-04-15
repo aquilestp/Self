@@ -27,17 +27,28 @@ extension StatWidgetContentView {
         return spaced
     }
 
+    private static let cityActivityTimeFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "h:mm a"
+        f.timeZone = TimeZone(secondsFromGMT: 0)
+        return f
+    }()
+
+    private static let cityActivityDayFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        f.timeZone = TimeZone(secondsFromGMT: 0)
+        return f
+    }()
+
     private var cityActivityDateTime: String {
         guard let date = activity.startDate else { return activity.date }
-        let calendar = Calendar.current
-        let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "h:mm a"
-        let timeStr = timeFormatter.string(from: date)
-        if calendar.isDateInToday(date) { return "Today at \(timeStr)" }
-        if calendar.isDateInYesterday(date) { return "Yesterday at \(timeStr)" }
-        let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "MMM d"
-        return "\(dayFormatter.string(from: date)) at \(timeStr)"
+        var utcCalendar = Calendar.current
+        utcCalendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let timeStr = Self.cityActivityTimeFormatter.string(from: date)
+        if utcCalendar.isDateInToday(date) { return "Today at \(timeStr)" }
+        if utcCalendar.isDateInYesterday(date) { return "Yesterday at \(timeStr)" }
+        return "\(Self.cityActivityDayFormatter.string(from: date)) at \(timeStr)"
     }
 
     private var cityActivityDistanceText: String {

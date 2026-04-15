@@ -14,6 +14,7 @@ struct ActivityDetailSheet: View {
     private static let dateTimeFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "EEEE, MMM d · h:mm a"
+        f.timeZone = TimeZone(secondsFromGMT: 0)
         return f
     }()
 
