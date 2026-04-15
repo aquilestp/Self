@@ -1,23 +1,23 @@
-# Fix City Name in City Activity Widget + Remove Stat Separators
+# Corregir zona horaria en todos los formatters de tiempo
 
-## What's being fixed
 
-### 1. City name now works via coordinates
+## Problema
+Las horas se muestran incorrectas porque los formatters aplican la zona horaria del dispositivo sobre una hora que Strava ya entrega en hora local (`start_date_local`). Esto desplaza la hora mostrada.
 
-Strava stopped reliably returning the city name field — it comes back empty for most activities. The fix:
+## Solución
+Fijar `timeZone = UTC (offset 0)` en el parser de fechas y en todos los formatters de display, para que la hora que se muestra sea **exactamente la misma** que Strava registró.
 
-- Read the activity's GPS start coordinates (which Strava still always provides)
-- Reverse geocode those coordinates using Apple Maps to get the city name
-- The widget will show "Medellín Run", "Bogotá Ride", etc. as intended
+## Cambios
 
-### 2. Remove lines between stat indicators
+**Formatter de parseo (`StravaViewModel`)**
+- Añadir `f.timeZone = TimeZone(secondsFromGMT: 0)` al `isoFormatter` para que no aplique offset al leer la fecha
 
-The vertical separator lines between Distance / Pace / Time at the bottom of the widget will be removed for a cleaner look.
+**Formatters de display (`CachedDateFormatters`)**
+- `timeShort` (hora `9:54 PM`) → añadir `timeZone UTC`
+- `bvtDate`, `dayOfWeek`, `monthDay`, `notesDate`, `medalDate` → añadir `timeZone UTC`
 
-## Files changed
+**Formatter de fecha en `StravaViewModel`**
+- `displayDateFormatter` → añadir `timeZone UTC`
 
-- `**StravaActivityDetail.swift**` — add `start_latlng` coordinate field
-- `**PhotoEditorView.swift**` — after loading activity detail, if city is empty, reverse geocode coordinates and store the city name
-- `**DraggableStatWidget.swift**` — pass geocoded city name down to the widget renderer
-- `**StatWidgetContentView+CityActivity.swift**` — use geocoded city in the title; remove vertical divider lines and the divider property
-
+## Resultado
+La hora mostrada en todos los widgets (BVT, Banners, Novelty, CityActivity) será idéntica a la hora que Strava tiene registrada para la actividad, independientemente de la zona horaria del teléfono.

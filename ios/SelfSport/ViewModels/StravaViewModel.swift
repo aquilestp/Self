@@ -34,12 +34,14 @@ final class StravaViewModel {
     private static let isoFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withFullDate, .withTime, .withDashSeparatorInDate, .withColonSeparatorInTime]
+        f.timeZone = TimeZone(secondsFromGMT: 0)
         return f
     }()
 
     private static let displayDateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "MMM d"
+        f.timeZone = TimeZone(secondsFromGMT: 0)
         return f
     }()
 
