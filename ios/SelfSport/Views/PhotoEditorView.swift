@@ -495,7 +495,7 @@ struct PhotoEditorView: View {
                             }
                         }
                     }
-                    .clipShape(.rect(cornerRadius: isCapturingCanvas ? 0 : 55))
+                    .clipShape(.rect(cornerRadius: isCapturingCanvas ? 0 : 28))
                     .onAppear {
                         canvasSize = geo.size
                         if isHorizontalPhoto {
@@ -514,7 +514,7 @@ struct PhotoEditorView: View {
                                 }
                         }
                     )
-                    .contentShape(.rect(cornerRadius: 55))
+                    .contentShape(.rect(cornerRadius: 28))
                     .gesture(
                         DragGesture(minimumDistance: 30, coordinateSpace: .local)
                             .onEnded { value in
@@ -718,7 +718,6 @@ struct PhotoEditorView: View {
                 keyboardHeight = 0
             }
         }
-        .statusBarHidden()
         .task {
             try? await Task.sleep(for: .seconds(0.7))
             guard drawerState == .collapsed else { return }
@@ -1210,9 +1209,9 @@ struct PhotoEditorView: View {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 56, height: 56)
+                    .frame(width: 53, height: 53)
                     .background(Color.white.opacity(0.12))
-                    .clipShape(.rect(cornerRadius: 18))
+                    .clipShape(.rect(cornerRadius: 17))
             }
             .buttonStyle(.plain)
 
@@ -1225,12 +1224,12 @@ struct PhotoEditorView: View {
                 }
                 .foregroundStyle(.white.opacity(0.9))
                 .frame(maxWidth: .infinity)
-                .frame(height: 56)
+                .frame(height: 53)
                 .background(Color.white.opacity(0.12))
                 .background(.ultraThinMaterial)
-                .clipShape(.rect(cornerRadius: 18))
+                .clipShape(.rect(cornerRadius: 17))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18).stroke(.white.opacity(0.15), lineWidth: 0.5)
+                    RoundedRectangle(cornerRadius: 17).stroke(.white.opacity(0.15), lineWidth: 0.5)
                 )
             }
             .buttonStyle(.plain)
@@ -1244,12 +1243,12 @@ struct PhotoEditorView: View {
                 }
                 .foregroundStyle(.white.opacity(0.9))
                 .frame(maxWidth: .infinity)
-                .frame(height: 56)
+                .frame(height: 53)
                 .background(Color.white.opacity(0.12))
                 .background(.ultraThinMaterial)
-                .clipShape(.rect(cornerRadius: 18))
+                .clipShape(.rect(cornerRadius: 17))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 18).stroke(.white.opacity(0.15), lineWidth: 0.5)
+                    RoundedRectangle(cornerRadius: 17).stroke(.white.opacity(0.15), lineWidth: 0.5)
                 )
             }
             .buttonStyle(.plain)
