@@ -5,6 +5,7 @@ struct LoginView: View {
     @Bindable var authViewModel: AuthViewModel
     var onBack: (() -> Void)? = nil
     @State private var showDevLogin: Bool = false
+    @State private var showDevModal: Bool = false
     @State private var devEmail: String = ""
     @State private var devPassword: String = ""
 
@@ -92,47 +93,6 @@ struct LoginView: View {
                         .padding(.top, 16)
                 }
 
-                if showDevLogin {
-                    VStack(spacing: 12) {
-                        TextField("Email", text: $devEmail)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.7))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 10)
-                            .background(.white.opacity(0.06), in: .rect(cornerRadius: 8))
-
-                        SecureField("Password", text: $devPassword)
-                            .textContentType(.password)
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.7))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 10)
-                            .background(.white.opacity(0.06), in: .rect(cornerRadius: 8))
-
-                        Button {
-                            Task {
-                                await authViewModel.signInWithEmail(email: devEmail, password: devPassword)
-                            }
-                        } label: {
-                            Text("Sign In")
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(.white.opacity(0.5))
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 8)
-                        }
-                        .buttonStyle(.plain)
-                        .background(.white.opacity(0.06), in: .rect(cornerRadius: 8))
-                        .disabled(devEmail.isEmpty || devPassword.isEmpty)
-                    }
-                    .frame(maxWidth: 240)
-                    .padding(.top, 20)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                }
-
                 Spacer(minLength: 16)
 
                 Button {
@@ -154,6 +114,19 @@ struct LoginView: View {
             .background(.black)
         }
         .ignoresSafeArea()
+        .onChange(of: showDevLogin) { _, newValue in
+            if newValue {
+                showDevModal = true
+            }
+        }
+        .sheet(isPresented: $showDevModal, onDismiss: {
+            showDevLogin = false
+        }) {
+            DevLoginModal(authViewModel: authViewModel, devEmail: $devEmail, devPassword: $devPassword, isPresented: $showDevModal)
+                .presentationDetents([.height(260)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(.ultraThinMaterial)
+        }
     }
 }
 
