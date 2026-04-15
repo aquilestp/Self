@@ -1,9 +1,8 @@
-# Agregar selector de fuentes con scroll al widget Distance Words
+# Eliminar los tabs de font no-scroll del widget Distance Words
 
-**Cambios**
+**Cambio:**
 
-- Se añade un selector de fuentes tipo scroll (igual al que ya tiene Split Banner) al widget **Distance Words**
-- Incluye **todas** las fuentes especiales como opciones: System, Groovy, Comic, Pixel, Urban, Mono, Metal, Monofett, Rocker, 80s, Distress, Glitch, Sedgwick, Sekuya, Caps
-- Al seleccionar una fuente, el texto del widget cambia en tiempo real con la fuente elegida
-- El picker aparece en el panel lateral de estilos cuando se selecciona un widget Distance Words
+- Eliminar los botones/tabs de estilo de fuente que aparecen como botones individuales (no scroll) en el panel lateral del widget Distance Words
+- El widget Distance Words ya tiene el selector de fuentes por scroll (`SplitBannerFontScrollPicker`), así que los tabs antiguos son redundantes
+- Como Distance Words es el único widget que usa esos tabs de fuente, se eliminará esa sección por completo
 

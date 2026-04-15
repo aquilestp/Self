@@ -13,12 +13,6 @@ struct PaletteSelectorView: View {
 
     private var paletteCount: Int { WidgetPalette.allCases.count }
 
-    private var fontPreviewLabel: String {
-        guard let w = widget else { return "5:30" }
-        let text = w.type == .distanceWords ? "five" : "5:30"
-        return String(text.prefix(4)).uppercased()
-    }
-
     var body: some View {
         VStack(alignment: .trailing, spacing: 8) {
             paletteButtons
@@ -34,7 +28,6 @@ struct PaletteSelectorView: View {
             ancestralMedalSection
             splitBannerSection
             whatsappSection
-            fontStyleSection
         }
         .padding(.vertical, 10)
         .padding(.leading, 6)
@@ -366,25 +359,6 @@ struct PaletteSelectorView: View {
         }
     }
 
-    // MARK: - Font Style
-
-    @ViewBuilder
-    private var fontStyleSection: some View {
-        if widget?.type.supportsFontStyle ?? false {
-            let baseDelay = Double(paletteCount) * 0.04
-            let currentFont = widget?.fontStyle ?? .system
-            separator(delay: baseDelay + 0.08)
-            ForEach(Array(WidgetFontStyle.allCases.enumerated()), id: \.element.id) { fontIdx, style in
-                let isActive = currentFont == style
-                animatedButton(delay: baseDelay + 0.10 + Double(fontIdx) * 0.03) {
-                    mutate { $0.fontStyle = style }
-                } label: {
-                    fontStyleLabel(text: fontPreviewLabel, style: style, isActive: isActive)
-                }
-            }
-        }
-    }
-
     // MARK: - Reusable Components
 
     private func mutate(_ transform: @escaping (inout PlacedWidget) -> Void) {
@@ -507,17 +481,4 @@ struct PaletteSelectorView: View {
         )
     }
 
-    private func fontStyleLabel(text: String, style: WidgetFontStyle, isActive: Bool) -> some View {
-        Text(text)
-            .font(style.font(size: 13))
-            .lineLimit(1)
-            .minimumScaleFactor(0.5)
-            .foregroundStyle(isActive ? .white.opacity(0.95) : .white.opacity(0.5))
-            .frame(width: 40, height: 48)
-            .background(isActive ? Color.white.opacity(0.25) : Color.black.opacity(0.45), in: RoundedRectangle(cornerRadius: 10))
-            .overlay(
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(isActive ? Color.white.opacity(0.6) : Color.white.opacity(0.15), lineWidth: isActive ? 1.5 : 0.5)
-            )
-    }
 }
