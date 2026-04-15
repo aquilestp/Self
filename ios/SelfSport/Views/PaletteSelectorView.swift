@@ -36,6 +36,37 @@ struct PaletteSelectorView: View {
             whatsappSection
             fontStyleSection
         }
+        .padding(.vertical, 10)
+        .padding(.leading, 6)
+        .padding(.trailing, 4)
+        .background {
+            UnevenRoundedRectangle(
+                topLeadingRadius: 14,
+                bottomLeadingRadius: 14,
+                bottomTrailingRadius: 0,
+                topTrailingRadius: 0
+            )
+            .fill(
+                LinearGradient(
+                    stops: [
+                        .init(color: .clear, location: 0),
+                        .init(color: .white.opacity(0.35), location: 1)
+                    ],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .background(
+                .ultraThinMaterial,
+                in: UnevenRoundedRectangle(
+                    topLeadingRadius: 14,
+                    bottomLeadingRadius: 14,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: 0
+                )
+            )
+            .allowsHitTesting(false)
+        }
         .shadow(color: .black.opacity(0.4), radius: 8, x: 0, y: 4)
     }
 
