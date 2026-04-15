@@ -1,25 +1,13 @@
-# Captura de pantalla real en vez de re-renderizar — imagen exportada 100% idéntica al canvas
+# Corregir el canvas para que no se solape con el Dynamic Island
 
-## Problema actual
+**Problema actual:** El canvas del editor se extiende detrás del Dynamic Island, causando que el contenido quede tapado/cortado por este.
 
-Cuando exportas a Instagram o guardas en la galería, los fondos translúcidos (glass/blur) de los widgets se ven más oscuros o diferentes porque el sistema actual reconstruye la vista desde cero y no puede reproducir el efecto blur real.
+**Referencia:** El canvas debe empezar justo debajo del Dynamic Island/status bar, con un pequeño espacio negro entre ambos (tal como se ve en la foto de referencia).
 
-## Nueva solución
+**Cambios:**
 
-En vez de reconstruir la imagen, vamos a **tomar una foto directa de lo que se ve en pantalla** — capturando los píxeles exactos del canvas incluyendo todos los efectos visuales.
-
-### Cómo funciona
-
-- Se agrega un "ancla de captura" invisible al canvas que permite acceder a la vista real en pantalla
-- Al exportar, se ocultan temporalmente los botones y controles del editor (drawer, botón de texto, guías, etc.)
-- Se toma una captura de los píxeles reales del canvas — esto incluye blur, materiales, sombras, todo exactamente como se ve
-- Se escala la captura a alta resolución (1080×1920) para que se vea nítida en Instagram y en la galería
-- Se restauran los controles del editor
-
-### Resultado
-
-- El fondo translúcido de los widgets se verá **idéntico** en la foto exportada
-- Los filtros, colores, efectos — todo se exportará tal cual aparece en el editor
-- Se elimina la necesidad de colores sólidos de fallback para la exportación
-- Compatible con todos los estilos de widget (normal, neon, aesthetic)
+- **Canvas respeta el área segura superior:** El canvas dejará de extenderse detrás del Dynamic Island y empezará justo debajo de él
+- **Fondo negro sigue detrás del Dynamic Island:** El fondo negro se mantiene extendido hasta el tope de la pantalla para que el área del status bar se vea limpia
+- **Overlay de botones alineado con el canvas:** Los botones superiores (Self ai, Location, back, menú) se mantienen correctamente posicionados dentro del canvas
+- **Sin cambios en la parte inferior:** La barra de compartir y los controles inferiores no se afectan
 

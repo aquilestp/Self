@@ -576,7 +576,7 @@ struct PhotoEditorView: View {
                 .frame(width: canvasWidth, height: canvasHeight)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .ignoresSafeArea()
+            .ignoresSafeArea(.container, edges: .bottom)
 
             GeometryReader { overlayGeo in
                 let canvasH = overlayGeo.size.height * 0.90
