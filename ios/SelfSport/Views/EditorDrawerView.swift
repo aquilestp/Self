@@ -147,11 +147,11 @@ extension PhotoEditorView {
                 toggleWidget(type)
             }
         } label: {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(spacing: 6) {
                 miniWidgetPreview(type: type)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
             }
-            .padding(.leading, 8)
+            .padding(.horizontal, 8)
             .frame(maxWidth: large ? .infinity : nil)
             .frame(width: large ? nil : 119, height: h)
             .background(
@@ -175,11 +175,11 @@ extension PhotoEditorView {
                 toggleWidget(type)
             }
         } label: {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(spacing: 6) {
                 miniWidgetPreview(type: type)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
             }
-            .padding(.leading, 8)
+            .padding(.horizontal, 8)
             .frame(maxWidth: .infinity)
             .frame(height: 94)
             .background(
