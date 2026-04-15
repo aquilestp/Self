@@ -116,6 +116,9 @@ struct PhotoEditorView: View {
     @State private var showFilterDotsIndicator: Bool = false
     @State private var filterDotsHideTask: Task<Void, Never>? = nil
     @State private var isCapturingCanvas: Bool = false
+    @State var drawerTab: DrawerTab = .popular
+    @State var widgetPopularityMap: [String: Int] = [:]
+    @State var userRecentsMap: [String: Date] = [:]
     private let photoFilterService = PhotoFilterService()
     let grokService = GrokImageEditService()
     let cityFilterService = CityFilterService()
@@ -123,6 +126,7 @@ struct PhotoEditorView: View {
     private let monthlyKmService = MonthlyKmService()
     private let detailService = SupabaseActivityDetailService()
     private let stravaService = StravaService()
+    private let widgetPopularityService = WidgetPopularityService()
 
     var currentPhoto: UIImage {
         let base = aiEditedPhoto ?? photo
@@ -736,6 +740,12 @@ struct PhotoEditorView: View {
             lastWeekKmData = await weeklyKmService.fetchLastWeekKm()
             monthlyKmData = await monthlyKmService.fetchMonthlyKm()
             lastMonthKmData = await monthlyKmService.fetchLastMonthKm()
+        }
+        .task {
+            async let pop = widgetPopularityService.fetchPopularity()
+            async let rec = widgetPopularityService.fetchUserRecents()
+            widgetPopularityMap = await pop
+            userRecentsMap = await rec
         }
         .onChange(of: aiEditedPhoto) { _, _ in
             filteredPhotoCache.removeAll()
@@ -1416,6 +1426,16 @@ struct PhotoEditorView: View {
         }
     }
 
+    private func trackWidgetUsage() {
+        let types = placedWidgets.map(\.type.rawValue)
+        guard !types.isEmpty else { return }
+        Task {
+            await widgetPopularityService.trackWidgetUsage(widgetTypes: types)
+            widgetPopularityMap = await widgetPopularityService.fetchPopularity()
+            userRecentsMap = await widgetPopularityService.fetchUserRecents()
+        }
+    }
+
     private func shareToStory() {
         Task {
             let facebookAppID = "1722813128328059"
@@ -1427,6 +1447,8 @@ struct PhotoEditorView: View {
 
             guard let image = await captureCanvas(),
                   let imageData = image.pngData() else { return }
+
+            trackWidgetUsage()
 
             let pasteboardItems: [[String: Any]] = [
                 [
@@ -1445,6 +1467,7 @@ struct PhotoEditorView: View {
     private func saveToPhotos() {
         Task {
             guard let image = await captureCanvas() else { return }
+            trackWidgetUsage()
             UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
             HapticService.notification.notificationOccurred(.success)
             showSavedAlert = true

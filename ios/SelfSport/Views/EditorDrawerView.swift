@@ -17,6 +17,9 @@ extension PhotoEditorView {
                         .padding(.top, 10)
                         .padding(.bottom, 6)
 
+                    drawerTabPills
+                        .padding(.bottom, 8)
+
                     if isExpanded {
                         expandedGrid
                             .transition(.opacity)
@@ -43,12 +46,80 @@ extension PhotoEditorView {
         }
     }
 
+    private var drawerTabPills: some View {
+        HStack(spacing: 6) {
+            drawerPill(tab: .popular, icon: "flame.fill")
+            drawerPill(tab: .recents, icon: "clock.arrow.circlepath")
+        }
+        .padding(.horizontal, 14)
+    }
+
+    private func drawerPill(tab: DrawerTab, icon: String) -> some View {
+        let isSelected = drawerTab == tab
+        return Button {
+            guard drawerTab != tab else { return }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                drawerTab = tab
+            }
+            HapticService.selection.selectionChanged()
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 10, weight: .semibold))
+                Text(tab.rawValue)
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .foregroundStyle(.white.opacity(isSelected ? 1.0 : 0.45))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(isSelected ? Color.white.opacity(0.18) : Color.white.opacity(0.06))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(isSelected ? Color.white.opacity(0.3) : Color.clear, lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
     var activeWidgetTypes: Set<StatWidgetType> {
         Set(placedWidgets.map(\.type))
     }
 
+    private func sortedWidgetTypes() -> [StatWidgetType] {
+        let all = StatWidgetType.allCases.filter { $0 != .fullBanner && $0 != .fullBannerBottom }
+        switch drawerTab {
+        case .popular:
+            return all.sorted { a, b in
+                let countA = widgetPopularityMap[a.rawValue] ?? 0
+                let countB = widgetPopularityMap[b.rawValue] ?? 0
+                if countA != countB { return countA > countB }
+                return (all.firstIndex(of: a) ?? 0) < (all.firstIndex(of: b) ?? 0)
+            }
+        case .recents:
+            if userRecentsMap.isEmpty {
+                return all.sorted { a, b in
+                    let countA = widgetPopularityMap[a.rawValue] ?? 0
+                    let countB = widgetPopularityMap[b.rawValue] ?? 0
+                    if countA != countB { return countA > countB }
+                    return (all.firstIndex(of: a) ?? 0) < (all.firstIndex(of: b) ?? 0)
+                }
+            }
+            return all.sorted { a, b in
+                let dateA = userRecentsMap[a.rawValue]
+                let dateB = userRecentsMap[b.rawValue]
+                if let dA = dateA, let dB = dateB { return dA > dB }
+                if dateA != nil { return true }
+                if dateB != nil { return false }
+                return (all.firstIndex(of: a) ?? 0) < (all.firstIndex(of: b) ?? 0)
+            }
+        }
+    }
+
     var gridStatTypes: [StatWidgetType] {
-        StatWidgetType.allCases.filter { $0 != .fullBanner && $0 != .fullBannerBottom }
+        sortedWidgetTypes()
     }
 
     var compactStatsList: some View {
@@ -59,7 +130,7 @@ extension PhotoEditorView {
                 columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
                 spacing: 10
             ) {
-                ForEach(Array(types.prefix(6))) { type in
+                ForEach(Array(types.prefix(6)), id: \.rawValue) { type in
                     widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
                 }
             }
@@ -79,15 +150,13 @@ extension PhotoEditorView {
     var expandedGrid: some View {
         let activeTypes = activeWidgetTypes
         let types = gridStatTypes
-        let firstTwo = Array(types.prefix(6))
-        let rest = Array(types.dropFirst(6))
         return ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 10) {
                 LazyVGrid(
                     columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
                     spacing: 10
                 ) {
-                    ForEach(firstTwo) { type in
+                    ForEach(types, id: \.rawValue) { type in
                         widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
                     }
                 }
@@ -95,15 +164,6 @@ extension PhotoEditorView {
                 fullWidthThumbnail(type: .fullBanner, isActive: activeTypes.contains(.fullBanner))
 
                 fullWidthThumbnail(type: .fullBannerBottom, isActive: activeTypes.contains(.fullBannerBottom))
-
-                LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
-                    spacing: 10
-                ) {
-                    ForEach(rest) { type in
-                        widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
-                    }
-                }
             }
             .padding(.horizontal, 14)
             .padding(.bottom, 20)

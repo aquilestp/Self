@@ -588,6 +588,11 @@ nonisolated enum DrawerState {
     case expanded
 }
 
+nonisolated enum DrawerTab: String {
+    case popular = "Popular"
+    case recents = "Recents"
+}
+
 nonisolated enum AIEditStyle: String, CaseIterable, Identifiable {
     case fast = "Fast"
     case distortion = "Distortion"
