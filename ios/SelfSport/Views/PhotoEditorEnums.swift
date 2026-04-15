@@ -275,6 +275,7 @@ struct PlacedWidget: Identifiable {
     var bestEffortsFilter: BestEffortsUnitFilter = .km
     var splitsFilter: SplitsUnitFilter = .km
     var distanceWordsFilter: SplitsUnitFilter = .km
+    var distanceWordsFontStyle: SplitBannerFontStyle = .system
     var fontStyle: WidgetFontStyle = .system
     var showTitle: Bool = true
     var showActivityName: Bool = true

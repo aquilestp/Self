@@ -96,12 +96,12 @@ extension StatWidgetContentView {
         let result = DistanceToWords.convert(distanceMeters: activity.distanceRaw, unit: filter)
         let words = result.numberText.lowercased()
         let unit = result.unitText.uppercased()
-        let wordsFont: Font = fontStyle == .system
+        let wordsFont: Font = distanceWordsFontStyle == .system
             ? .system(size: 32, weight: .light, design: .monospaced)
-            : fontStyle.font(size: 32)
-        let unitFont: Font = fontStyle == .system
+            : distanceWordsFontStyle.font(size: 32)
+        let unitFont: Font = distanceWordsFontStyle == .system
             ? .system(size: 11, weight: .bold, design: .monospaced)
-            : fontStyle.secondaryFont(size: 11)
+            : distanceWordsFontStyle.font(size: 11)
 
         return VStack(alignment: .leading, spacing: 2) {
             Text(words)

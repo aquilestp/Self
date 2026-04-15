@@ -1,11 +1,9 @@
-# Pegar solo el fondo translúcido al borde derecho, no los controles
+# Agregar selector de fuentes con scroll al widget Distance Words
 
-**Problema:** Al quitar el padding del componente para pegarlo al borde derecho, se movieron también todos los botones y controles al borde. Solo el fondo blanco translúcido debería estar pegado al borde derecho.
+**Cambios**
 
-**Solución:**
-
-- Separar el fondo translúcido del contenido de los controles
-- El fondo blanco con gradiente se mantiene pegado al borde derecho de la pantalla (sin padding)
-- Los botones y controles del panel recuperan un pequeño margen derecho (~12pt) para que no queden pegados al borde
-- Visualmente: el fondo translúcido llega hasta el borde, pero los botones flotan con espacio respecto al borde
+- Se añade un selector de fuentes tipo scroll (igual al que ya tiene Split Banner) al widget **Distance Words**
+- Incluye **todas** las fuentes especiales como opciones: System, Groovy, Comic, Pixel, Urban, Mono, Metal, Monofett, Rocker, 80s, Distress, Glitch, Sedgwick, Sekuya, Caps
+- Al seleccionar una fuente, el texto del widget cambia en tiempo real con la fuente elegida
+- El picker aparece en el panel lateral de estilos cuando se selecciona un widget Distance Words
 

@@ -140,11 +140,26 @@ struct PaletteSelectorView: View {
     @ViewBuilder
     private var distanceWordsSection: some View {
         if widget?.type.isDistanceWords ?? false {
+            let baseDelay = Double(paletteCount) * 0.04
             let current = widget?.distanceWordsFilter ?? .km
-            separator(delay: Double(paletteCount) * 0.04 + 0.04)
-            unitToggle(current: current, delay: Double(paletteCount) * 0.04 + 0.06) {
+            let currentFont = widget?.distanceWordsFontStyle ?? .system
+            separator(delay: baseDelay + 0.04)
+            unitToggle(current: current, delay: baseDelay + 0.06) {
                 mutate { $0.distanceWordsFilter = $0.distanceWordsFilter == .km ? .miles : .km }
             }
+            SplitBannerFontScrollPicker(
+                currentStyle: currentFont,
+                onSelectStyle: { style in
+                    mutate { $0.distanceWordsFontStyle = style }
+                }
+            )
+            .offset(x: 12)
+            .scaleEffect(showPaletteSelector ? 1 : 0.3)
+            .opacity(showPaletteSelector ? 1 : 0)
+            .animation(
+                .spring(response: 0.35, dampingFraction: 0.7).delay(baseDelay + 0.08),
+                value: showPaletteSelector
+            )
         }
     }
 
