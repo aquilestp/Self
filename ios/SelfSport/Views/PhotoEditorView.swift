@@ -607,21 +607,52 @@ struct PhotoEditorView: View {
             .animation(.easeInOut(duration: 0.2), value: isPhotoGesturing || isDraggingWidget || isTextEditing)
 
             if showPaletteSelector && !isDraggingWidget && !isPhotoGesturing && !isTextEditing {
-                PaletteSelectorView(
-                    targetWidget: placedWidgets.first(where: { $0.id == paletteTargetWidgetId }),
-                    showPaletteSelector: showPaletteSelector,
-                    waPresetTexts: Self.waPresetTexts,
-                    updateWidget: { widgetId, transform in
-                        guard let idx = placedWidgets.firstIndex(where: { $0.id == widgetId }) else { return }
-                        transform(&placedWidgets[idx])
-                    },
-                    resetHideTimer: { resetPaletteHideTimer() }
-                )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-                    .padding(.trailing, 12)
-                    .offset(y: -60)
-                    .allowsHitTesting(true)
-                    .transition(.opacity)
+                ZStack(alignment: .trailing) {
+                    UnevenRoundedRectangle(
+                        topLeadingRadius: 12,
+                        bottomLeadingRadius: 12,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 0
+                    )
+                    .fill(
+                        LinearGradient(
+                            stops: [
+                                .init(color: .clear, location: 0),
+                                .init(color: .white.opacity(0.38), location: 1)
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .background(
+                        .ultraThinMaterial,
+                        in: UnevenRoundedRectangle(
+                            topLeadingRadius: 12,
+                            bottomLeadingRadius: 12,
+                            bottomTrailingRadius: 0,
+                            topTrailingRadius: 0
+                        )
+                    )
+                    .frame(width: 58)
+                    .padding(.trailing, -12)
+                    .allowsHitTesting(false)
+
+                    PaletteSelectorView(
+                        targetWidget: placedWidgets.first(where: { $0.id == paletteTargetWidgetId }),
+                        showPaletteSelector: showPaletteSelector,
+                        waPresetTexts: Self.waPresetTexts,
+                        updateWidget: { widgetId, transform in
+                            guard let idx = placedWidgets.firstIndex(where: { $0.id == widgetId }) else { return }
+                            transform(&placedWidgets[idx])
+                        },
+                        resetHideTimer: { resetPaletteHideTimer() }
+                    )
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
+                .padding(.trailing, 12)
+                .offset(y: -60)
+                .allowsHitTesting(true)
+                .transition(.opacity)
             }
 
             if isDraggingWidget {
