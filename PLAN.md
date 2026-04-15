@@ -1,13 +1,12 @@
-# Ajustes a botones Self AI y Location
+# Desactivar animaciones solo al exportar imagen
 
+**Cambio**
 
-## Cambios
+Cuando se exporta la foto (a Instagram Stories o al guardar en la galería), los elementos de la interfaz que se ocultan (botones, selectores) lo hacen con animación, lo que causa un retraso antes de capturar la imagen.
 
-### Botón Self AI
-- [x] **Remover** el ícono de sparkles — solo quedará el texto "Self ai"
-- [x] **Mover la animación de colores dentro del botón**: el fondo del botón cambiará de color (gradiente animado entre los colores actuales), eliminando el glow/blur exterior que se desbordaba fuera del capsule
+**Ajuste**
 
-### Botón Location
-- [x] **Remover** el ícono (location.fill / mappin.and.ellipse) — solo quedará el texto de la ciudad o "Location", y el spinner de carga si aplica
+- Al iniciar la captura del canvas, desactivar temporalmente **todas** las animaciones del sistema para que los elementos se oculten de forma instantánea (sin transición visible)
+- Una vez tomada la captura, restaurar las animaciones al estado normal
+- Las animaciones durante el uso normal de la app (arrastrar widgets, abrir menús, etc.) se mantienen exactamente igual
 
-Ambos botones mantienen su forma, altura y comportamiento actual — solo cambia la presentación visual.

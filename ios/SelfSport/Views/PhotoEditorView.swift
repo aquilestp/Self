@@ -1375,12 +1375,14 @@ struct PhotoEditorView: View {
     func captureCanvas() async -> UIImage? {
         guard canvasSize.width > 0, canvasSize.height > 0 else { return nil }
 
+        UIView.setAnimationsEnabled(false)
         isCapturingCanvas = true
-        try? await Task.sleep(for: .milliseconds(80))
+        try? await Task.sleep(for: .milliseconds(50))
 
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first else {
             isCapturingCanvas = false
+            UIView.setAnimationsEnabled(true)
             return nil
         }
 
@@ -1390,6 +1392,7 @@ struct PhotoEditorView: View {
         }
 
         isCapturingCanvas = false
+        UIView.setAnimationsEnabled(true)
 
         let imageScale = fullImage.scale
         let cropRect = CGRect(
