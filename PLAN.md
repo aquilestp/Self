@@ -1,18 +1,14 @@
-# Fix widget drawer thumbnail centering
+# Glass gradient background for font style picker
 
 
-## Problem
-The drawer thumbnail wrapper was changed to use left-alignment and a leading-only padding to prevent long activity names from overflowing. This has a side effect: widgets with short or no activity name text are also stuck to the left.
+## What changes
 
-## Fix
-In both the regular thumbnail and full-width thumbnail:
+The font style scroll picker's background will go from a uniform dark panel to a **directional glass effect**:
 
-- Change the outer `VStack` from `alignment: .leading` → no alignment (center by default)
-- Change `.frame(maxWidth: .infinity, alignment: .leading)` → `.frame(maxWidth: .infinity)` (center by default)
-- Change `.padding(.leading, 8)` → `.padding(.horizontal, 8)` (symmetric padding)
+**Background gradient (left → right):**
+- **Left edge (inner / toward the photo):** fully transparent — the material blur shows through cleanly, revealing the photo behind it
+- **Right edge (outer / screen edge):** solid dark (~60% black) — anchors the panel visually at the edge
 
-This way:
-- **Long activity name** → the text inside the mini preview still has `lineLimit(1)` + `.truncationMode(.tail)`, so it truncates. The content is rendered left-aligned *within itself* (each mini preview defines its own internal alignment), but centered within the card.
-- **Short activity name or no name** → the content is naturally centered in the card.
+**Glass layer:** the existing `ultraThinMaterial` blur is kept underneath, so the transparent left side genuinely shows a frosted-glass view of whatever is behind it.
 
-No changes to the mini preview content itself — only the wrapper alignment in the two thumbnail builder functions is changed.
+**Border:** the stroke around the panel also fades — nearly invisible on the left, slightly more visible on the right — so the whole component feels like it's emerging from the photo rather than sitting on top of it.

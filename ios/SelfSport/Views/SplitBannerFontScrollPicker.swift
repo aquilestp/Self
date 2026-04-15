@@ -35,11 +35,31 @@ struct SplitBannerFontScrollPicker: View {
         }
         .background {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(.black.opacity(0.4))
+                .fill(
+                    LinearGradient(
+                        stops: [
+                            .init(color: .clear, location: 0.0),
+                            .init(color: .black.opacity(0.15), location: 0.35),
+                            .init(color: .black.opacity(0.58), location: 1.0)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .stroke(.white.opacity(0.1), lineWidth: 0.5)
+                        .stroke(
+                            LinearGradient(
+                                stops: [
+                                    .init(color: .white.opacity(0.04), location: 0.0),
+                                    .init(color: .white.opacity(0.18), location: 1.0)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ),
+                            lineWidth: 0.5
+                        )
                 )
         }
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
