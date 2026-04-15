@@ -1067,6 +1067,8 @@ struct PhotoEditorView: View {
                         Text(locationService.cityName ?? "Location")
                             .font(.system(size: 13, weight: .semibold))
                             .lineLimit(1)
+                            .truncationMode(.tail)
+                            .frame(maxWidth: 130, alignment: .leading)
                     }
                     .foregroundStyle(.white)
                     .padding(.horizontal, 12)
@@ -1076,7 +1078,7 @@ struct PhotoEditorView: View {
                 }
                 .buttonStyle(.plain)
                 .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 3)
-                .frame(maxWidth: locationService.cityName != nil ? 160 : nil)
+                .fixedSize()
                 .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
         }
