@@ -111,6 +111,7 @@ struct PhotoEditorView: View {
     @State private var showFilterLabel: Bool = false
     @State var filterLabelText: String = ""
     @State private var filterLabelHideTask: Task<Void, Never>? = nil
+    @State private var isCapturingCanvas: Bool = false
     private let photoFilterService = PhotoFilterService()
     let grokService = GrokImageEditService()
     let cityFilterService = CityFilterService()
@@ -282,7 +283,7 @@ struct PhotoEditorView: View {
                             .allowsHitTesting(false)
                             .zIndex(3)
 
-                        if drawerState == .collapsed && !isDraggingWidget && !isPhotoGesturing {
+                        if drawerState == .collapsed && !isDraggingWidget && !isPhotoGesturing && !isCapturingCanvas {
                             collapsedDrawer
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                                 .padding(.bottom, 12)
@@ -290,14 +291,16 @@ struct PhotoEditorView: View {
                                 .zIndex(5)
                         }
 
-                        AlignmentGuidesOverlay(
-                            canvasSize: geo.size,
-                            activeGuides: alignmentGuideState.activeGuides
-                        )
-                        .allowsHitTesting(false)
-                        .zIndex(3.5)
-                        .sensoryFeedback(.impact(weight: .medium), trigger: alignmentGuideState.snapHapticTrigger)
-                        .sensoryFeedback(.impact(weight: .light), trigger: alignmentGuideState.crossingHapticTrigger)
+                        if !isCapturingCanvas {
+                            AlignmentGuidesOverlay(
+                                canvasSize: geo.size,
+                                activeGuides: alignmentGuideState.activeGuides
+                            )
+                            .allowsHitTesting(false)
+                            .zIndex(3.5)
+                            .sensoryFeedback(.impact(weight: .medium), trigger: alignmentGuideState.snapHapticTrigger)
+                            .sensoryFeedback(.impact(weight: .light), trigger: alignmentGuideState.crossingHapticTrigger)
+                        }
 
                         PhotoGestureOverlay(
                             photoCenter: CGPoint(
@@ -441,7 +444,7 @@ struct PhotoEditorView: View {
 
 
 
-                        if !isDraggingWidget && !isPhotoGesturing && !isTextEditing && paletteTargetWidgetId == nil {
+                        if !isDraggingWidget && !isPhotoGesturing && !isTextEditing && paletteTargetWidgetId == nil && !isCapturingCanvas {
                             addTextButton
                                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
                                 .padding(.trailing, 12)
@@ -450,27 +453,29 @@ struct PhotoEditorView: View {
                         }
 
 
-                        if filterMode != .none || hasDynamicCityFilters {
-                            filterDots
-                                .frame(maxHeight: .infinity, alignment: .bottom)
-                                .padding(.bottom, drawerState == .collapsed ? 140 : drawerState == .open ? 280 : 140)
-                        }
+                        if !isCapturingCanvas {
+                            if filterMode != .none || hasDynamicCityFilters {
+                                filterDots
+                                    .frame(maxHeight: .infinity, alignment: .bottom)
+                                    .padding(.bottom, drawerState == .collapsed ? 140 : drawerState == .open ? 280 : 140)
+                            }
 
-                        photoFilterDotsView
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                            .padding(.bottom, drawerState == .collapsed ? 110 : drawerState == .open ? 250 : 110)
-                            .allowsHitTesting(false)
-                            .zIndex(5.8)
-
-                        if showFilterLabel {
-                            photoFilterLabelView
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                            photoFilterDotsView
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                                .padding(.bottom, drawerState == .collapsed ? 110 : drawerState == .open ? 250 : 110)
                                 .allowsHitTesting(false)
-                                .transition(.opacity)
-                                .zIndex(5.9)
+                                .zIndex(5.8)
+
+                            if showFilterLabel {
+                                photoFilterLabelView
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                                    .allowsHitTesting(false)
+                                    .transition(.opacity)
+                                    .zIndex(5.9)
+                            }
                         }
                     }
-                    .clipShape(.rect(cornerRadius: 55))
+                    .clipShape(.rect(cornerRadius: isCapturingCanvas ? 0 : 55))
                     .onAppear {
                         canvasSize = geo.size
                         if isHorizontalPhoto {
@@ -603,10 +608,10 @@ struct PhotoEditorView: View {
                     }
                 }
             }
-            .opacity(isPhotoGesturing || isDraggingWidget || isTextEditing ? 0 : 1)
-            .animation(.easeInOut(duration: 0.2), value: isPhotoGesturing || isDraggingWidget || isTextEditing)
+            .opacity(isPhotoGesturing || isDraggingWidget || isTextEditing || isCapturingCanvas ? 0 : 1)
+            .animation(.easeInOut(duration: 0.2), value: isPhotoGesturing || isDraggingWidget || isTextEditing || isCapturingCanvas)
 
-            if showPaletteSelector && !isDraggingWidget && !isPhotoGesturing && !isTextEditing {
+            if showPaletteSelector && !isDraggingWidget && !isPhotoGesturing && !isTextEditing && !isCapturingCanvas {
                 PaletteSelectorView(
                     targetWidget: placedWidgets.first(where: { $0.id == paletteTargetWidgetId }),
                     showPaletteSelector: showPaletteSelector,
@@ -788,7 +793,7 @@ struct PhotoEditorView: View {
 
     @ViewBuilder
     private var colorPickerInCanvas: some View {
-        if isBackgroundExposed && !isPhotoGesturing && !isDraggingWidget {
+        if isBackgroundExposed && !isPhotoGesturing && !isDraggingWidget && !isCapturingCanvas {
             colorPickerButton
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                 .padding(.leading, 16)
@@ -1348,81 +1353,78 @@ struct PhotoEditorView: View {
         }
     }
 
-    func captureCanvas() -> UIImage? {
+    func captureCanvas() async -> UIImage? {
         guard canvasSize.width > 0, canvasSize.height > 0 else { return nil }
 
-        let content = ZStack {
-            Rectangle().fill(canvasBackgroundColor)
+        isCapturingCanvas = true
+        try? await Task.sleep(for: .milliseconds(80))
 
-            Image(uiImage: currentPhoto)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: canvasSize.width, height: canvasSize.height)
-                .scaleEffect(photoScale)
-                .rotationEffect(photoRotation)
-                .offset(photoOffset)
-                .allowsHitTesting(false)
-
-            activeFilterOverlay(size: canvasSize)
-
-            ForEach(placedWidgets) { widget in
-                StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, distanceWordsFontStyle: widget.distanceWordsFontStyle, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter, splitBannerFontStyle: widget.splitBannerFontStyle)
-                    .scaleEffect(widget.scale)
-                    .rotationEffect(widget.rotation)
-                    .offset(x: widget.position.width, y: widget.position.height)
-            }
-
-            ForEach(placedTexts) { textWidget in
-                StyledCanvasText(
-                    text: textWidget.text,
-                    styleType: textWidget.styleType,
-                    styleColor: textWidget.styleColor,
-                    maxWidth: canvasSize.width * 0.8
-                )
-                .scaleEffect(textWidget.scale)
-                .rotationEffect(textWidget.rotation)
-                .offset(x: textWidget.position.width, y: textWidget.position.height)
-            }
-
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = windowScene.windows.first else {
+            isCapturingCanvas = false
+            return nil
         }
-        .frame(width: canvasSize.width, height: canvasSize.height)
-        .clipped()
-        .environment(\.isExport, true)
 
-        let renderer = ImageRenderer(content: content)
-        renderer.scale = max(1080 / canvasSize.width, 1920 / canvasSize.height)
-        return renderer.uiImage
+        let renderer = UIGraphicsImageRenderer(bounds: window.bounds)
+        let fullImage = renderer.image { _ in
+            window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
+        }
+
+        isCapturingCanvas = false
+
+        let imageScale = fullImage.scale
+        let cropRect = CGRect(
+            x: canvasGlobalOrigin.x * imageScale,
+            y: canvasGlobalOrigin.y * imageScale,
+            width: canvasSize.width * imageScale,
+            height: canvasSize.height * imageScale
+        )
+
+        guard let cgCropped = fullImage.cgImage?.cropping(to: cropRect) else { return nil }
+        let cropped = UIImage(cgImage: cgCropped, scale: imageScale, orientation: .up)
+
+        let targetScale = max(1080 / canvasSize.width, 1920 / canvasSize.height)
+        let targetSize = CGSize(width: canvasSize.width * targetScale, height: canvasSize.height * targetScale)
+
+        let upscaleRenderer = UIGraphicsImageRenderer(size: targetSize)
+        return upscaleRenderer.image { _ in
+            cropped.draw(in: CGRect(origin: .zero, size: targetSize))
+        }
     }
 
     private func shareToStory() {
-        let facebookAppID = "1722813128328059"
-        guard let instagramURL = URL(string: "instagram-stories://share?source_application=\(facebookAppID)"),
-              UIApplication.shared.canOpenURL(instagramURL) else {
-            showInstagramAlert = true
-            return
-        }
+        Task {
+            let facebookAppID = "1722813128328059"
+            guard let instagramURL = URL(string: "instagram-stories://share?source_application=\(facebookAppID)"),
+                  UIApplication.shared.canOpenURL(instagramURL) else {
+                showInstagramAlert = true
+                return
+            }
 
-        guard let image = captureCanvas(),
-              let imageData = image.pngData() else { return }
+            guard let image = await captureCanvas(),
+                  let imageData = image.pngData() else { return }
 
-        let pasteboardItems: [[String: Any]] = [
-            [
-                "com.instagram.sharedSticker.backgroundImage": imageData
+            let pasteboardItems: [[String: Any]] = [
+                [
+                    "com.instagram.sharedSticker.backgroundImage": imageData
+                ]
             ]
-        ]
-        let pasteboardOptions: [UIPasteboard.OptionsKey: Any] = [
-            .expirationDate: Date().addingTimeInterval(300)
-        ]
-        UIPasteboard.general.setItems(pasteboardItems, options: pasteboardOptions)
+            let pasteboardOptions: [UIPasteboard.OptionsKey: Any] = [
+                .expirationDate: Date().addingTimeInterval(300)
+            ]
+            UIPasteboard.general.setItems(pasteboardItems, options: pasteboardOptions)
 
-        UIApplication.shared.open(instagramURL)
+            await UIApplication.shared.open(instagramURL)
+        }
     }
 
     private func saveToPhotos() {
-        guard let image = captureCanvas() else { return }
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-        HapticService.notification.notificationOccurred(.success)
-        showSavedAlert = true
+        Task {
+            guard let image = await captureCanvas() else { return }
+            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+            HapticService.notification.notificationOccurred(.success)
+            showSavedAlert = true
+        }
     }
 
 }

@@ -178,14 +178,14 @@ extension PhotoEditorView {
             aiPulseAnimation = true
         }
 
-        let imageToEdit: UIImage
-        if includeStatsOverlay && hasCanvasContent, let captured = captureCanvas() {
-            imageToEdit = captured
-        } else {
-            imageToEdit = currentPhoto
-        }
-
         aiGenerationTask = Task {
+            let imageToEdit: UIImage
+            if includeStatsOverlay && hasCanvasContent, let captured = await captureCanvas() {
+                imageToEdit = captured
+            } else {
+                imageToEdit = currentPhoto
+            }
+
             do {
                 let editedImage = try await grokService.generateEditedImage(
                     photo: imageToEdit,
@@ -226,16 +226,18 @@ extension PhotoEditorView {
     }
 
     func startVideoGeneration() {
-        let imageToCapture: UIImage
-        if includeStatsOverlay && hasCanvasContent, let captured = captureCanvas() {
-            imageToCapture = captured
-        } else {
-            imageToCapture = currentPhoto
-        }
+        Task {
+            let imageToCapture: UIImage
+            if includeStatsOverlay && hasCanvasContent, let captured = await captureCanvas() {
+                imageToCapture = captured
+            } else {
+                imageToCapture = currentPhoto
+            }
 
-        videoPreviewImage = imageToCapture
-        withAnimation(.easeInOut(duration: 0.4)) {
-            showVideoGeneration = true
+            videoPreviewImage = imageToCapture
+            withAnimation(.easeInOut(duration: 0.4)) {
+                showVideoGeneration = true
+            }
         }
     }
 
