@@ -25,7 +25,7 @@ extension StatWidgetContentView {
             Text("BEST EFFORTS")
                 .font(.system(size: 14, weight: .bold))
                 .tracking(2.0)
-                .foregroundStyle(secondaryColor)
+                .foregroundStyle(primaryColor)
 
             VStack(spacing: rowSpacing) {
                 ForEach(Array(efforts.enumerated()), id: \.element.id) { idx, effort in
@@ -112,7 +112,7 @@ extension StatWidgetContentView {
             Text(unit)
                 .font(unitFont)
                 .tracking(4)
-                .foregroundStyle(secondaryColor)
+                .foregroundStyle(primaryColor)
                 .padding(.top, 2)
         }
         .frame(width: 200, alignment: .leading)

@@ -27,7 +27,7 @@ extension StatWidgetContentView {
                     Text(item.0)
                         .font(.system(size: 8, weight: .regular, design: .serif))
                         .tracking(1.5)
-                        .foregroundStyle(secondaryColor)
+                        .foregroundStyle(primaryColor)
                     Text(item.1)
                         .font(.system(size: 18, weight: .regular, design: .serif).italic())
                         .foregroundStyle(primaryColor)
@@ -73,7 +73,7 @@ extension StatWidgetContentView {
                     Text(item.0)
                         .font(.system(size: 8, weight: .regular, design: .serif))
                         .tracking(1.5)
-                        .foregroundStyle(secondaryColor)
+                        .foregroundStyle(primaryColor)
                 }
                 .frame(maxWidth: .infinity)
             }

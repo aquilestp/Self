@@ -134,7 +134,7 @@ extension StatWidgetContentView {
             Text(label)
                 .font(.system(size: 10, weight: .regular, design: .serif))
                 .tracking(0.5)
-                .foregroundStyle(secondaryColor)
+                .foregroundStyle(primaryColor)
                 .lineLimit(1)
             Text(value)
                 .font(.system(size: 20, weight: .regular, design: .serif).italic())

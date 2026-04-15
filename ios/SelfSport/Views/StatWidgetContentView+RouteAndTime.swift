@@ -164,7 +164,7 @@ extension StatWidgetContentView {
             Text("MOVING")
                 .font(.system(size: 8, weight: .bold))
                 .tracking(1.4)
-                .foregroundStyle(secondaryColor)
+                .foregroundStyle(primaryColor)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -206,7 +206,7 @@ extension StatWidgetContentView {
             Text("ELAPSED")
                 .font(.system(size: 8, weight: .bold))
                 .tracking(1.4)
-                .foregroundStyle(secondaryColor)
+                .foregroundStyle(primaryColor)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -276,7 +276,7 @@ extension StatWidgetContentView {
                 Text("BPM")
                     .font(.system(size: 7, weight: .bold))
                     .tracking(1.6)
-                    .foregroundStyle(secondaryColor)
+                    .foregroundStyle(primaryColor)
             }
         }
         .padding(.horizontal, 16)
@@ -321,7 +321,7 @@ extension StatWidgetContentView {
             Text("AVG HR")
                 .font(.system(size: 8, weight: .bold))
                 .tracking(1.4)
-                .foregroundStyle(secondaryColor)
+                .foregroundStyle(primaryColor)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
@@ -396,7 +396,7 @@ extension StatWidgetContentView {
                 Text("ELEVATION GAIN")
                     .font(.system(size: 7, weight: .bold))
                     .tracking(2.2)
-                    .foregroundStyle(secondaryColor)
+                    .foregroundStyle(primaryColor)
             }
             .padding(.top, 6)
         }

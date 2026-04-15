@@ -10,7 +10,7 @@ extension PhotoEditorView {
                 Text(activity.primaryLabel)
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.white)
                 Text(activity.primaryStat)
                     .font(.system(size: 16, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
@@ -21,7 +21,7 @@ extension PhotoEditorView {
                     Text(activity.primaryLabelShort)
                         .font(.system(size: 7, weight: .regular, design: .serif))
                         .tracking(0.8)
-                        .foregroundStyle(.white.opacity(0.45))
+                        .foregroundStyle(.white)
                     Text(activity.primaryStat)
                         .font(.system(size: 12, weight: .regular, design: .serif).italic())
                         .foregroundStyle(.white)
@@ -33,7 +33,7 @@ extension PhotoEditorView {
                     Text(activity.hasDistance ? "PACE" : "TIME")
                         .font(.system(size: 7, weight: .regular, design: .serif))
                         .tracking(0.8)
-                        .foregroundStyle(.white.opacity(0.45))
+                        .foregroundStyle(.white)
                     Text(activity.hasDistance ? activity.pace : activity.duration)
                         .font(.system(size: 12, weight: .regular, design: .serif).italic())
                         .foregroundStyle(.white)
@@ -76,7 +76,7 @@ extension PhotoEditorView {
                     HStack {
                         Text(label)
                             .font(.system(size: 6, weight: .semibold).italic().width(.expanded))
-                            .foregroundStyle(.white.opacity(0.45))
+                            .foregroundStyle(.white)
                         Spacer()
                         Text(value)
                             .font(.system(size: 8, weight: .heavy).italic().width(.expanded))
@@ -217,10 +217,10 @@ extension PhotoEditorView {
                     if activity.hasDistance {
                         Text("PACE \(activity.pace)")
                             .font(.system(size: 6, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(.white)
                         Text("TIME \(activity.duration)")
                             .font(.system(size: 6, weight: .bold))
-                            .foregroundStyle(.white.opacity(0.5))
+                            .foregroundStyle(.white)
                     } else {
                         Text(activity.date.uppercased())
                             .font(.system(size: 6, weight: .bold))
@@ -233,7 +233,7 @@ extension PhotoEditorView {
                 Text(activity.primaryLabel)
                     .font(.system(size: 5, weight: .bold, design: .default).width(.expanded))
                     .tracking(2)
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(.white)
                 Text(activity.primaryStat.uppercased())
                     .font(.system(size: 14, weight: .black, design: .default).width(.expanded))
                     .tracking(-0.5)
@@ -246,7 +246,7 @@ extension PhotoEditorView {
                 Text(activity.primaryLabel)
                     .font(.system(size: 5, weight: .bold, design: .default).width(.condensed))
                     .tracking(1)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
                 Text(activity.primaryStat.uppercased())
                     .font(.system(size: 14, weight: .black, design: .default).width(.compressed))
                     .foregroundStyle(.white)
@@ -330,7 +330,7 @@ extension PhotoEditorView {
             Text(label)
                 .font(.system(size: 7, weight: .regular, design: .serif))
                 .tracking(0.8)
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(.white)
             Text(value)
                 .font(.system(size: 9, weight: .regular, design: .serif).italic())
                 .foregroundStyle(.white)
@@ -397,7 +397,7 @@ extension PhotoEditorView {
             Text("THIS WEEK")
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -428,7 +428,7 @@ extension PhotoEditorView {
             Text("LAST WEEK")
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -455,7 +455,7 @@ extension PhotoEditorView {
             Text(data.monthLabel.isEmpty ? "THIS MONTH" : data.monthLabel)
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -481,7 +481,7 @@ extension PhotoEditorView {
             Text(data.monthLabel.isEmpty ? "LAST MONTH" : data.monthLabel)
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -497,7 +497,7 @@ extension PhotoEditorView {
                     .minimumScaleFactor(0.5)
                 Text("m")
                     .font(.system(size: 7, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(.white)
             }
             MountainRidgeShape()
                 .fill(
@@ -511,7 +511,7 @@ extension PhotoEditorView {
             Text("ELEVATION")
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.5)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -529,7 +529,7 @@ extension PhotoEditorView {
             Text("SPLITS")
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.2)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -563,7 +563,7 @@ extension PhotoEditorView {
             Text("FASTEST")
                 .font(.system(size: 4.5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
         .padding(.horizontal, 6)
     }
@@ -592,7 +592,7 @@ extension PhotoEditorView {
             Text("SPLITS")
                 .font(.system(size: 4.5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
         .padding(.horizontal, 6)
     }
@@ -619,7 +619,7 @@ extension PhotoEditorView {
             Text("ALL SPLITS")
                 .font(.system(size: 4.5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
         .padding(.horizontal, 8)
     }
@@ -636,7 +636,7 @@ extension PhotoEditorView {
             Text(result.unitText.uppercased())
                 .font(.system(size: 5, weight: .bold, design: .monospaced))
                 .tracking(1.5)
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(.white)
         }
     }
 
@@ -660,7 +660,7 @@ extension PhotoEditorView {
             Text("BEST EFFORTS")
                 .font(.system(size: 4.5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -692,7 +692,7 @@ extension PhotoEditorView {
                 Text("BPM")
                     .font(.system(size: 4, weight: .bold))
                     .tracking(0.8)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
             }
         }
     }
@@ -727,7 +727,7 @@ extension PhotoEditorView {
             Text(label)
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 
@@ -737,7 +737,7 @@ extension PhotoEditorView {
                 Text("TIME")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
                 Text(activity.duration)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
@@ -749,7 +749,7 @@ extension PhotoEditorView {
                 Text("DIST")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
                 Text(activity.distance)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
@@ -761,7 +761,7 @@ extension PhotoEditorView {
                 Text("PACE")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
                 Text(activity.pace)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
@@ -773,7 +773,7 @@ extension PhotoEditorView {
                 Text("ELEV")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
                 Text(activity.elevationGain)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
@@ -796,7 +796,7 @@ extension PhotoEditorView {
                 Text("TIME")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
@@ -808,7 +808,7 @@ extension PhotoEditorView {
                 Text("DIST")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
@@ -820,7 +820,7 @@ extension PhotoEditorView {
                 Text("PACE")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
@@ -832,7 +832,7 @@ extension PhotoEditorView {
                 Text("ELEV")
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(.white)
             }
             .frame(maxWidth: .infinity)
         }
@@ -1034,7 +1034,7 @@ extension PhotoEditorView {
             Text(label)
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(.white)
         }
     }
 

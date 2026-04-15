@@ -17,7 +17,7 @@ extension StatWidgetContentView {
                 Text("KMs THIS WEEK")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
-                    .foregroundStyle(secondaryColor)
+                    .foregroundStyle(primaryColor)
             }
             HStack(alignment: .bottom, spacing: 5) {
                 ForEach(0..<7, id: \.self) { i in
@@ -59,7 +59,7 @@ extension StatWidgetContentView {
                 Text("KMs LAST WEEK")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
-                    .foregroundStyle(secondaryColor)
+                    .foregroundStyle(primaryColor)
             }
             HStack(alignment: .bottom, spacing: 5) {
                 ForEach(0..<7, id: \.self) { i in
@@ -100,7 +100,7 @@ extension StatWidgetContentView {
                 Text("KMs \(data.monthLabel.isEmpty ? "THIS MONTH" : data.monthLabel)")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
-                    .foregroundStyle(secondaryColor)
+                    .foregroundStyle(primaryColor)
             }
             HStack(alignment: .bottom, spacing: 2) {
                 ForEach(0..<data.daysInMonth, id: \.self) { i in
@@ -148,7 +148,7 @@ extension StatWidgetContentView {
                 Text("KMs \(data.monthLabel.isEmpty ? "LAST MONTH" : data.monthLabel)")
                     .font(.system(size: 8, weight: .bold))
                     .tracking(1.8)
-                    .foregroundStyle(secondaryColor)
+                    .foregroundStyle(primaryColor)
             }
             HStack(alignment: .bottom, spacing: 2) {
                 ForEach(0..<data.daysInMonth, id: \.self) { i in
