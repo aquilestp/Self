@@ -111,6 +111,8 @@ struct PhotoEditorView: View {
     @State private var showFilterLabel: Bool = false
     @State var filterLabelText: String = ""
     @State private var filterLabelHideTask: Task<Void, Never>? = nil
+    @State private var showFilterDotsIndicator: Bool = false
+    @State private var filterDotsHideTask: Task<Void, Never>? = nil
     @State private var isCapturingCanvas: Bool = false
     private let photoFilterService = PhotoFilterService()
     let grokService = GrokImageEditService()
@@ -156,6 +158,20 @@ struct PhotoEditorView: View {
             }
         }
         HapticService.selection.selectionChanged()
+    }
+
+    private func showFilterDotsTemporarily() {
+        filterDotsHideTask?.cancel()
+        withAnimation(.easeInOut(duration: 0.25)) {
+            showFilterDotsIndicator = true
+        }
+        filterDotsHideTask = Task {
+            try? await Task.sleep(for: .seconds(3.0))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeInOut(duration: 0.4)) {
+                showFilterDotsIndicator = false
+            }
+        }
     }
 
     var photoBeforeAIEdit: UIImage {
@@ -454,17 +470,21 @@ struct PhotoEditorView: View {
 
 
                         if !isCapturingCanvas {
-                            if filterMode != .none || hasDynamicCityFilters {
+                            if showFilterDotsIndicator && (filterMode != .none || hasDynamicCityFilters) {
                                 filterDots
                                     .frame(maxHeight: .infinity, alignment: .bottom)
                                     .padding(.bottom, drawerState == .collapsed ? 140 : drawerState == .open ? 280 : 140)
+                                    .transition(.opacity)
                             }
 
-                            photoFilterDotsView
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                                .padding(.bottom, drawerState == .collapsed ? 110 : drawerState == .open ? 250 : 110)
-                                .allowsHitTesting(false)
-                                .zIndex(5.8)
+                            if showFilterDotsIndicator {
+                                photoFilterDotsView
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                                    .padding(.bottom, drawerState == .collapsed ? 110 : drawerState == .open ? 250 : 110)
+                                    .allowsHitTesting(false)
+                                    .zIndex(5.8)
+                                    .transition(.opacity)
+                            }
 
                             if showFilterLabel {
                                 photoFilterLabelView
@@ -502,6 +522,7 @@ struct PhotoEditorView: View {
                                 let horizontal = value.translation.width
                                 let vertical = abs(value.translation.height)
                                 guard abs(horizontal) > vertical else { return }
+                                showFilterDotsTemporarily()
                                 if filterMode != .none || hasDynamicCityFilters {
                                     if horizontal < 0 {
                                         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
