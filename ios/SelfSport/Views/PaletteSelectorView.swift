@@ -38,7 +38,7 @@ struct PaletteSelectorView: View {
         }
         .padding(.vertical, 10)
         .padding(.leading, 6)
-        .padding(.trailing, 0)
+        .padding(.trailing, 12)
         .background {
             UnevenRoundedRectangle(
                 topLeadingRadius: 14,

@@ -1,15 +1,11 @@
-# Rediseñar fondo del panel de estilos lateral
+# Pegar solo el fondo translúcido al borde derecho, no los controles
 
-**Cambios:**
+**Problema:** Al quitar el padding del componente para pegarlo al borde derecho, se movieron también todos los botones y controles al borde. Solo el fondo blanco translúcido debería estar pegado al borde derecho.
 
-1. **Eliminar los dos fondos sólidos actuales:**
-  - El fondo principal del panel (`PaletteSelectorView`) que tiene material + gradiente blanco
-  - El fondo oscuro sólido del picker de fonts/efectos (`BVTEffectScrollPicker` y `SplitBannerFontScrollPicker`)
-2. **Nuevo fondo único sutil:**
-  - Un solo fondo que cubre toda la altura del panel de controles
-  - Casi completamente transparente hacia la izquierda (centro de la pantalla)
-  - Ligeramente visible hacia la derecha (borde de la pantalla)
-  - Sin bordes redondeados en el lado derecho (pegado al borde)
-  - Bordes redondeados solo en el lado izquierdo
-  - Efecto de gradiente muy sutil usando solo opacidad mínima, sin material grueso
+**Solución:**
+
+- Separar el fondo translúcido del contenido de los controles
+- El fondo blanco con gradiente se mantiene pegado al borde derecho de la pantalla (sin padding)
+- Los botones y controles del panel recuperan un pequeño margen derecho (~12pt) para que no queden pegados al borde
+- Visualmente: el fondo translúcido llega hasta el borde, pero los botones flotan con espacio respecto al borde
 
