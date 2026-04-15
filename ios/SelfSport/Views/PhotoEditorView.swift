@@ -631,8 +631,8 @@ struct PhotoEditorView: View {
                     }
                 }
             }
-            .opacity(isPhotoGesturing || isDraggingWidget || isTextEditing || isCapturingCanvas ? 0 : 1)
-            .animation(.easeInOut(duration: 0.2), value: isPhotoGesturing || isDraggingWidget || isTextEditing || isCapturingCanvas)
+            .opacity(isCapturingCanvas ? 0 : (isPhotoGesturing || isDraggingWidget || isTextEditing ? 0 : 1))
+            .animation(isCapturingCanvas ? nil : .easeInOut(duration: 0.2), value: isPhotoGesturing || isDraggingWidget || isTextEditing)
 
             if showPaletteSelector && !isDraggingWidget && !isPhotoGesturing && !isTextEditing && !isCapturingCanvas {
                 PaletteSelectorView(
