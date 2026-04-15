@@ -1,8 +1,9 @@
-# Eliminar los tabs de font no-scroll del widget Distance Words
+# Eliminar fondo sólido transparente de los scroll pickers
 
-**Cambio:**
+Se eliminará la cápsula de fondo semitransparente que aparece detrás del elemento seleccionado en los tres scroll pickers:
 
-- Eliminar los botones/tabs de estilo de fuente que aparecen como botones individuales (no scroll) en el panel lateral del widget Distance Words
-- El widget Distance Words ya tiene el selector de fuentes por scroll (`SplitBannerFontScrollPicker`), así que los tabs antiguos son redundantes
-- Como Distance Words es el único widget que usa esos tabs de fuente, se eliminará esa sección por completo
+- **SplitBannerFontScrollPicker** — Se quita la cápsula blanca translúcida del ítem seleccionado
+- **BVTEffectScrollPicker** — Se quita la cápsula blanca translúcida del ítem seleccionado
+- **WhatsAppTextScrollPicker** — Se quita la cápsula verde translúcida del ítem seleccionado
 
+El texto y los estilos de selección (tamaño, opacidad, color del texto) se mantienen igual — solo se elimina el fondo sólido detrás de cada ítem.

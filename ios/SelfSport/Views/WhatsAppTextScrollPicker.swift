@@ -22,18 +22,6 @@ struct WhatsAppTextScrollPicker: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 11)
                     .padding(.vertical, 4)
-                    .background(
-                        Group {
-                            if isSelected {
-                                Capsule()
-                                    .fill(Color(red: 0.00, green: 0.37, blue: 0.33))
-                                    .overlay(
-                                        Capsule().stroke(Color.white.opacity(0.25), lineWidth: 0.5)
-                                    )
-                            }
-                        }
-                    )
-                    .animation(.easeOut(duration: 0.15), value: isSelected)
             }
         }
     }

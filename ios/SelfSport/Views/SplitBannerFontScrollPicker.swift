@@ -20,18 +20,6 @@ struct SplitBannerFontScrollPicker: View {
                 .lineLimit(1)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
-                .background(
-                    Group {
-                        if isSelected {
-                            Capsule()
-                                .fill(Color.white.opacity(0.2))
-                                .overlay(
-                                    Capsule().stroke(Color.white.opacity(0.3), lineWidth: 0.5)
-                                )
-                        }
-                    }
-                )
-                .animation(.easeOut(duration: 0.15), value: isSelected)
         }
 
     }
