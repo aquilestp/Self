@@ -1,9 +1,15 @@
-# Eliminar fondo sólido transparente de los scroll pickers
+# Corregir fondo translúcido que no aparece al exportar/compartir
 
-Se eliminará la cápsula de fondo semitransparente que aparece detrás del elemento seleccionado en los tres scroll pickers:
+## Problema
 
-- **SplitBannerFontScrollPicker** — Se quita la cápsula blanca translúcida del ítem seleccionado
-- **BVTEffectScrollPicker** — Se quita la cápsula blanca translúcida del ítem seleccionado
-- **WhatsAppTextScrollPicker** — Se quita la cápsula verde translúcida del ítem seleccionado
+Cuando se activa el fondo translúcido (glass) en un widget/stat, este se ve correctamente en la pantalla del editor, pero al guardar la foto o compartir a Instagram, el fondo no aparece.
 
-El texto y los estilos de selección (tamaño, opacidad, color del texto) se mantienen igual — solo se elimina el fondo sólido detrás de cada ítem.
+## Causa
+
+Al generar la imagen para exportar, el código no le pasa la opción de fondo translúcido al widget. Por eso siempre se exporta sin fondo, aunque en pantalla sí se vea.
+
+## Solución
+
+- Agregar el parámetro de fondo translúcido (`useGlassBackground`) a la construcción del widget dentro de la función de captura/exportación
+- También agregar otros parámetros que faltan en la exportación (`notesUnitFilter`, `ancestralUnitFilter`, `ancestralShowPace`, `ancestralShowTime`) para que la imagen exportada sea idéntica a lo que se ve en pantalla
+
