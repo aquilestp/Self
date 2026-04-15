@@ -1,36 +1,19 @@
-# Speed up Strava connection by removing push notification sync
+# Eliminar widget "Golden Arch" (primer widget de medalla)
 
-## Problem
-The Strava login flow is extremely slow because it waits for push notification (APNs) token registration and syncing — adding up to **22+ seconds** of delays during the connection process.
+## Cambios
 
-## What will change
+Eliminar completamente el primer widget de medalla ("Golden Arch") de la lista de widgets disponibles.
 
-**Strava Connection (StravaService)**
-- Remove the push re-registration call and 2-second sleep during token exchange
-- Remove the aggressive APNs retry loop (`ensureAPNsTokenSynced`) that can block for up to 20 seconds
-- The token exchange will now just: get the code → exchange with Strava → save tokens → sync to Supabase (without APNs) → done
+**Lo que se elimina:**
 
-**Token Sync (SupabaseTokenService)**
-- Remove all APNs-related fields from the sync process — no more `apns_token` writes
-- Remove the `syncAPNsTokenToDB`, `startPendingAPNsSync`, and `ensureAPNsTokenSynced` methods
-- Keep the core Strava token sync (access token, refresh token, expires at, athlete ID)
+- El tipo `goldenArch` del catálogo de widgets
+- La vista completa del widget Golden Arch y sus helpers
+- La miniatura del Golden Arch en el selector de widgets
+- La sección de configuración (unidad, pace, tiempo) del Golden Arch en el panel de paleta
+- Las propiedades `goldenArchUnitFilter`, `goldenArchShowPace`, `goldenArchShowTime` de la configuración de widgets
 
-**App Startup & Foreground (SelfSportApp)**
-- Remove the foreground re-register + 2-second sleep + APNs DB sync
-- Remove the APNs token change listener
-- Remove the initial 3-second delayed APNs sync on launch
+**Lo que se conserva:**
 
-**AppDelegate**
-- Keep basic push registration (in case you re-enable later), but remove the DB sync call when token arrives
+- El segundo widget de medalla ("Ancestral") permanece intacto
+- Todas las estructuras de soporte compartidas (MedalStarDots, MedalCurvedText, MedalBannerView) se mantienen ya que las usa el Ancestral
 
-**NotificationService**
-- Keep the service intact (local notifications still work), but its token is no longer synced to the database
-
-## What stays the same
-- Strava OAuth flow and activity fetching — unchanged
-- Local notifications — still work
-- The `strava_tokens` table still gets Strava tokens synced — just without the `apns_token` column being written
-- Push notification permission prompts — still work if needed later
-
-## Result
-Strava connection should complete in **1-3 seconds** instead of 20+.

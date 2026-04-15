@@ -38,7 +38,6 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case fullBannerBottom = "Full Banner Bottom"
     case blurredVerticalText = "Blurred Vertical"
     case whatsappMessage = "WhatsApp"
-    case goldenArch = "Golden Arch"
     case notesScreenshot = "Notes"
     case ancestralMedal = "Ancestral"
     case splitBanner = "Split Banner"
@@ -78,7 +77,6 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .fullBannerBottom: return "rectangle.bottomhalf.filled"
         case .blurredVerticalText: return "list.bullet"
         case .whatsappMessage: return "bubble.right.fill"
-        case .goldenArch: return "trophy.fill"
         case .notesScreenshot: return "note.text"
         case .ancestralMedal: return "crown.fill"
         case .splitBanner: return "text.alignleft"
@@ -87,7 +85,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
 
     var supportsGlass: Bool {
         switch self {
-        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .goldenArch, .notesScreenshot, .ancestralMedal, .splitBanner:
+        case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .notesScreenshot, .ancestralMedal, .splitBanner:
             return false
         default:
             return true
@@ -114,10 +112,6 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .splits, .splitsTable, .splitsFastest, .splitsBars, .bestEfforts, .blurredVerticalText: return true
         default: return false
         }
-    }
-
-    var isGoldenArch: Bool {
-        self == .goldenArch
     }
 
     var isNotesScreenshot: Bool {
@@ -307,9 +301,6 @@ struct PlacedWidget: Identifiable {
     var bvtUnitFilter: SplitsUnitFilter = .km
     var bvtEffect: BVTEffect = .glow
     var whatsappText: String = "My coach would be proud"
-    var goldenArchUnitFilter: SplitsUnitFilter = .km
-    var goldenArchShowPace: Bool = true
-    var goldenArchShowTime: Bool = true
     var notesUnitFilter: SplitsUnitFilter = .km
     var ancestralUnitFilter: SplitsUnitFilter = .km
     var ancestralShowPace: Bool = true

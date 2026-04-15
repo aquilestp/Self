@@ -31,7 +31,6 @@ struct PaletteSelectorView: View {
             heroStatSection
             fullBannerSection
             bvtSection
-            goldenArchSection
             ancestralMedalSection
             splitBannerSection
             whatsappSection
@@ -45,7 +44,7 @@ struct PaletteSelectorView: View {
     @ViewBuilder
     private var paletteButtons: some View {
         let type = widget?.type
-        let hideColors = type == .whatsappMessage || type == .goldenArch || type == .ancestralMedal
+        let hideColors = type == .whatsappMessage || type == .ancestralMedal
         if !hideColors {
             let currentPalette = widget?.colorStyle.palette ?? .classic
             ForEach(Array(WidgetPalette.allCases.enumerated()), id: \.element.id) { index, palette in
@@ -253,27 +252,6 @@ struct PaletteSelectorView: View {
                 .spring(response: 0.35, dampingFraction: 0.7).delay(baseDelay + 0.08),
                 value: showPaletteSelector
             )
-        }
-    }
-
-    // MARK: - Golden Arch
-
-    @ViewBuilder
-    private var goldenArchSection: some View {
-        if widget?.type == .goldenArch {
-            let baseDelay = Double(paletteCount) * 0.04
-            let current = widget?.goldenArchUnitFilter ?? .km
-            separator(delay: baseDelay + 0.04)
-            unitToggle(current: current, delay: baseDelay + 0.06) {
-                mutate { $0.goldenArchUnitFilter = $0.goldenArchUnitFilter == .km ? .miles : .km }
-            }
-            separator(delay: baseDelay + 0.10)
-            visToggle(icon: "speedometer", isOn: widget?.goldenArchShowPace ?? true, delay: baseDelay + 0.12) {
-                mutate { $0.goldenArchShowPace.toggle() }
-            }
-            visToggle(icon: "clock", isOn: widget?.goldenArchShowTime ?? true, delay: baseDelay + 0.15) {
-                mutate { $0.goldenArchShowTime.toggle() }
-            }
         }
     }
 

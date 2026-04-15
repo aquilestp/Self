@@ -314,8 +314,6 @@ extension PhotoEditorView {
             miniBlurredVerticalText
         case .whatsappMessage:
             miniWhatsappMessage
-        case .goldenArch:
-            miniGoldenArch
         case .notesScreenshot:
             miniNotesScreenshot
         case .ancestralMedal:
@@ -858,52 +856,6 @@ extension PhotoEditorView {
             RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .fill(Color(red: 0.00, green: 0.37, blue: 0.33))
         )
-    }
-
-    var miniGoldenArch: some View {
-        let goldDark = Color(red: 0.50, green: 0.36, blue: 0.04)
-        let goldMid = Color(red: 0.68, green: 0.50, blue: 0.04)
-        let goldBright = Color(red: 0.82, green: 0.65, blue: 0.0)
-        let goldShine = Color(red: 1.0, green: 0.94, blue: 0.70)
-        let rimGrad = AngularGradient(
-            colors: [goldDark, goldBright, goldShine, goldBright, goldDark, goldMid, goldShine, goldMid, goldDark],
-            center: .center
-        )
-        let bodyGrad = RadialGradient(
-            colors: [goldShine, goldBright, goldMid],
-            center: .init(x: 0.4, y: 0.35),
-            startRadius: 2,
-            endRadius: 24
-        )
-        let sz: CGFloat = 48
-        return ZStack {
-            Circle()
-                .fill(rimGrad)
-                .frame(width: sz, height: sz)
-                .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-            Circle()
-                .fill(bodyGrad)
-                .frame(width: sz - 5, height: sz - 5)
-            Circle()
-                .strokeBorder(goldDark.opacity(0.3), lineWidth: 0.5)
-                .frame(width: sz - 8, height: sz - 8)
-            VStack(spacing: 0) {
-                Text("MY FIRST")
-                    .font(.system(size: 3.5, weight: .heavy, design: .default).width(.expanded))
-                    .tracking(0.5)
-                    .foregroundStyle(Color.black.opacity(0.75))
-                Text(activity.hasDistance ? ActivityFormatting.distanceValue(activity.distanceRaw, unit: .km) : "--")
-                    .font(.system(size: 13, weight: .black, design: .default).width(.compressed))
-                    .foregroundStyle(Color.black.opacity(0.85))
-                Text("KM")
-                    .font(.system(size: 3.5, weight: .heavy, design: .default).width(.expanded))
-                    .tracking(1)
-                    .foregroundStyle(Color.black.opacity(0.5))
-                Image(systemName: "figure.run")
-                    .font(.system(size: 3.5))
-                    .foregroundStyle(Color.black.opacity(0.3))
-            }
-        }
     }
 
     var miniAncestralMedal: some View {
