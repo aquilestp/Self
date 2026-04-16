@@ -440,6 +440,7 @@ struct DashboardView: View {
     @State private var visibleActivityID: String?
     @State private var comingSoonProvider: ProviderItem?
     @State private var visibleProviderIndex: Int?
+    @State private var showConnectProvidersSheet: Bool = false
     @State private var pullRefreshTriggered: Bool = false
     @State private var showCooldownToast: Bool = false
     @State private var isRefreshing: Bool = false
@@ -610,33 +611,10 @@ struct DashboardView: View {
                 )
                 .id(0)
 
-                ConnectStravaCard(
-                    isConnecting: stravaViewModel.isConnecting,
-                    onConnect: connectStrava
+                BringActivitiesCard(
+                    onTap: { showConnectProvidersSheet = true }
                 )
                 .id(1)
-
-                ConnectProviderCard(
-                    providerName: "COROS",
-                    subtitle: "Sync workouts from your COROS watch",
-                    systemImage: "applewatch.side.right",
-                    accentColor: Color(red: 0.85, green: 0.12, blue: 0.15),
-                    gradientTop: Color(red: 0.16, green: 0.04, blue: 0.04),
-                    gradientBottom: Color(red: 0.07, green: 0.02, blue: 0.02),
-                    onConnect: { comingSoonProvider = ProviderItem(name: "COROS") }
-                )
-                .id(2)
-
-                ConnectProviderCard(
-                    providerName: "Garmin",
-                    subtitle: "Import activities from Garmin Connect",
-                    systemImage: "location.north.circle",
-                    accentColor: Color(red: 0.0, green: 0.47, blue: 0.78),
-                    gradientTop: Color(red: 0.02, green: 0.08, blue: 0.14),
-                    gradientBottom: Color(red: 0.01, green: 0.03, blue: 0.07),
-                    onConnect: { comingSoonProvider = ProviderItem(name: "Garmin") }
-                )
-                .id(3)
             }
             .scrollTargetLayout()
         }
@@ -648,11 +626,14 @@ struct DashboardView: View {
             let generator = UIImpactFeedbackGenerator(style: .heavy)
             generator.impactOccurred()
         }
-        .sheet(item: $comingSoonProvider) { provider in
-            ComingSoonSheet(providerName: provider.name)
-                .presentationDetents([.height(320)])
-                .presentationDragIndicator(.visible)
-                .presentationBackground(Color(white: 0.10))
+        .sheet(isPresented: $showConnectProvidersSheet) {
+            ConnectProvidersSheet(
+                isConnecting: stravaViewModel.isConnecting,
+                onConnectStrava: connectStrava
+            )
+            .presentationDetents([.height(420)])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(Color(white: 0.08))
         }
     }
 

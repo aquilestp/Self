@@ -321,6 +321,251 @@ struct CreatePostCard: View {
     }
 }
 
+struct BringActivitiesCard: View {
+    let onTap: () -> Void
+
+    private let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.603
+    private let cardHeight: CGFloat = 481
+    private let accent = Color(red: 0.60, green: 0.82, blue: 0.72)
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.08, green: 0.13, blue: 0.11),
+                            Color(red: 0.03, green: 0.05, blue: 0.04)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(accent.opacity(0.18), lineWidth: 1)
+                }
+                .overlay {
+                    RadialGradient(
+                        colors: [accent.opacity(0.10), .clear],
+                        center: .topLeading,
+                        startRadius: 10,
+                        endRadius: 220
+                    )
+                    .clipShape(.rect(cornerRadius: 28))
+                }
+
+            VStack(alignment: .leading, spacing: 0) {
+                Spacer()
+
+                ZStack {
+                    Circle()
+                        .fill(accent.opacity(0.08))
+                        .frame(width: 120, height: 120)
+
+                    ZStack {
+                        Image(systemName: "figure.run")
+                            .font(.system(size: 34, weight: .ultraLight))
+                            .foregroundStyle(accent.opacity(0.55))
+                            .offset(x: 10, y: -4)
+
+                        Image(systemName: "applewatch.side.right")
+                            .font(.system(size: 22, weight: .ultraLight))
+                            .foregroundStyle(accent.opacity(0.35))
+                            .offset(x: -16, y: 12)
+                    }
+                }
+                .padding(.bottom, 24)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Bring your activities")
+                        .font(.system(size: 22, weight: .regular, design: .serif).italic())
+                        .foregroundStyle(Color.white.opacity(0.92))
+
+                    Text("Connect Strava, COROS or Garmin to build posts with your real data.")
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(Color.white.opacity(0.38))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.bottom, 20)
+
+                Button(action: onTap) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "link")
+                            .font(.system(size: 13, weight: .semibold))
+                        Text("Explore options")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 46)
+                    .background(accent, in: .capsule)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(20)
+        }
+        .frame(width: cardWidth, height: cardHeight)
+        .shadow(color: .black.opacity(0.30), radius: 22, x: 0, y: 14)
+        .contentShape(.rect(cornerRadius: 28))
+    }
+}
+
+struct ConnectProvidersSheet: View {
+    let isConnecting: Bool
+    let onConnectStrava: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    private let stravaOrange = Color(red: 0.99, green: 0.32, blue: 0.14)
+    private let corosRed = Color(red: 0.85, green: 0.12, blue: 0.15)
+    private let garminBlue = Color(red: 0.0, green: 0.47, blue: 0.78)
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 6) {
+                Text("Connect a service")
+                    .font(.system(size: 22, weight: .regular, design: .serif).italic())
+                    .foregroundStyle(Color.white.opacity(0.96))
+
+                Text("Import your real activities, routes and stats")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.white.opacity(0.40))
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.top, 28)
+            .padding(.bottom, 28)
+
+            VStack(spacing: 12) {
+                providerRow(
+                    name: "Strava",
+                    subtitle: "Import real activities, routes and stats",
+                    systemImage: "figure.run",
+                    accent: stravaOrange,
+                    isComingSoon: false,
+                    isConnecting: isConnecting,
+                    onConnect: {
+                        dismiss()
+                        onConnectStrava()
+                    }
+                )
+
+                providerRow(
+                    name: "COROS",
+                    subtitle: "Sync workouts from your COROS watch",
+                    systemImage: "applewatch.side.right",
+                    accent: corosRed,
+                    isComingSoon: true,
+                    isConnecting: false,
+                    onConnect: {}
+                )
+
+                providerRow(
+                    name: "Garmin",
+                    subtitle: "Import activities from Garmin Connect",
+                    systemImage: "location.north.circle",
+                    accent: garminBlue,
+                    isComingSoon: true,
+                    isConnecting: false,
+                    onConnect: {}
+                )
+            }
+            .padding(.horizontal, 20)
+
+            Spacer(minLength: 0)
+
+            Button(action: { dismiss() }) {
+                Text("Not now")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(Color.white.opacity(0.40))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+            }
+            .buttonStyle(.plain)
+            .padding(.bottom, 8)
+        }
+        .padding(.bottom, 12)
+    }
+
+    private func providerRow(
+        name: String,
+        subtitle: String,
+        systemImage: String,
+        accent: Color,
+        isComingSoon: Bool,
+        isConnecting: Bool,
+        onConnect: @escaping () -> Void
+    ) -> some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(accent.opacity(0.12))
+                    .frame(width: 44, height: 44)
+
+                Image(systemName: systemImage)
+                    .font(.system(size: 18, weight: .light))
+                    .foregroundStyle(accent.opacity(0.80))
+            }
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 8) {
+                    Text(name)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.92))
+
+                    if isComingSoon {
+                        Text("Soon")
+                            .font(.system(size: 10, weight: .semibold))
+                            .tracking(0.6)
+                            .foregroundStyle(Color.white.opacity(0.40))
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 3)
+                            .background(Color.white.opacity(0.07), in: Capsule())
+                            .overlay(Capsule().stroke(Color.white.opacity(0.08), lineWidth: 0.5))
+                    }
+                }
+
+                Text(subtitle)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.white.opacity(0.34))
+            }
+
+            Spacer(minLength: 0)
+
+            if !isComingSoon {
+                Button(action: onConnect) {
+                    HStack(spacing: 6) {
+                        if isConnecting {
+                            ProgressView()
+                                .tint(.white)
+                                .scaleEffect(0.75)
+                        } else {
+                            Image(systemName: "link")
+                                .font(.system(size: 12, weight: .semibold))
+                        }
+                        Text(isConnecting ? "Connecting" : "Connect")
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 14)
+                    .frame(height: 36)
+                    .background(accent, in: .capsule)
+                }
+                .buttonStyle(.plain)
+                .disabled(isConnecting)
+            }
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color.white.opacity(0.04))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                )
+        )
+    }
+}
+
 struct ConnectStravaCard: View {
     let isConnecting: Bool
     let onConnect: () -> Void

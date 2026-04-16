@@ -1,20 +1,25 @@
-# Delete account from Settings with confirmation
+# Consolidar métodos de conexión en un solo card secundario
 
-**What will be added**
 
-- A new **Danger Zone** section at the bottom of the Settings screen with a **Delete Account** button (red, destructive styling, matching the existing Sign Out card look).
-- Tapping it shows a native iOS confirmation alert with the title **"Delete Account"**, message **"This will permanently delete your account and all associated data. This action cannot be undone."**, and two actions: **Cancel** and **Delete** (destructive red).
-- On confirm, the app calls a secure server-side deletion (Supabase RPC `delete_user`) that removes the user's auth record and profile, then signs the user out locally and returns them to the login screen.
-- While deletion is running, the button shows a small spinner and is disabled to prevent double taps. If the server call fails, an inline error alert appears.
-- For demo mode users (not a real account), the button simply exits the demo session — no server call.
+## Qué cambia
 
-**Design**
+La pantalla de inicio pasa de tener 4 cards en el carrusel (Create a post + Strava + COROS + Garmin) a tener **solo 2 cards del mismo tamaño**, limpios y con jerarquía clara.
 
-- Section header "DANGER ZONE" with a small `exclamationmark.triangle.fill` icon, same muted tracking-style as other section labels.
-- Card with the same dark translucent background as other Settings cards; red text + red trailing `trash` SF Symbol.
-- Confirmation uses the standard iOS destructive alert (native look, red Delete button).
+## Cards resultantes
 
-**Note on backend**
+- **Card 1 — "Create a post"** (sin cambios): el mismo card actual, sin tocar nada.
+- **Card 2 — "Bring your activities"**: nuevo card secundario del mismo tamaño. Tono más oscuro y sutil para señalar que es una opción secundaria. Incluirá un icono representativo, un título como *"Bring your activities"* y una descripción corta invitando a conectar Strava, COROS o Garmin. Botón de acción que abre el sheet.
 
-- Requires a one-time SQL function in Supabase (`delete_user()` RPC using `auth.admin`) so the signed-in user can trigger deletion of their own account securely. I'll include the SQL snippet to paste into the Supabase SQL editor.
+## Sheet de conexión
 
+Al tocar el segundo card se abre un **bottom sheet** (sin cambiar de pantalla) con los 3 métodos de conexión:
+
+- **Strava** — con su botón de conectar activo (funcionalidad existente)
+- **COROS** — marcado como *Coming soon* (funcionalidad existente)
+- **Garmin** — marcado como *Coming soon* (funcionalidad existente)
+
+El sheet tendrá un diseño limpio con filas verticales, cada una con el color de marca de cada servicio, igual que los cards actuales pero en formato compacto de lista dentro del modal.
+
+## Lo que desaparece
+
+Los 3 cards individuales de Strava, COROS y Garmin del carrusel horizontal dejan de mostrarse directamente — ahora viven dentro del sheet.
