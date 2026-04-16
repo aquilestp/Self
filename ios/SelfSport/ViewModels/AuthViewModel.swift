@@ -14,6 +14,7 @@ final class AuthViewModel {
     var errorMessage: String?
     var currentNonce: String?
     var isGoogleLoading: Bool = false
+    var isDeletingAccount: Bool = false
     private var authListenerTask: Task<Void, Never>?
 
     func startAuthListener() {
@@ -185,6 +186,29 @@ final class AuthViewModel {
             createdAt: nil
         )
         isDemoLoading = false
+    }
+
+    func deleteAccount() async -> Bool {
+        if isDemoMode {
+            isAuthenticated = false
+            isDemoMode = false
+            userProfile = nil
+            return true
+        }
+        isDeletingAccount = true
+        errorMessage = nil
+        do {
+            try await supabase.rpc("delete_user").execute()
+            try? await supabase.auth.signOut()
+            isAuthenticated = false
+            userProfile = nil
+            isDeletingAccount = false
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            isDeletingAccount = false
+            return false
+        }
     }
 
     func signOut() async {

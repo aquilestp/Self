@@ -1,10 +1,20 @@
-# Add "Go without a specific activity" button for demo mode
+# Delete account from Settings with confirmation
 
-**Only for users who entered without connecting Strava/COROS/Garmin (demo mode).**
+**What will be added**
 
-- Below the horizontal activity carousel, add a full-width button labeled **"Go without a specific activity"** that stays put (does not scroll sideways with the cards).
-- Tapping it takes the user straight into the editor flow with a blank/placeholder activity, so they can use fake stats, their photo gallery, and all editing tools without picking a specific activity.
-- Shrink the activity cards so the carousel + the new button + the header all fit in a single viewport without vertical scrolling (cards go from very tall to a more compact height that still shows the date, route/icon, and main stat).
-- Cards keep their current look — just shorter.
-- Connected users (Strava/COROS/Garmin) see the original layout, unchanged.
+- A new **Danger Zone** section at the bottom of the Settings screen with a **Delete Account** button (red, destructive styling, matching the existing Sign Out card look).
+- Tapping it shows a native iOS confirmation alert with the title **"Delete Account"**, message **"This will permanently delete your account and all associated data. This action cannot be undone."**, and two actions: **Cancel** and **Delete** (destructive red).
+- On confirm, the app calls a secure server-side deletion (Supabase RPC `delete_user`) that removes the user's auth record and profile, then signs the user out locally and returns them to the login screen.
+- While deletion is running, the button shows a small spinner and is disabled to prevent double taps. If the server call fails, an inline error alert appears.
+- For demo mode users (not a real account), the button simply exits the demo session — no server call.
+
+**Design**
+
+- Section header "DANGER ZONE" with a small `exclamationmark.triangle.fill` icon, same muted tracking-style as other section labels.
+- Card with the same dark translucent background as other Settings cards; red text + red trailing `trash` SF Symbol.
+- Confirmation uses the standard iOS destructive alert (native look, red Delete button).
+
+**Note on backend**
+
+- Requires a one-time SQL function in Supabase (`delete_user()` RPC using `auth.admin`) so the signed-in user can trigger deletion of their own account securely. I'll include the SQL snippet to paste into the Supabase SQL editor.
 

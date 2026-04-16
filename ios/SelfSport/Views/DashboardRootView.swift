@@ -188,6 +188,9 @@ struct DashboardRootView: View {
                 },
                 onSignOut: {
                     Task { await authViewModel.signOut() }
+                },
+                onDeleteAccount: {
+                    await authViewModel.deleteAccount()
                 }
             )
         }

@@ -5,9 +5,14 @@ struct SettingsView: View {
     let isStravaConnected: Bool
     let onDisconnectStrava: () -> Void
     let onSignOut: () -> Void
+    var onDeleteAccount: () async -> Bool = { false }
     @Environment(\.dismiss) private var dismiss
     @State private var showSignOutConfirmation: Bool = false
     @State private var showDisconnectStravaConfirmation: Bool = false
+    @State private var showDeleteAccountConfirmation: Bool = false
+    @State private var isDeletingAccount: Bool = false
+    @State private var deleteErrorMessage: String?
+    @State private var showDeleteError: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -17,6 +22,7 @@ struct SettingsView: View {
                     notificationsSection
                     stravaSection
                     sessionSection
+                    dangerZoneSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
@@ -64,6 +70,60 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Are you sure you want to sign out?")
+        }
+        .alert("Delete Account", isPresented: $showDeleteAccountConfirmation) {
+            Button("Cancel", role: .cancel) {}
+            Button("Delete", role: .destructive) {
+                Task {
+                    isDeletingAccount = true
+                    let success = await onDeleteAccount()
+                    isDeletingAccount = false
+                    if success {
+                        dismiss()
+                    } else {
+                        deleteErrorMessage = "We couldn't delete your account. Please try again or contact support."
+                        showDeleteError = true
+                    }
+                }
+            }
+        } message: {
+            Text("This will permanently delete your account and all associated data. This action cannot be undone.")
+        }
+        .alert("Deletion Failed", isPresented: $showDeleteError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(deleteErrorMessage ?? "An error occurred.")
+        }
+    }
+
+    private var dangerZoneSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionLabel("DANGER ZONE", icon: "exclamationmark.triangle.fill")
+
+            Button {
+                showDeleteAccountConfirmation = true
+            } label: {
+                HStack {
+                    Text("Delete Account")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30))
+                    Spacer()
+                    if isDeletingAccount {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(Color(red: 1.0, green: 0.30, blue: 0.30))
+                    } else {
+                        Image(systemName: "trash")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30).opacity(0.60))
+                    }
+                }
+                .padding(16)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .background(cardBackground)
+            .disabled(isDeletingAccount)
         }
     }
 
