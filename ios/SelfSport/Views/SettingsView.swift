@@ -187,18 +187,23 @@ struct SettingsView: View {
         return first + last
     }
 
+    private var externalConnectionName: String {
+        if isStravaConnected { return "Strava" }
+        return "None"
+    }
+
     private var stravaSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionLabel("STRAVA", icon: "figure.run")
+            sectionLabel("EXTERNAL CONNECTION", icon: "link")
 
             VStack(spacing: 0) {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Connection")
+                        Text("Connected app")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundStyle(Color.white.opacity(0.80))
 
-                        Text(isStravaConnected ? "Connected" : "Not connected")
+                        Text(externalConnectionName)
                             .font(.system(size: 13, weight: .regular))
                             .foregroundStyle(isStravaConnected ? Color(red: 0.30, green: 0.78, blue: 0.45) : Color.white.opacity(0.36))
                     }
@@ -221,7 +226,7 @@ struct SettingsView: View {
                         showDisconnectStravaConfirmation = true
                     } label: {
                         HStack {
-                            Text("Disconnect Strava")
+                            Text("Disconnect \(externalConnectionName)")
                                 .font(.system(size: 15, weight: .regular))
                                 .foregroundStyle(Color(red: 0.99, green: 0.32, blue: 0.14))
                             Spacer()
