@@ -6,7 +6,7 @@ struct ActivityHighlightCard: View {
 
     var body: some View {
         let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * (isCompact ? 0.52 : 0.603)
-        let cardHeight: CGFloat = isCompact ? 320 : 481
+        let cardHeight: CGFloat = isCompact ? 368 : 481
 
         ZStack(alignment: .bottomLeading) {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
