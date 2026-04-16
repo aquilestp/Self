@@ -12,6 +12,7 @@ final class StravaViewModel {
     var isConnected: Bool = false
     var isLoadingMore: Bool = false
     var hasMoreActivities: Bool = true
+    var isUsingDemoActivities: Bool = false
     var errorMessage: String?
     var isLoadingDetail: Bool = false
     var currentActivityDetail: StravaActivityDetail?
@@ -89,6 +90,7 @@ final class StravaViewModel {
     }
 
     func checkConnection() {
+        isUsingDemoActivities = false
         isConnected = service.isConnected
     }
 
@@ -102,6 +104,7 @@ final class StravaViewModel {
     }
 
     func connect() async {
+        isUsingDemoActivities = false
         isConnecting = true
         errorMessage = nil
         do {
@@ -121,6 +124,7 @@ final class StravaViewModel {
         service.disconnect()
         pollingService.stopPolling()
         isConnected = false
+        isUsingDemoActivities = false
         activities = []
         activityHighlights = []
         highlightCache = [:]
@@ -147,7 +151,19 @@ final class StravaViewModel {
     }
 
     func loadDemoActivities() async {
+        pollingService.stopPolling()
         isLoading = true
+        errorMessage = nil
+        currentActivityDetail = nil
+        detailError = nil
+        activities = []
+        activityHighlights = []
+        highlightCache = [:]
+        isConnected = false
+        isUsingDemoActivities = true
+        didCompleteFirstLoad = false
+        resetPagination()
+        hasMoreActivities = false
         let calendar = Calendar.current
         let now = Date()
         func daysAgo(_ n: Int) -> Date { calendar.date(byAdding: .day, value: -n, to: now) ?? now }
@@ -374,13 +390,11 @@ final class StravaViewModel {
         ]
 
         activityHighlights = runs
-        isConnected = true
-        hasMoreActivities = false
-        didCompleteFirstLoad = true
         isLoading = false
     }
 
     func loadFromCacheOnly() async {
+        isUsingDemoActivities = false
         isLoading = true
         errorMessage = nil
         resetPagination()
@@ -402,6 +416,7 @@ final class StravaViewModel {
 
     func loadInitial() async {
         guard isConnected else { return }
+        isUsingDemoActivities = false
         isLoading = true
         errorMessage = nil
         resetPagination()
@@ -425,6 +440,7 @@ final class StravaViewModel {
 
     func firstTimeLoad() async {
         guard isConnected else { return }
+        isUsingDemoActivities = false
         isLoading = true
         errorMessage = nil
         resetPagination()
@@ -527,6 +543,7 @@ final class StravaViewModel {
     func handleCallback(_ url: URL) async {
         do {
             try await service.handleCallbackURL(url)
+            isUsingDemoActivities = false
             isConnected = service.isConnected
             if isConnected {
                 await firstTimeLoad()

@@ -77,6 +77,10 @@ struct DashboardRootView: View {
     @State private var detailActivity: ActivityHighlight?
     @State private var showNotificationPrompt: Bool = false
 
+    private var hasActivitySource: Bool {
+        stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
+    }
+
     var body: some View {
         ZStack(alignment: .bottom) {
             activeScreen
@@ -143,7 +147,7 @@ struct DashboardRootView: View {
                     }
                 }
             }
-            if completed {
+            if completed && stravaViewModel.isConnected {
                 stravaViewModel.startWebhookPolling()
             }
         }
@@ -208,11 +212,7 @@ struct DashboardRootView: View {
                                 pendingActivity = activity
                             }
                         },
-                        onShowDetail: { activity in
-                            detailActivity = activity
-                            guard let stravaId = Int(activity.id) else { return }
-                            Task { await stravaViewModel.fetchActivityDetail(stravaId: stravaId) }
-                        },
+                        onShowDetail: presentActivityDetail,
                         onOpenSettings: {
                             showSettings = true
                         }
@@ -230,6 +230,14 @@ struct DashboardRootView: View {
         }
     }
 
+    private func presentActivityDetail(_ activity: ActivityHighlight) {
+        guard !stravaViewModel.isUsingDemoActivities,
+              let stravaId = Int(activity.id) else { return }
+        detailActivity = activity
+        Task {
+            await stravaViewModel.fetchActivityDetail(stravaId: stravaId)
+        }
+    }
 }
 
 struct DashboardView: View {
@@ -241,6 +249,10 @@ struct DashboardView: View {
 
     private var activities: [ActivityHighlight] {
         stravaViewModel.activityHighlights
+    }
+
+    private var hasActivitySource: Bool {
+        stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
     }
 
     var body: some View {
@@ -257,6 +269,9 @@ struct DashboardView: View {
         .background(Color.black)
         .toolbar(.hidden, for: .navigationBar)
         .task {
+            if stravaViewModel.isUsingDemoActivities {
+                return
+            }
             if authViewModel.isDemoMode {
                 await stravaViewModel.loadDemoActivities()
             } else {
@@ -304,7 +319,7 @@ struct DashboardView: View {
     }
 
     private var heroTitle: String {
-        stravaViewModel.isConnected ? "Choose your activity" : "Import your activities"
+        hasActivitySource ? "Choose your activity" : "Import your activities"
     }
 
     private var heroHeader: some View {
@@ -336,7 +351,7 @@ struct DashboardView: View {
             Group {
                 if stravaViewModel.isLoading && activities.isEmpty {
                     loadingRail
-                } else if !stravaViewModel.isConnected {
+                } else if !hasActivitySource {
                     connectStravaRail
                 } else if activities.isEmpty {
                     emptyActivitiesRail
@@ -451,16 +466,33 @@ struct DashboardView: View {
         }
     }
 
+    private func openDemoActivities() {
+        HapticService.heavy.impactOccurred()
+        Task {
+            await stravaViewModel.loadDemoActivities()
+        }
+    }
+
+    private func connectStrava() {
+        Task {
+            await stravaViewModel.connect()
+        }
+    }
+
     private var connectStravaRail: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 14) {
-                ConnectStravaCard(
-                    isConnecting: stravaViewModel.isConnecting,
-                    onConnect: {
-                        Task { await stravaViewModel.connect() }
-                    }
+                DemoActivitiesCard(
+                    isLoading: stravaViewModel.isLoading,
+                    onOpenDemo: openDemoActivities
                 )
                 .id(0)
+
+                ConnectStravaCard(
+                    isConnecting: stravaViewModel.isConnecting,
+                    onConnect: connectStrava
+                )
+                .id(1)
 
                 ConnectProviderCard(
                     providerName: "COROS",
@@ -471,7 +503,7 @@ struct DashboardView: View {
                     gradientBottom: Color(red: 0.07, green: 0.02, blue: 0.02),
                     onConnect: { comingSoonProvider = ProviderItem(name: "COROS") }
                 )
-                .id(1)
+                .id(2)
 
                 ConnectProviderCard(
                     providerName: "Garmin",
@@ -482,7 +514,7 @@ struct DashboardView: View {
                     gradientBottom: Color(red: 0.01, green: 0.03, blue: 0.07),
                     onConnect: { comingSoonProvider = ProviderItem(name: "Garmin") }
                 )
-                .id(2)
+                .id(3)
             }
             .scrollTargetLayout()
         }

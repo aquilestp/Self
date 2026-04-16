@@ -1,33 +1,16 @@
-# Demo mode sin Supabase — actividades hardcodeadas
+# Add a first connection card for demo activities
 
-## Qué cambia
+**Features**
+- [x] Add a new first card on the connection selection screen called **Demo Activities**.
+- [x] Let reviewers enter the app immediately without connecting Strava, COROS, or Garmin.
+- [x] Open a ready-to-use set of sample activities when the card is tapped.
+- [x] Keep the existing connection cards after the new demo card.
 
-El botón **"Try Demo"** ya no depende de Supabase ni de ninguna conexión. Al tocarlo, entra directamente a la app y muestra actividades de carrera ya listas, sin login ni red.
+**Design**
+- [x] Match the same premium card style already used on the connection screen so it feels native and consistent.
+- [x] Give the demo card its own clear visual identity so it reads as a quick preview path, not a real account connection.
+- [x] Keep the card copy short and obvious for App Review, explaining that no login is required.
 
----
-
-## Funcionalidades
-
-- **Demo instantáneo**: tocar "Try Demo" entra al app en menos de un segundo, sin llamadas de red ni autenticación
-- **Actividades de carrera precargadas**: ~7 carreras realistas con distancias, tiempos, ritmos y elevación variados
-- **Perfil "Demo User"**: el saludo superior muestra "Demo User" como nombre
-- **Sin error de conexión**: se elimina el mensaje "Demo unavailable — check your connection" para siempre
-- **Flujo de salida limpio**: cerrar sesión en modo demo regresa a la pantalla de login sin afectar nada en Supabase
-
----
-
-## Qué se elimina
-
-- La llamada a Supabase en el botón "Try Demo" (era la causa del error)
-- La dependencia de que exista el usuario `test@selfsport.app` en la base de datos
-- La carga desde caché de Supabase en modo demo (`loadFromCacheOnly`)
-
----
-
-## Cómo funciona internamente
-
-1. **Botón "Try Demo"** → activa modo demo localmente sin red
-2. **Perfil falso** → crea "Demo User" en memoria, sin tocar Supabase
-3. **Actividades hardcodeadas** → 7 carreras cargadas directamente desde el código del app, visibles de inmediato
-4. **Strava desconectado** en demo → no muestra el botón de conectar, solo las carreras demo
-
+**Pages / Screens**
+- [x] **Connection selection screen**: show **Demo Activities** as the first card before the provider cards.
+- [x] **Activity selection flow**: after tapping the demo card, show sample activities right away so Apple can test the full experience.

@@ -211,6 +211,111 @@ struct ActivityHighlightCard: View {
     }
 }
 
+struct DemoActivitiesCard: View {
+    let isLoading: Bool
+    let onOpenDemo: () -> Void
+
+    private let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.603
+    private let cardHeight: CGFloat = 481
+    private let accent = Color(red: 0.84, green: 0.78, blue: 0.66)
+
+    var body: some View {
+        Button(action: onOpenDemo) {
+            ZStack(alignment: .bottomLeading) {
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.13, green: 0.14, blue: 0.18),
+                                Color(red: 0.04, green: 0.05, blue: 0.08)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .stroke(accent.opacity(0.18), lineWidth: 1)
+                    }
+                    .overlay {
+                        RadialGradient(
+                            colors: [accent.opacity(0.12), .clear],
+                            center: .topTrailing,
+                            startRadius: 12,
+                            endRadius: 220
+                        )
+                        .clipShape(.rect(cornerRadius: 28))
+                    }
+
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text("NO ACCOUNT NEEDED")
+                            .font(.system(size: 11, weight: .semibold))
+                            .tracking(1.2)
+                            .foregroundStyle(Color.white.opacity(0.72))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(Color.white.opacity(0.08), in: Capsule())
+
+                        Spacer()
+                    }
+
+                    Spacer()
+
+                    ZStack {
+                        Circle()
+                            .fill(accent.opacity(0.08))
+                            .frame(width: 116, height: 116)
+
+                        Image(systemName: "sparkles.rectangle.stack.fill")
+                            .font(.system(size: 42, weight: .light))
+                            .foregroundStyle(accent.opacity(0.82))
+                    }
+                    .padding(.bottom, 24)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Demo Activities")
+                            .font(.system(size: 22, weight: .regular, design: .serif).italic())
+                            .foregroundStyle(Color.white.opacity(0.96))
+
+                        Text("Open sample workouts instantly and test the full flow without Strava, COROS or Garmin.")
+                            .font(.system(size: 14, weight: .regular))
+                            .foregroundStyle(Color.white.opacity(0.42))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.bottom, 20)
+
+                    HStack(spacing: 8) {
+                        if isLoading {
+                            ProgressView()
+                                .tint(.black)
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 13, weight: .semibold))
+                        }
+
+                        Text(isLoading ? "Opening..." : "Open demo")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                    .foregroundStyle(.black)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
+                    .background(accent, in: .capsule)
+                }
+                .padding(20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+            }
+            .frame(width: cardWidth, height: cardHeight)
+        }
+        .buttonStyle(.plain)
+        .disabled(isLoading)
+        .shadow(color: .black.opacity(0.30), radius: 22, x: 0, y: 14)
+        .accessibilityLabel("Demo Activities")
+        .accessibilityHint("Open sample activities without connecting a provider")
+    }
+}
+
 struct ConnectStravaCard: View {
     let isConnecting: Bool
     let onConnect: () -> Void
