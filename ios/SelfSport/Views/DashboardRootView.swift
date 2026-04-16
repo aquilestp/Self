@@ -428,11 +428,13 @@ struct DashboardView: View {
                 .tracking(2.8)
                 .foregroundStyle(Color.white.opacity(0.48))
 
-            Text(heroTitle)
-                .font(.system(size: 34, weight: .regular, design: .serif).italic())
-                .foregroundStyle(Color(red: 0.97, green: 0.96, blue: 0.95))
-                .lineSpacing(-3)
-                .minimumScaleFactor(0.9)
+            if hasActivitySource {
+                Text(heroTitle)
+                    .font(.system(size: 34, weight: .regular, design: .serif).italic())
+                    .foregroundStyle(Color(red: 0.97, green: 0.96, blue: 0.95))
+                    .lineSpacing(-3)
+                    .minimumScaleFactor(0.9)
+            }
         }
         .padding(.top, 6)
     }
