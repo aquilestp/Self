@@ -71,32 +71,6 @@ struct LoginView: View {
                             .stroke(.white.opacity(0.10), lineWidth: 1)
                     }
 
-                    Button {
-                        Task { await authViewModel.signInWithDemo() }
-                    } label: {
-                        HStack(spacing: 8) {
-                            if authViewModel.isDemoLoading {
-                                ProgressView()
-                                    .tint(.white.opacity(0.60))
-                                    .controlSize(.small)
-                            } else {
-                                Image(systemName: "play.circle")
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundStyle(.white.opacity(0.50))
-                            }
-                            Text("Try Demo")
-                                .font(.subheadline.weight(.medium))
-                                .foregroundStyle(.white.opacity(0.60))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 44)
-                    }
-                    .buttonStyle(.plain)
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(.white.opacity(0.14), lineWidth: 1)
-                    }
-                    .disabled(authViewModel.isDemoLoading)
                 }
                 .frame(maxWidth: 280)
                 .disabled(authViewModel.isLoading)

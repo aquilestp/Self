@@ -76,6 +76,9 @@ struct DashboardRootView: View {
     @State private var stravaViewModel = StravaViewModel()
     @State private var detailActivity: ActivityHighlight?
     @State private var showNotificationPrompt: Bool = false
+    @State private var isPhotoFirstFlow: Bool = false
+    @State private var photoFirstImage: UIImage?
+    @State private var showTemplatePicker: Bool = false
 
     private var hasActivitySource: Bool {
         stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
@@ -157,6 +160,25 @@ struct DashboardRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
             stravaViewModel.stopWebhookPolling()
         }
+        .sheet(isPresented: $showTemplatePicker) {
+            TemplatePickerSheet(
+                templates: stravaViewModel.activityHighlights,
+                onPick: { template in
+                    showTemplatePicker = false
+                    guard let image = photoFirstImage else { return }
+                    withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
+                        editorPhoto = image
+                        editorActivity = template
+                        isPhotoFirstFlow = false
+                        photoFirstImage = nil
+                    }
+                }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(Color(white: 0.06))
+            .presentationContentInteraction(.scrolls)
+        }
         .sheet(isPresented: $showSettings) {
             SettingsView(
                 userProfile: authViewModel.userProfile,
@@ -202,6 +224,21 @@ struct DashboardRootView: View {
                         }
                     }
                 )
+            } else if isPhotoFirstFlow {
+                PhotoGridPickerView(
+                    activity: placeholderActivity,
+                    stravaViewModel: stravaViewModel,
+                    onPhotoPicked: { image in
+                        photoFirstImage = image
+                        showTemplatePicker = true
+                    },
+                    onGoBack: {
+                        withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
+                            isPhotoFirstFlow = false
+                            photoFirstImage = nil
+                        }
+                    }
+                )
             } else {
                 NavigationStack {
                     DashboardView(
@@ -215,6 +252,19 @@ struct DashboardRootView: View {
                         onShowDetail: presentActivityDetail,
                         onOpenSettings: {
                             showSettings = true
+                        },
+                        onStartTemplates: {
+                            HapticService.heavy.impactOccurred()
+                            Task { await stravaViewModel.loadDemoActivities() }
+                        },
+                        onStartFromPhoto: {
+                            HapticService.medium.impactOccurred()
+                            if stravaViewModel.activityHighlights.isEmpty {
+                                Task { await stravaViewModel.loadDemoActivities() }
+                            }
+                            withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
+                                isPhotoFirstFlow = true
+                            }
                         }
                     )
                 }
@@ -228,6 +278,35 @@ struct DashboardRootView: View {
                 )
             }
         }
+    }
+
+    private var placeholderActivity: ActivityHighlight {
+        stravaViewModel.activityHighlights.first ?? ActivityHighlight(
+            id: "placeholder",
+            title: "New post",
+            date: "",
+            distance: "",
+            pace: "",
+            duration: "",
+            systemImage: "sparkles",
+            summarySymbol: "sparkles",
+            accent: Color(red: 0.92, green: 0.86, blue: 0.72),
+            backgroundTop: Color(red: 0.15, green: 0.13, blue: 0.11),
+            backgroundBottom: Color(red: 0.05, green: 0.04, blue: 0.03),
+            linePoints: [],
+            hasRealRoute: false,
+            hasDistance: false,
+            startDate: nil,
+            activityName: "New post",
+            activityType: "Run",
+            elapsedTime: "",
+            elevationGain: "",
+            maxSpeed: "",
+            averageHeartrate: nil,
+            distanceRaw: 0,
+            movingTimeRaw: 0,
+            elapsedTimeRaw: 0
+        )
     }
 
     private func presentActivityDetail(_ activity: ActivityHighlight) {
@@ -246,6 +325,8 @@ struct DashboardView: View {
     let onSelectActivity: (ActivityHighlight) -> Void
     let onShowDetail: (ActivityHighlight) -> Void
     let onOpenSettings: () -> Void
+    let onStartTemplates: () -> Void
+    let onStartFromPhoto: () -> Void
 
     private var activities: [ActivityHighlight] {
         stravaViewModel.activityHighlights
@@ -482,9 +563,10 @@ struct DashboardView: View {
     private var connectStravaRail: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 14) {
-                DemoActivitiesCard(
+                CreatePostCard(
                     isLoading: stravaViewModel.isLoading,
-                    onOpenDemo: openDemoActivities
+                    onStart: onStartTemplates,
+                    onNewFromPhoto: onStartFromPhoto
                 )
                 .id(0)
 

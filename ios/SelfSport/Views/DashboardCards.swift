@@ -211,108 +211,112 @@ struct ActivityHighlightCard: View {
     }
 }
 
-struct DemoActivitiesCard: View {
+struct CreatePostCard: View {
     let isLoading: Bool
-    let onOpenDemo: () -> Void
+    let onStart: () -> Void
+    let onNewFromPhoto: () -> Void
 
     private let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.603
     private let cardHeight: CGFloat = 481
-    private let accent = Color(red: 0.84, green: 0.78, blue: 0.66)
+    private let accent = Color(red: 0.92, green: 0.86, blue: 0.72)
 
     var body: some View {
-        Button(action: onOpenDemo) {
-            ZStack(alignment: .bottomLeading) {
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.13, green: 0.14, blue: 0.18),
-                                Color(red: 0.04, green: 0.05, blue: 0.08)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+        ZStack(alignment: .bottomLeading) {
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.15, green: 0.13, blue: 0.11),
+                            Color(red: 0.05, green: 0.04, blue: 0.03)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
                     )
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 28, style: .continuous)
-                            .stroke(accent.opacity(0.18), lineWidth: 1)
-                    }
-                    .overlay {
-                        RadialGradient(
-                            colors: [accent.opacity(0.12), .clear],
-                            center: .topTrailing,
-                            startRadius: 12,
-                            endRadius: 220
-                        )
-                        .clipShape(.rect(cornerRadius: 28))
-                    }
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(accent.opacity(0.22), lineWidth: 1)
+                }
+                .overlay {
+                    RadialGradient(
+                        colors: [accent.opacity(0.16), .clear],
+                        center: .topTrailing,
+                        startRadius: 12,
+                        endRadius: 240
+                    )
+                    .clipShape(.rect(cornerRadius: 28))
+                }
 
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Text("NO ACCOUNT NEEDED")
-                            .font(.system(size: 11, weight: .semibold))
-                            .tracking(1.2)
-                            .foregroundStyle(Color.white.opacity(0.72))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color.white.opacity(0.08), in: Capsule())
+            VStack(alignment: .leading, spacing: 0) {
+                Spacer()
 
-                        Spacer()
-                    }
+                ZStack {
+                    Circle()
+                        .fill(accent.opacity(0.10))
+                        .frame(width: 120, height: 120)
 
-                    Spacer()
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 46, weight: .light))
+                        .foregroundStyle(accent.opacity(0.92))
+                }
+                .padding(.bottom, 24)
 
-                    ZStack {
-                        Circle()
-                            .fill(accent.opacity(0.08))
-                            .frame(width: 116, height: 116)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Create a post")
+                        .font(.system(size: 24, weight: .regular, design: .serif).italic())
+                        .foregroundStyle(Color.white.opacity(0.98))
 
-                        Image(systemName: "sparkles.rectangle.stack.fill")
-                            .font(.system(size: 42, weight: .light))
-                            .foregroundStyle(accent.opacity(0.82))
-                    }
-                    .padding(.bottom, 24)
+                    Text("Pick a workout template, drop your photo and share it.")
+                        .font(.system(size: 14, weight: .regular))
+                        .foregroundStyle(Color.white.opacity(0.48))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.bottom, 18)
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Demo Activities")
-                            .font(.system(size: 22, weight: .regular, design: .serif).italic())
-                            .foregroundStyle(Color.white.opacity(0.96))
-
-                        Text("Open sample workouts instantly and test the full flow without Strava, COROS or Garmin.")
-                            .font(.system(size: 14, weight: .regular))
-                            .foregroundStyle(Color.white.opacity(0.42))
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(.bottom, 20)
-
+                Button(action: onStart) {
                     HStack(spacing: 8) {
                         if isLoading {
                             ProgressView()
                                 .tint(.black)
                                 .scaleEffect(0.8)
                         } else {
-                            Image(systemName: "play.fill")
-                                .font(.system(size: 13, weight: .semibold))
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 13, weight: .bold))
                         }
 
-                        Text(isLoading ? "Opening..." : "Open demo")
+                        Text(isLoading ? "Loading\u{2026}" : "Start")
                             .font(.system(size: 15, weight: .semibold))
                     }
                     .foregroundStyle(.black)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 44)
+                    .frame(height: 46)
                     .background(accent, in: .capsule)
                 }
-                .padding(20)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                .buttonStyle(.plain)
+                .disabled(isLoading)
+
+                Button(action: onNewFromPhoto) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "photo.on.rectangle.angled")
+                            .font(.system(size: 12, weight: .medium))
+                        Text("New post from photo")
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .foregroundStyle(Color.white.opacity(0.70))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 38)
+                }
+                .buttonStyle(.plain)
+                .disabled(isLoading)
+                .padding(.top, 4)
             }
-            .frame(width: cardWidth, height: cardHeight)
+            .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
         }
-        .buttonStyle(.plain)
-        .disabled(isLoading)
+        .frame(width: cardWidth, height: cardHeight)
         .shadow(color: .black.opacity(0.30), radius: 22, x: 0, y: 14)
-        .accessibilityLabel("Demo Activities")
-        .accessibilityHint("Open sample activities without connecting a provider")
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Create a post")
     }
 }
 
