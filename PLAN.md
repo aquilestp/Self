@@ -1,72 +1,53 @@
-# Popular & Your Recents en el drawer de widgets
+# Botón "Try Demo" con actividades pre-cargadas
 
-## Resumen
+## Qué hace esto
 
-El drawer de widgets mostrará dos opciones de ordenamiento: **Popular** (por defecto) y **Your Recents**. Ambas muestran todos los widgets disponibles, solo cambia el orden en que aparecen. Los datos de popularidad se obtienen de la base de datos en tiempo real.
-
----
-
-## Funcionalidad
-
-### Tracking de uso
-
-- Cada vez que el usuario **exporta o guarda** una imagen (compartir a Instagram Stories o guardar en la galería), se registran **todos los widgets que están en el canvas** en ese momento
-- Se incrementa un contador global de popularidad por cada widget usado
-- Se registra la fecha de último uso de cada widget para el usuario actual
-
-### Tab "Popular" (por defecto)
-
-- Muestra todos los widgets ordenados por número total de usos a nivel global (todos los usuarios de la app)
-- Los widgets que nadie ha usado aparecen al final en el orden original
-- Se carga al abrir el editor y se cachea en memoria durante la sesión
-
-### Tab "Your Recents"
-
-- Muestra todos los widgets ordenados por la fecha más reciente en que **tú** los usaste al exportar
-- Los widgets que nunca has usado aparecen al final
-- Si el usuario no tiene historial, se muestra automáticamente el orden de Popular con un mensaje sutil
+Un botón **"Try Demo"** visible en la pantalla de login que entra automáticamente a la app usando una cuenta demo de Supabase, mostrando las actividades pre-cargadas (las de Aquiles) sin necesidad de conectar Strava ni Coros.
 
 ---
 
-## Diseño
+## Flujo del reviewer
 
-### Selector de tabs
-
-- Dos pills/chips minimalistas horizontales en la parte superior del drawer, debajo del handle
-- Estilo: fondo translúcido con texto blanco, el pill activo tiene un fondo blanco más opaco
-- Texto: "Popular" con ícono de flame, "Recents" con ícono de reloj
-- Transición suave al cambiar entre tabs
-
-### Grid de widgets
-
-- El grid se mantiene exactamente igual visualmente, solo cambia el orden de los widgets
-- Animación sutil al reordenar cuando se cambia de tab
+1. Toca **"Try Demo"** en la pantalla de login
+2. La app se autentica silenciosamente con la cuenta demo (sin que el reviewer escriba nada)
+3. Entra directo al dashboard con las actividades ya cargadas
+4. Puede explorar toda la app normalmente
 
 ---
 
-## Base de datos (2 tablas nuevas en Supabase)
+## Cambios en la app
 
-### Tabla `widget_popularity`
+### Pantalla de Login
 
-- Una fila por tipo de widget (~35 filas máximo, tabla siempre pequeña)
-- Columnas: tipo de widget y contador de usos
-- Se incrementa atómicamente con una función de base de datos para evitar conflictos de concurrencia
-- Escala infinitamente porque la tabla nunca crece
+- Nuevo botón **"Try Demo"** visible debajo de "Sign in with Apple" y "Continue with Google"
+- Estilo sutil (borde blanco semitransparente, texto blanco) — no compite con los CTAs principales
+- Muestra un spinner mientras autentica
 
-### Tabla `user_widget_recents`
+### Lógica de autenticación
 
-- Una fila por combinación usuario + widget (~35 filas máximo por usuario)
-- Columnas: usuario, tipo de widget, fecha de último uso
-- Se actualiza (upsert) cada vez que se exporta con ese widget
-- Lectura rápida filtrada por usuario
+- Toca el botón → llama `signInWithEmail` con las credenciales demo hardcodeadas: `test@selfsport.app` / `testingselfapp7`
+- Si falla por red, muestra error claro: "Demo unavailable — check your connection"
+
+### Carga de actividades sin Strava
+
+- En modo demo, el dashboard carga las actividades directamente desde Supabase (la caché) sin requerir conexión a Strava
+- El feed muestra las actividades de la cuenta demo normalmente
+- Los botones de "Connect Strava" siguen visibles pero no son necesarios para navegar
 
 ---
 
-## Flujo completo
+## Qué necesitas hacer en Supabase (una vez)
 
-1. Usuario abre el editor → se cargan los datos de popularidad global y recientes del usuario (en paralelo, en background)
-2. El drawer muestra los widgets ordenados por "Popular" por defecto
-3. Usuario puede cambiar a "Your Recents" con el pill selector
-4. Usuario diseña su canvas con widgets y exporta → se registra el uso de cada widget presente en el canvas
-5. El registro es fire-and-forget (no bloquea la exportación)
+> **Requisito previo — sin esto el botón no funciona:**
+>
+> 1. En Supabase → Authentication → Email: **desactivar "Confirm email"** (o confirmar manualmente la cuenta `test@selfsport.app`)
+> 2. Verificar que la tabla `strava_activities` tenga filas con el `user_id` de esa cuenta (las actividades de Aquiles)
+
+---
+
+## Notas para App Store Review
+
+En el campo "Review Notes" de App Store Connect escribirías:
+
+> *"Tap 'Try Demo' on the login screen to access a demo account with pre-loaded activities. No account creation required."*
 

@@ -257,9 +257,13 @@ struct DashboardView: View {
         .background(Color.black)
         .toolbar(.hidden, for: .navigationBar)
         .task {
-            stravaViewModel.checkConnection()
-            if stravaViewModel.isConnected {
-                await stravaViewModel.loadInitial()
+            if authViewModel.isDemoMode {
+                await stravaViewModel.loadFromCacheOnly()
+            } else {
+                stravaViewModel.checkConnection()
+                if stravaViewModel.isConnected {
+                    await stravaViewModel.loadInitial()
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in

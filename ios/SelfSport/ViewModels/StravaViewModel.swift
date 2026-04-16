@@ -146,6 +146,26 @@ final class StravaViewModel {
         await pollingService.checkForNewActivities()
     }
 
+    func loadFromCacheOnly() async {
+        isLoading = true
+        errorMessage = nil
+        resetPagination()
+
+        do {
+            let cached = try await cache.fetchCachedActivities(limit: pageSize, offset: 0)
+            if !cached.isEmpty {
+                setActivities(cached)
+                cachedOffset = cached.count
+                hasMoreActivities = cached.count >= pageSize
+                isConnected = true
+                didCompleteFirstLoad = true
+            }
+        } catch {
+            // Silent
+        }
+        isLoading = false
+    }
+
     func loadInitial() async {
         guard isConnected else { return }
         isLoading = true

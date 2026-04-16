@@ -8,6 +8,8 @@ import Auth
 final class AuthViewModel {
     var isAuthenticated: Bool = false
     var isLoading: Bool = true
+    var isDemoMode: Bool = false
+    var isDemoLoading: Bool = false
     var userProfile: UserProfile?
     var errorMessage: String?
     var currentNonce: String?
@@ -169,10 +171,34 @@ final class AuthViewModel {
         isLoading = false
     }
 
+    func signInWithDemo() async {
+        isDemoLoading = true
+        errorMessage = nil
+
+        do {
+            let session = try await supabase.auth.signIn(
+                email: "test@selfsport.app",
+                password: "testingselfapp7"
+            )
+            isDemoMode = true
+            isAuthenticated = true
+            await fetchProfile(userId: session.user.id)
+        } catch {
+            errorMessage = "Demo unavailable — check your connection"
+        }
+
+        isDemoLoading = false
+    }
+
     func signOut() async {
         do {
-            try await supabase.auth.signOut()
+            if !isDemoMode {
+                try await supabase.auth.signOut()
+            } else {
+                try? await supabase.auth.signOut()
+            }
             isAuthenticated = false
+            isDemoMode = false
             userProfile = nil
         } catch {
             errorMessage = error.localizedDescription
