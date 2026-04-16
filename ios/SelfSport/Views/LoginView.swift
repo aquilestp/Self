@@ -4,10 +4,6 @@ import AuthenticationServices
 struct LoginView: View {
     @Bindable var authViewModel: AuthViewModel
     var onBack: (() -> Void)? = nil
-    @State private var showDevLogin: Bool = false
-    @State private var showDevModal: Bool = false
-    @State private var devEmail: String = ""
-    @State private var devPassword: String = ""
 
     var body: some View {
         GeometryReader { proxy in
@@ -120,20 +116,6 @@ struct LoginView: View {
                         .padding(.top, 16)
                 }
 
-                Spacer(minLength: 16)
-
-                Button {
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        showDevLogin.toggle()
-                    }
-                } label: {
-                    Text(showDevLogin ? "Hide" : "Developer Access")
-                        .font(.caption2)
-                        .foregroundStyle(.white)
-                }
-                .buttonStyle(.plain)
-                .padding(.bottom, 12)
-
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -141,19 +123,7 @@ struct LoginView: View {
             .background(.black)
         }
         .ignoresSafeArea()
-        .onChange(of: showDevLogin) { _, newValue in
-            if newValue {
-                showDevModal = true
-            }
-        }
-        .sheet(isPresented: $showDevModal, onDismiss: {
-            showDevLogin = false
-        }) {
-            DevLoginModal(authViewModel: authViewModel, devEmail: $devEmail, devPassword: $devPassword, isPresented: $showDevModal)
-                .presentationDetents([.height(260)])
-                .presentationDragIndicator(.visible)
-                .presentationBackground(.ultraThinMaterial)
-        }
+
     }
 }
 
