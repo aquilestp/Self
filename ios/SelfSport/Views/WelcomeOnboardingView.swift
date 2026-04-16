@@ -230,7 +230,7 @@ private struct WelcomeIntroStepView: View {
 private struct WelcomeCanvasStepView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 22) {
-            Text("Connect via Strava, Coros or Garmin and choose your activity")
+            Text("Or connect a fitness app and choose your activity")
                 .font(.system(.largeTitle, design: .serif, weight: .regular).width(.compressed))
                 .italic()
                 .foregroundStyle(.white)
