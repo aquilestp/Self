@@ -102,7 +102,7 @@ struct LoginView: View {
                 } label: {
                     Text(showDevLogin ? "Hide" : "Developer Access")
                         .font(.caption2)
-                        .foregroundStyle(.white.opacity(0.18))
+                        .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)
                 .padding(.bottom, 12)

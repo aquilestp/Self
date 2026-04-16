@@ -11,6 +11,9 @@ struct DevLoginModal: View {
         case email, password
     }
 
+    @State private var isSigningIn: Bool = false
+    @State private var localError: String?
+
     var body: some View {
         VStack(spacing: 16) {
             HStack {
@@ -47,21 +50,42 @@ struct DevLoginModal: View {
                 .background(.quaternary, in: .rect(cornerRadius: 10))
                 .focused($focusedField, equals: .password)
 
+            if let localError {
+                Text(localError)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
             Button {
                 Task {
+                    isSigningIn = true
+                    localError = nil
                     await authViewModel.signInWithEmail(email: devEmail, password: devPassword)
-                    isPresented = false
+                    if let err = authViewModel.errorMessage {
+                        localError = err
+                        isSigningIn = false
+                    } else {
+                        isPresented = false
+                    }
                 }
             } label: {
-                Text("Sign In")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
+                HStack(spacing: 8) {
+                    if isSigningIn {
+                        ProgressView()
+                            .tint(.white)
+                            .controlSize(.small)
+                    }
+                    Text("Sign In")
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
             }
             .buttonStyle(.plain)
             .background(.blue, in: .rect(cornerRadius: 10))
-            .disabled(devEmail.isEmpty || devPassword.isEmpty)
+            .disabled(devEmail.isEmpty || devPassword.isEmpty || isSigningIn)
             .opacity(devEmail.isEmpty || devPassword.isEmpty ? 0.5 : 1)
         }
         .padding(20)
