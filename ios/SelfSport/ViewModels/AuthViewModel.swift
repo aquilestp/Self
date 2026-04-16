@@ -139,21 +139,30 @@ final class AuthViewModel {
         isLoading = true
         errorMessage = nil
 
+        print("[Auth] Attempting signIn with email: \(email)")
+
         do {
             let session = try await supabase.auth.signIn(
                 email: email,
                 password: password
             )
+            print("[Auth] signIn success, userId: \(session.user.id)")
             isAuthenticated = true
             await fetchProfile(userId: session.user.id)
         } catch let authError as AuthError {
+            print("[Auth] AuthError: \(authError)")
             switch authError {
-            case .api(let apiError):
-                errorMessage = apiError.message
+            case .api(let message, let errorCode, _, _):
+                print("[Auth] API error code: \(errorCode), message: \(message)")
+                errorMessage = message
             default:
+                print("[Auth] Other AuthError: \(authError.localizedDescription)")
                 errorMessage = authError.localizedDescription
             }
         } catch {
+            print("[Auth] Unexpected error: \(error)")
+            print("[Auth] Error type: \(type(of: error))")
+            print("[Auth] Error details: \(String(describing: error))")
             errorMessage = error.localizedDescription
         }
 
