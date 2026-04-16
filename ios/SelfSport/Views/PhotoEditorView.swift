@@ -612,7 +612,8 @@ struct PhotoEditorView: View {
 
                         if drawerState == .collapsed && !showEditStyleDrawer {
                             bottomShareBar
-                                .padding(.top, 1)
+                                .padding(.top, 14)
+                                .padding(.bottom, 10)
                                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                                 .animation(.snappy(duration: 0.32), value: drawerState)
                         } else if drawerState == .open || drawerState == .expanded {
