@@ -369,7 +369,7 @@ struct BringActivitiesCard: View {
                         .font(.system(size: 22, weight: .regular, design: .serif).italic())
                         .foregroundStyle(Color.white.opacity(0.92))
 
-                    Text("Connect Strava, COROS or Garmin to build posts with your real data.")
+                    Text("Bring activities from other apps to build posts with your workout data")
                         .font(.system(size: 14, weight: .regular))
                         .foregroundStyle(Color.white.opacity(0.38))
                         .fixedSize(horizontal: false, vertical: true)
