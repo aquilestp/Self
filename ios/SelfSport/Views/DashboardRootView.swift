@@ -265,6 +265,12 @@ struct DashboardRootView: View {
                             withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
                                 isPhotoFirstFlow = true
                             }
+                        },
+                        onGoWithoutActivity: {
+                            HapticService.medium.impactOccurred()
+                            withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
+                                pendingActivity = placeholderActivity
+                            }
                         }
                     )
                 }
@@ -327,6 +333,7 @@ struct DashboardView: View {
     let onOpenSettings: () -> Void
     let onStartTemplates: () -> Void
     let onStartFromPhoto: () -> Void
+    let onGoWithoutActivity: () -> Void
 
     private var activities: [ActivityHighlight] {
         stravaViewModel.activityHighlights
@@ -336,12 +343,19 @@ struct DashboardView: View {
         stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
     }
 
+    private var isDemoOnly: Bool {
+        stravaViewModel.isUsingDemoActivities && !stravaViewModel.isConnected
+    }
+
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 18) {
                 topActions
                 heroHeader
                 activityRail
+                if isDemoOnly && !activities.isEmpty {
+                    goWithoutActivityButton
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 18)
@@ -448,6 +462,29 @@ struct DashboardView: View {
         }
     }
 
+    private var goWithoutActivityButton: some View {
+        Button {
+            HapticService.medium.impactOccurred()
+            onGoWithoutActivity()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 13, weight: .bold))
+                Text("Go without a specific activity")
+                    .font(.system(size: 15, weight: .semibold))
+            }
+            .foregroundStyle(Color.white.opacity(0.92))
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(Color.white.opacity(0.06), in: .capsule)
+            .overlay(
+                Capsule()
+                    .stroke(Color.white.opacity(0.14), lineWidth: 0.5)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
     private var cooldownToast: some View {
         HStack(spacing: 6) {
             Image(systemName: "checkmark.circle.fill")
@@ -478,7 +515,7 @@ struct DashboardView: View {
                     )
 
                 ForEach(activities) { activity in
-                    ActivityHighlightCard(activity: activity)
+                    ActivityHighlightCard(activity: activity, isCompact: isDemoOnly)
                         .onTapGesture {
                             HapticService.medium.impactOccurred()
                             onSelectActivity(activity)

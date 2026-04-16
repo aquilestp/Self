@@ -2,10 +2,11 @@ import SwiftUI
 
 struct ActivityHighlightCard: View {
     let activity: ActivityHighlight
+    var isCompact: Bool = false
 
     var body: some View {
-        let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.603
-        let cardHeight: CGFloat = 481
+        let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * (isCompact ? 0.52 : 0.603)
+        let cardHeight: CGFloat = isCompact ? 320 : 481
 
         ZStack(alignment: .bottomLeading) {
             RoundedRectangle(cornerRadius: 28, style: .continuous)
@@ -194,17 +195,17 @@ struct ActivityHighlightCard: View {
                     .position(last)
             }
         }
-        .frame(height: 240)
+        .frame(height: isCompact ? 140 : 240)
     }
 
     private var activityTypeIcon: some View {
         ZStack {
             Circle()
                 .fill(activity.accent.opacity(0.10))
-                .frame(width: 132, height: 132)
+                .frame(width: isCompact ? 88 : 132, height: isCompact ? 88 : 132)
 
             Image(systemName: activity.systemImage)
-                .font(.system(size: 57, weight: .light))
+                .font(.system(size: isCompact ? 38 : 57, weight: .light))
                 .foregroundStyle(activity.accent.opacity(0.70))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
