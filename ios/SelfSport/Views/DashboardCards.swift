@@ -296,20 +296,7 @@ struct CreatePostCard: View {
                 .buttonStyle(.plain)
                 .disabled(isLoading)
 
-                Button(action: onNewFromPhoto) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "photo.on.rectangle.angled")
-                            .font(.system(size: 12, weight: .medium))
-                        Text("New post from photo")
-                            .font(.system(size: 13, weight: .medium))
-                    }
-                    .foregroundStyle(Color.white.opacity(0.70))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 38)
-                }
-                .buttonStyle(.plain)
-                .disabled(isLoading)
-                .padding(.top, 4)
+
             }
             .padding(20)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
@@ -532,26 +519,15 @@ struct ConnectProvidersSheet: View {
             Spacer(minLength: 0)
 
             if !isComingSoon {
-                Button(action: onConnect) {
-                    HStack(spacing: 6) {
-                        if isConnecting {
-                            ProgressView()
-                                .tint(.white)
-                                .scaleEffect(0.75)
-                        } else {
-                            Image(systemName: "link")
-                                .font(.system(size: 12, weight: .semibold))
-                        }
-                        Text(isConnecting ? "Connecting" : "Connect")
-                            .font(.system(size: 14, weight: .semibold))
-                    }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 14)
-                    .frame(height: 36)
-                    .background(accent, in: .capsule)
+                if isConnecting {
+                    ProgressView()
+                        .tint(.white)
+                        .scaleEffect(0.75)
+                } else {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.30))
                 }
-                .buttonStyle(.plain)
-                .disabled(isConnecting)
             }
         }
         .padding(16)
@@ -563,6 +539,12 @@ struct ConnectProvidersSheet: View {
                         .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
                 )
         )
+        .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .onTapGesture {
+            if !isComingSoon && !isConnecting {
+                onConnect()
+            }
+        }
     }
 }
 
