@@ -37,17 +37,19 @@ struct DevLoginModal: View {
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
                 .font(.callout)
+                .foregroundStyle(.primary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 12)
-                .background(.quaternary, in: .rect(cornerRadius: 10))
+                .background(Color(.secondarySystemBackground), in: .rect(cornerRadius: 10))
                 .focused($focusedField, equals: .email)
 
             SecureField("Password", text: $devPassword)
                 .textContentType(.password)
                 .font(.callout)
+                .foregroundStyle(.primary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 12)
-                .background(.quaternary, in: .rect(cornerRadius: 10))
+                .background(Color(.secondarySystemBackground), in: .rect(cornerRadius: 10))
                 .focused($focusedField, equals: .password)
 
             if let localError {
@@ -81,10 +83,11 @@ struct DevLoginModal: View {
                         .foregroundStyle(.white)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .frame(minHeight: 48)
+                .background(.blue, in: .rect(cornerRadius: 10))
+                .contentShape(.rect(cornerRadius: 10))
             }
             .buttonStyle(.plain)
-            .background(.blue, in: .rect(cornerRadius: 10))
             .disabled(devEmail.isEmpty || devPassword.isEmpty || isSigningIn)
             .opacity(devEmail.isEmpty || devPassword.isEmpty ? 0.5 : 1)
         }
