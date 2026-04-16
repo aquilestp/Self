@@ -258,7 +258,7 @@ struct DashboardView: View {
         .toolbar(.hidden, for: .navigationBar)
         .task {
             if authViewModel.isDemoMode {
-                await stravaViewModel.loadFromCacheOnly()
+                await stravaViewModel.loadDemoActivities()
             } else {
                 stravaViewModel.checkConnection()
                 if stravaViewModel.isConnected {

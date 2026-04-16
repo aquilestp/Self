@@ -174,31 +174,29 @@ final class AuthViewModel {
     func signInWithDemo() async {
         isDemoLoading = true
         errorMessage = nil
-
-        do {
-            let session = try await supabase.auth.signIn(
-                email: "test@selfsport.app",
-                password: "testingselfapp7"
-            )
-            isDemoMode = true
-            isAuthenticated = true
-            await fetchProfile(userId: session.user.id)
-        } catch {
-            errorMessage = "Demo unavailable — check your connection"
-        }
-
+        try? await Task.sleep(for: .milliseconds(300))
+        isDemoMode = true
+        isAuthenticated = true
+        userProfile = UserProfile(
+            id: UUID(),
+            fullName: "Demo User",
+            email: nil,
+            avatarUrl: nil,
+            createdAt: nil
+        )
         isDemoLoading = false
     }
 
     func signOut() async {
-        do {
-            if !isDemoMode {
-                try await supabase.auth.signOut()
-            } else {
-                try? await supabase.auth.signOut()
-            }
+        if isDemoMode {
             isAuthenticated = false
             isDemoMode = false
+            userProfile = nil
+            return
+        }
+        do {
+            try await supabase.auth.signOut()
+            isAuthenticated = false
             userProfile = nil
         } catch {
             errorMessage = error.localizedDescription

@@ -146,6 +146,240 @@ final class StravaViewModel {
         await pollingService.checkForNewActivities()
     }
 
+    func loadDemoActivities() async {
+        isLoading = true
+        let calendar = Calendar.current
+        let now = Date()
+        func daysAgo(_ n: Int) -> Date { calendar.date(byAdding: .day, value: -n, to: now) ?? now }
+        func dateStr(_ d: Date) -> String {
+            let f = DateFormatter()
+            f.dateFormat = "MMM d"
+            return f.string(from: d)
+        }
+
+        let runs: [ActivityHighlight] = [
+            ActivityHighlight(
+                id: "demo-1",
+                title: "Morning Run",
+                date: dateStr(daysAgo(1)),
+                distance: "10.2 km",
+                pace: "5'12\"/km",
+                duration: "52:58",
+                systemImage: "figure.run",
+                summarySymbol: "figure.run",
+                accent: Color(red: 0.70, green: 0.64, blue: 0.57),
+                backgroundTop: Color(red: 0.14, green: 0.14, blue: 0.16),
+                backgroundBottom: Color(red: 0.03, green: 0.03, blue: 0.05),
+                linePoints: [
+                    CGPoint(x: 0.05, y: 0.68), CGPoint(x: 0.15, y: 0.58), CGPoint(x: 0.25, y: 0.62),
+                    CGPoint(x: 0.35, y: 0.48), CGPoint(x: 0.45, y: 0.52), CGPoint(x: 0.55, y: 0.38),
+                    CGPoint(x: 0.65, y: 0.42), CGPoint(x: 0.75, y: 0.30), CGPoint(x: 0.88, y: 0.28)
+                ],
+                hasRealRoute: true,
+                hasDistance: true,
+                startDate: daysAgo(1),
+                activityName: "Morning Run",
+                activityType: "Run",
+                elapsedTime: "54:10",
+                elevationGain: "112 m",
+                maxSpeed: "4'30\"/km",
+                averageHeartrate: "158 bpm",
+                distanceRaw: 10200,
+                movingTimeRaw: 3178,
+                elapsedTimeRaw: 3250
+            ),
+            ActivityHighlight(
+                id: "demo-2",
+                title: "Easy Recovery",
+                date: dateStr(daysAgo(3)),
+                distance: "5.8 km",
+                pace: "6'02\"/km",
+                duration: "34:59",
+                systemImage: "figure.run",
+                summarySymbol: "figure.run",
+                accent: Color(red: 0.70, green: 0.64, blue: 0.57),
+                backgroundTop: Color(red: 0.14, green: 0.14, blue: 0.16),
+                backgroundBottom: Color(red: 0.03, green: 0.03, blue: 0.05),
+                linePoints: [
+                    CGPoint(x: 0.05, y: 0.55), CGPoint(x: 0.18, y: 0.60), CGPoint(x: 0.30, y: 0.52),
+                    CGPoint(x: 0.42, y: 0.58), CGPoint(x: 0.55, y: 0.50), CGPoint(x: 0.68, y: 0.54),
+                    CGPoint(x: 0.80, y: 0.46), CGPoint(x: 0.92, y: 0.42)
+                ],
+                hasRealRoute: true,
+                hasDistance: true,
+                startDate: daysAgo(3),
+                activityName: "Easy Recovery",
+                activityType: "Run",
+                elapsedTime: "35:40",
+                elevationGain: "48 m",
+                maxSpeed: "5'10\"/km",
+                averageHeartrate: "138 bpm",
+                distanceRaw: 5800,
+                movingTimeRaw: 2099,
+                elapsedTimeRaw: 2140
+            ),
+            ActivityHighlight(
+                id: "demo-3",
+                title: "Tempo Intervals",
+                date: dateStr(daysAgo(5)),
+                distance: "12.0 km",
+                pace: "4'45\"/km",
+                duration: "57:00",
+                systemImage: "figure.run",
+                summarySymbol: "figure.run",
+                accent: Color(red: 0.70, green: 0.64, blue: 0.57),
+                backgroundTop: Color(red: 0.14, green: 0.14, blue: 0.16),
+                backgroundBottom: Color(red: 0.03, green: 0.03, blue: 0.05),
+                linePoints: [
+                    CGPoint(x: 0.05, y: 0.70), CGPoint(x: 0.12, y: 0.45), CGPoint(x: 0.20, y: 0.65),
+                    CGPoint(x: 0.28, y: 0.40), CGPoint(x: 0.38, y: 0.62), CGPoint(x: 0.48, y: 0.38),
+                    CGPoint(x: 0.58, y: 0.55), CGPoint(x: 0.70, y: 0.32), CGPoint(x: 0.82, y: 0.48),
+                    CGPoint(x: 0.92, y: 0.28)
+                ],
+                hasRealRoute: true,
+                hasDistance: true,
+                startDate: daysAgo(5),
+                activityName: "Tempo Intervals",
+                activityType: "Run",
+                elapsedTime: "58:20",
+                elevationGain: "85 m",
+                maxSpeed: "3'55\"/km",
+                averageHeartrate: "172 bpm",
+                distanceRaw: 12000,
+                movingTimeRaw: 3420,
+                elapsedTimeRaw: 3500
+            ),
+            ActivityHighlight(
+                id: "demo-4",
+                title: "Long Run",
+                date: dateStr(daysAgo(8)),
+                distance: "21.5 km",
+                pace: "5'28\"/km",
+                duration: "1:57:42",
+                systemImage: "figure.run",
+                summarySymbol: "figure.run",
+                accent: Color(red: 0.70, green: 0.64, blue: 0.57),
+                backgroundTop: Color(red: 0.14, green: 0.14, blue: 0.16),
+                backgroundBottom: Color(red: 0.03, green: 0.03, blue: 0.05),
+                linePoints: [
+                    CGPoint(x: 0.04, y: 0.60), CGPoint(x: 0.14, y: 0.52), CGPoint(x: 0.24, y: 0.56),
+                    CGPoint(x: 0.34, y: 0.44), CGPoint(x: 0.44, y: 0.50), CGPoint(x: 0.54, y: 0.36),
+                    CGPoint(x: 0.64, y: 0.42), CGPoint(x: 0.74, y: 0.30), CGPoint(x: 0.84, y: 0.35),
+                    CGPoint(x: 0.93, y: 0.26)
+                ],
+                hasRealRoute: true,
+                hasDistance: true,
+                startDate: daysAgo(8),
+                activityName: "Long Run",
+                activityType: "Run",
+                elapsedTime: "2:00:05",
+                elevationGain: "210 m",
+                maxSpeed: "4'22\"/km",
+                averageHeartrate: "155 bpm",
+                distanceRaw: 21500,
+                movingTimeRaw: 7062,
+                elapsedTimeRaw: 7205
+            ),
+            ActivityHighlight(
+                id: "demo-5",
+                title: "Evening Jog",
+                date: dateStr(daysAgo(10)),
+                distance: "7.1 km",
+                pace: "5'44\"/km",
+                duration: "40:44",
+                systemImage: "figure.run",
+                summarySymbol: "figure.run",
+                accent: Color(red: 0.70, green: 0.64, blue: 0.57),
+                backgroundTop: Color(red: 0.14, green: 0.14, blue: 0.16),
+                backgroundBottom: Color(red: 0.03, green: 0.03, blue: 0.05),
+                linePoints: [
+                    CGPoint(x: 0.06, y: 0.62), CGPoint(x: 0.20, y: 0.55), CGPoint(x: 0.33, y: 0.60),
+                    CGPoint(x: 0.46, y: 0.48), CGPoint(x: 0.60, y: 0.53), CGPoint(x: 0.74, y: 0.44),
+                    CGPoint(x: 0.88, y: 0.40)
+                ],
+                hasRealRoute: true,
+                hasDistance: true,
+                startDate: daysAgo(10),
+                activityName: "Evening Jog",
+                activityType: "Run",
+                elapsedTime: "41:30",
+                elevationGain: "62 m",
+                maxSpeed: "4'50\"/km",
+                averageHeartrate: "144 bpm",
+                distanceRaw: 7100,
+                movingTimeRaw: 2444,
+                elapsedTimeRaw: 2490
+            ),
+            ActivityHighlight(
+                id: "demo-6",
+                title: "5K Workout",
+                date: dateStr(daysAgo(13)),
+                distance: "5.0 km",
+                pace: "4'30\"/km",
+                duration: "22:30",
+                systemImage: "figure.run",
+                summarySymbol: "figure.run",
+                accent: Color(red: 0.70, green: 0.64, blue: 0.57),
+                backgroundTop: Color(red: 0.14, green: 0.14, blue: 0.16),
+                backgroundBottom: Color(red: 0.03, green: 0.03, blue: 0.05),
+                linePoints: [
+                    CGPoint(x: 0.05, y: 0.72), CGPoint(x: 0.18, y: 0.50), CGPoint(x: 0.32, y: 0.56),
+                    CGPoint(x: 0.46, y: 0.36), CGPoint(x: 0.60, y: 0.42), CGPoint(x: 0.75, y: 0.28),
+                    CGPoint(x: 0.90, y: 0.32)
+                ],
+                hasRealRoute: true,
+                hasDistance: true,
+                startDate: daysAgo(13),
+                activityName: "5K Workout",
+                activityType: "Run",
+                elapsedTime: "23:05",
+                elevationGain: "30 m",
+                maxSpeed: "3'42\"/km",
+                averageHeartrate: "178 bpm",
+                distanceRaw: 5000,
+                movingTimeRaw: 1350,
+                elapsedTimeRaw: 1385
+            ),
+            ActivityHighlight(
+                id: "demo-7",
+                title: "Sunday Long Run",
+                date: dateStr(daysAgo(15)),
+                distance: "18.3 km",
+                pace: "5'35\"/km",
+                duration: "1:42:14",
+                systemImage: "figure.run",
+                summarySymbol: "figure.run",
+                accent: Color(red: 0.70, green: 0.64, blue: 0.57),
+                backgroundTop: Color(red: 0.14, green: 0.14, blue: 0.16),
+                backgroundBottom: Color(red: 0.03, green: 0.03, blue: 0.05),
+                linePoints: [
+                    CGPoint(x: 0.04, y: 0.65), CGPoint(x: 0.13, y: 0.55), CGPoint(x: 0.23, y: 0.60),
+                    CGPoint(x: 0.33, y: 0.46), CGPoint(x: 0.43, y: 0.52), CGPoint(x: 0.53, y: 0.38),
+                    CGPoint(x: 0.63, y: 0.44), CGPoint(x: 0.73, y: 0.32), CGPoint(x: 0.83, y: 0.36),
+                    CGPoint(x: 0.93, y: 0.28)
+                ],
+                hasRealRoute: true,
+                hasDistance: true,
+                startDate: daysAgo(15),
+                activityName: "Sunday Long Run",
+                activityType: "Run",
+                elapsedTime: "1:44:00",
+                elevationGain: "175 m",
+                maxSpeed: "4'18\"/km",
+                averageHeartrate: "152 bpm",
+                distanceRaw: 18300,
+                movingTimeRaw: 6134,
+                elapsedTimeRaw: 6240
+            )
+        ]
+
+        activityHighlights = runs
+        isConnected = true
+        hasMoreActivities = false
+        didCompleteFirstLoad = true
+        isLoading = false
+    }
+
     func loadFromCacheOnly() async {
         isLoading = true
         errorMessage = nil
