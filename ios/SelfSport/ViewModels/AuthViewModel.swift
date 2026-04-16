@@ -146,6 +146,13 @@ final class AuthViewModel {
             )
             isAuthenticated = true
             await fetchProfile(userId: session.user.id)
+        } catch let authError as AuthError {
+            switch authError {
+            case .api(let apiError):
+                errorMessage = apiError.message
+            default:
+                errorMessage = authError.localizedDescription
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
