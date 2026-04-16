@@ -18,7 +18,8 @@ extension PhotoEditorView {
                         .padding(.bottom, 6)
 
                     drawerTabPills
-                        .padding(.bottom, 8)
+                        .padding(.top, 6)
+                        .padding(.bottom, 10)
 
                     if isExpanded {
                         expandedGrid
