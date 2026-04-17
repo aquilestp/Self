@@ -30,6 +30,7 @@ struct PaletteSelectorView: View {
             whatsappSection
             cityActivitySection
             routeDistanceSection
+            nameStatsSection
         }
         .padding(.vertical, 10)
         .padding(.leading, 6)
@@ -384,6 +385,33 @@ struct PaletteSelectorView: View {
             }
             visToggle(icon: "clock", isOn: widget?.showTime ?? true, delay: baseDelay + 0.18) {
                 mutate { $0.showTime.toggle() }
+            }
+        }
+    }
+
+    // MARK: - Name Stats
+
+    @ViewBuilder
+    private var nameStatsSection: some View {
+        if widget?.type == .nameStats {
+            let baseDelay = Double(paletteCount) * 0.04
+            let current = widget?.nameStatsUnitFilter ?? .km
+            separator(delay: baseDelay + 0.04)
+            unitToggle(current: current, delay: baseDelay + 0.06) {
+                mutate { $0.nameStatsUnitFilter = $0.nameStatsUnitFilter == .km ? .miles : .km }
+            }
+            separator(delay: baseDelay + 0.10)
+            visToggle(icon: "ruler", isOn: widget?.nameStatsShowDistance ?? true, delay: baseDelay + 0.12) {
+                mutate { $0.nameStatsShowDistance.toggle() }
+            }
+            visToggle(icon: "speedometer", isOn: widget?.nameStatsShowPace ?? true, delay: baseDelay + 0.15) {
+                mutate { $0.nameStatsShowPace.toggle() }
+            }
+            visToggle(icon: "clock", isOn: widget?.nameStatsShowTime ?? true, delay: baseDelay + 0.18) {
+                mutate { $0.nameStatsShowTime.toggle() }
+            }
+            visToggle(icon: "mountain.2", isOn: widget?.nameStatsShowElevation ?? false, delay: baseDelay + 0.21) {
+                mutate { $0.nameStatsShowElevation.toggle() }
             }
         }
     }

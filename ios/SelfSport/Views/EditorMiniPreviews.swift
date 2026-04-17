@@ -324,6 +324,8 @@ extension PhotoEditorView {
             miniCityActivity
         case .routeDistance:
             miniRouteDistance
+        case .nameStats:
+            miniNameStats
         }
     }
 
@@ -1074,6 +1076,31 @@ extension PhotoEditorView {
                     .font(.system(size: 6, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.65))
                     .lineLimit(1)
+            }
+        }
+        .padding(.horizontal, 4)
+    }
+
+    var miniNameStats: some View {
+        VStack(alignment: .center, spacing: 3) {
+            Text("Today at 6:55 AM")
+                .font(.system(size: 5.5, weight: .light, design: .serif))
+                .foregroundStyle(.white.opacity(0.55))
+                .lineLimit(1)
+            Text(activity.activityName.isEmpty ? activity.title : activity.activityName)
+                .font(.system(size: 14, weight: .bold, design: .serif))
+                .foregroundStyle(.white)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.55)
+            if activity.hasDistance {
+                HStack(spacing: 5) {
+                    miniStat(label: "Dist", value: activity.distance)
+                    miniStat(label: "Pace", value: activity.pace)
+                    miniStat(label: "Time", value: activity.duration)
+                }
+            } else {
+                miniStat(label: "Time", value: activity.duration)
             }
         }
         .padding(.horizontal, 4)

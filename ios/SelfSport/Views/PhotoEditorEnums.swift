@@ -43,6 +43,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     case splitBanner = "Split Banner"
     case cityActivity = "City Activity"
     case routeDistance = "Route Dist"
+    case nameStats = "Name Stats"
 
     var id: String { rawValue }
 
@@ -84,6 +85,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         case .splitBanner: return "text.alignleft"
         case .cityActivity: return "mappin.circle.fill"
         case .routeDistance: return "point.topleft.down.to.point.bottomright.curvepath"
+        case .nameStats: return "person.text.rectangle.fill"
         }
     }
 
@@ -91,6 +93,8 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
         switch self {
         case .routeClean, .bold, .impact, .titleCard, .blurredVerticalText, .whatsappMessage, .notesScreenshot, .ancestralMedal, .splitBanner:
             return false
+        case .nameStats:
+            return true
         default:
             return true
         }
@@ -321,6 +325,11 @@ struct PlacedWidget: Identifiable {
     var routeDistanceShowElevation: Bool = true
     var routeDistanceShowTime: Bool = true
     var routeDistanceShowSpeed: Bool = true
+    var nameStatsUnitFilter: SplitsUnitFilter = .km
+    var nameStatsShowDistance: Bool = true
+    var nameStatsShowPace: Bool = true
+    var nameStatsShowTime: Bool = true
+    var nameStatsShowElevation: Bool = false
 }
 
 nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {

@@ -1,30 +1,58 @@
-# New "Route + Distance" Widget
+# Nuevo widget "Name Stats" — nombre de actividad + indicadores
 
-## Features
+## Diseño
 
-- **New widget in the drawer** called "Route Dist" — appears in the grid alongside all other widgets, sortable by Popular/Recents
-- **Route trace on top (~60% of card)** — the GPS route drawn in the selected color as a clean stroke
-- **Large bold distance** displayed below the route — dominant number + unit (e.g. `18.34 MI`)
-- **Three secondary stats** in a row at the bottom: elevation gain, moving time, and average speed
-- **All three secondary stats can be toggled on/off** individually via the right-side customization panel (same icon-based toggle buttons as other widgets)
-- **KM / MI unit toggle** in the customization panel — switches distance, speed unit, and elevation between metric and imperial
-- **Color change** via the existing palette system (classic, neon, aesthetic) — defaults to white
-- **Glass background toggle** available (same as other widgets)
+Widget centrado con 3 zonas inspirado en la foto:
 
-## Design
+- **Arriba:** fecha y hora en tipografía serif pequeña (ej. "Today at 6:55 AM")
+- **Centro:** nombre de la actividad (ej. "Fondo") en serif bold muy grande — elemento hero
+- **Abajo:** fila de columnas de stats (Distancia, Pace, Tiempo, Elevación) con la etiqueta encima del valor
 
-- **Portrait card layout** — route trace fills the top portion, large number in the middle, small stats row at the bottom
-- **Default color: white** — all text, route stroke, and stat labels use the selected palette color
-- **Distance number** uses the same heavy compressed system font as the Bold/Impact widgets — large and impactful
-- **Unit label** (MI / KM) sits right next to the number, slightly smaller
-- **Secondary stats row** — three small all-caps labels above each value (e.g. `ELEV`, `TIME`, `SPEED`), values in a clean monospace-style font
-- **Route stroke** uses the same style as the existing Route Clean widget but fills the available card space
-- **Card outline** — no background fill on the widget itself (transparent), just the elements — compatible with glass toggle
+Color blanco por defecto. Soporte glass. Compatible con todos los palettes existentes.
 
-## What Gets Updated
+---
 
-- New widget type added to the full list (drawer, sorting, popularity tracking)
-- New customization panel section in the right-side style panel with: unit toggle (KM/MI), elevation toggle, time toggle, speed toggle
-- New mini thumbnail preview in the drawer grid
-- All existing widget data flows (color, glass, export) work automatically via the shared system
+## Cambios
+
+### 1 – Nuevo tipo de widget
+
+- Se agrega `nameStats = "Name Stats"` al enum de tipos de widgets
+- Icono: `person.text.rectangle.fill`
+- Soporte de glass activado
+
+### 2 – Nuevos campos en el widget
+
+Se agregan 5 campos al modelo de widget guardado:
+
+- `nameStatsUnitFilter` (KM / MI)
+- `nameStatsShowDistance` (on/off)
+- `nameStatsShowPace` (on/off)
+- `nameStatsShowTime` (on/off)
+- `nameStatsShowElevation` (on/off)
+
+### 3 – Vista del widget
+
+Nuevo archivo de extensión con la vista `nameStatsWidget`:
+
+- Hora en serif ligero arriba centrado
+- Nombre de actividad en serif bold grande centrado (escala automáticamente si es largo)
+- Columnas de stats debajo separadas por divisores verticales finos, cada una con etiqueta serif encima y valor serif italic abajo
+- `.conditionalGlass()` igual que los demás widgets
+
+### 4 – Panel de personalización
+
+Nueva sección en `PaletteSelectorView` visible solo cuando el widget activo es `nameStats`:
+
+- Toggle KM ↔ MI
+- Toggle visibilidad de Distance, Pace, Time, Elevation (iconos de regla, velocímetro, reloj, montaña)
+
+### 5 – Miniatura en el drawer
+
+Se agrega la preview pequeña del widget en el drawer: fecha pequeña + nombre de actividad + stats mini en serif
+
+### 6 – Integración completa
+
+- Aparece en el drawer como cualquier otro widget (popular/recents)
+- Todos los gestos, arrastre, escala, rotación funcionan igual
+- Color inicial: blanco
 

@@ -85,7 +85,12 @@ struct StatWidgetContentView: View, Equatable {
         lhs.routeDistanceUnitFilter == rhs.routeDistanceUnitFilter &&
         lhs.routeDistanceShowElevation == rhs.routeDistanceShowElevation &&
         lhs.routeDistanceShowTime == rhs.routeDistanceShowTime &&
-        lhs.routeDistanceShowSpeed == rhs.routeDistanceShowSpeed
+        lhs.routeDistanceShowSpeed == rhs.routeDistanceShowSpeed &&
+        lhs.nameStatsUnitFilter == rhs.nameStatsUnitFilter &&
+        lhs.nameStatsShowDistance == rhs.nameStatsShowDistance &&
+        lhs.nameStatsShowPace == rhs.nameStatsShowPace &&
+        lhs.nameStatsShowTime == rhs.nameStatsShowTime &&
+        lhs.nameStatsShowElevation == rhs.nameStatsShowElevation
     }
 
     let type: StatWidgetType
@@ -140,6 +145,11 @@ struct StatWidgetContentView: View, Equatable {
     var routeDistanceShowElevation: Bool = true
     var routeDistanceShowTime: Bool = true
     var routeDistanceShowSpeed: Bool = true
+    var nameStatsUnitFilter: SplitsUnitFilter = .km
+    var nameStatsShowDistance: Bool = true
+    var nameStatsShowPace: Bool = true
+    var nameStatsShowTime: Bool = true
+    var nameStatsShowElevation: Bool = false
 
     // MARK: - Color palette (internal so extension files can access)
 
@@ -190,6 +200,7 @@ struct StatWidgetContentView: View, Equatable {
         case .splitBanner: splitBannerWidget
         case .cityActivity: cityActivityWidget
         case .routeDistance: routeDistanceWidget
+        case .nameStats: nameStatsWidget
         }
     }
 }
@@ -364,7 +375,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, distanceWordsFontStyle: widget.distanceWordsFontStyle, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter, splitBannerFontStyle: widget.splitBannerFontStyle, cityActivityUnitFilter: widget.cityActivityUnitFilter, geocodedActivityCity: geocodedActivityCity, routeDistanceUnitFilter: widget.routeDistanceUnitFilter, routeDistanceShowElevation: widget.routeDistanceShowElevation, routeDistanceShowTime: widget.routeDistanceShowTime, routeDistanceShowSpeed: widget.routeDistanceShowSpeed)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, distanceWordsFontStyle: widget.distanceWordsFontStyle, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter, splitBannerFontStyle: widget.splitBannerFontStyle, cityActivityUnitFilter: widget.cityActivityUnitFilter, geocodedActivityCity: geocodedActivityCity, routeDistanceUnitFilter: widget.routeDistanceUnitFilter, routeDistanceShowElevation: widget.routeDistanceShowElevation, routeDistanceShowTime: widget.routeDistanceShowTime, routeDistanceShowSpeed: widget.routeDistanceShowSpeed, nameStatsUnitFilter: widget.nameStatsUnitFilter, nameStatsShowDistance: widget.nameStatsShowDistance, nameStatsShowPace: widget.nameStatsShowPace, nameStatsShowTime: widget.nameStatsShowTime, nameStatsShowElevation: widget.nameStatsShowElevation)
     }
 }
 
