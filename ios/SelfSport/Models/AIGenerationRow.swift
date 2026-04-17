@@ -19,6 +19,16 @@ nonisolated struct AIGenerationRow: Codable, Sendable {
     }
 }
 
+nonisolated struct AIGenerationInsertRow: Codable, Sendable {
+    let userId: String
+    let kind: String
+
+    enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+        case kind
+    }
+}
+
 nonisolated struct AIGenerationDateRow: Codable, Sendable {
     let createdAt: String
 

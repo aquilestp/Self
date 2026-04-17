@@ -85,16 +85,24 @@ final class AIQuotaService {
     }
 
     func recordUsage(_ kind: AIGenerationKind) async {
-        guard let userId = try? await supabase.auth.session.user.id.uuidString else { return }
+        let userId: String
         do {
-            let row = AIGenerationRow(id: nil, userId: userId, kind: kind.rawValue, createdAt: nil)
+            userId = try await supabase.auth.session.user.id.uuidString
+        } catch {
+            print("[AIQuota] No authenticated user, cannot record \(kind.rawValue): \(error)")
+            return
+        }
+        print("[AIQuota] Recording \(kind.rawValue) usage for user \(userId)")
+        do {
+            let row = AIGenerationInsertRow(userId: userId, kind: kind.rawValue)
             try await supabase
                 .from("ai_generations")
                 .insert(row)
                 .execute()
+            print("[AIQuota] Successfully recorded \(kind.rawValue)")
             await refresh()
         } catch {
-            print("[AIQuota] Failed to record \(kind.rawValue): \(error)")
+            print("[AIQuota] Failed to insert \(kind.rawValue): \(error)")
         }
     }
 }

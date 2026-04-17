@@ -74,7 +74,7 @@ extension PhotoEditorView {
                     Spacer()
                     Toggle("", isOn: $includeStatsOverlay)
                         .labelsHidden()
-                        .tint(Color.white.opacity(0.6))
+                        .tint(.green)
                 }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
