@@ -183,8 +183,12 @@ struct DashboardRootView: View {
             SettingsView(
                 userProfile: authViewModel.userProfile,
                 isStravaConnected: stravaViewModel.isConnected,
+                isConnecting: stravaViewModel.isConnecting,
                 onDisconnectStrava: {
                     stravaViewModel.disconnect()
+                },
+                onConnectStrava: {
+                    Task { await stravaViewModel.connect() }
                 },
                 onSignOut: {
                     Task { await authViewModel.signOut() }

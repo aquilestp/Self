@@ -1,25 +1,26 @@
-# Consolidar métodos de conexión en un solo card secundario
-
+# Connected Apps row en Settings abre drawer de conexión o desconexión
 
 ## Qué cambia
 
-La pantalla de inicio pasa de tener 4 cards en el carrusel (Create a post + Strava + COROS + Garmin) a tener **solo 2 cards del mismo tamaño**, limpios y con jerarquía clara.
+### Comportamiento del row "Connected app" en Settings
 
-## Cards resultantes
+**Sin conexión activa:**
 
-- **Card 1 — "Create a post"** (sin cambios): el mismo card actual, sin tocar nada.
-- **Card 2 — "Bring your activities"**: nuevo card secundario del mismo tamaño. Tono más oscuro y sutil para señalar que es una opción secundaria. Incluirá un icono representativo, un título como *"Bring your activities"* y una descripción corta invitando a conectar Strava, COROS o Garmin. Botón de acción que abre el sheet.
+- El row "Connected app" se vuelve tappable (aparece un chevron `>` a la derecha)
+- Al tocarlo, se abre el mismo drawer de "Connect a service" (Strava, COROS, Garmin)
+- Mismo flujo que el botón "See connections" del dashboard
 
-## Sheet de conexión
+**Con conexión activa (ej. Strava):**
 
-Al tocar el segundo card se abre un **bottom sheet** (sin cambiar de pantalla) con los 3 métodos de conexión:
+- El row ya muestra el nombre de la app conectada en verde
+- Al tocarlo, aparece el diálogo de confirmación de desconexión que ya existe
+- El botón "Disconnect Strava" inline que hay debajo desaparece (el tap en el row ya lo cubre)
 
-- **Strava** — con su botón de conectar activo (funcionalidad existente)
-- **COROS** — marcado como *Coming soon* (funcionalidad existente)
-- **Garmin** — marcado como *Coming soon* (funcionalidad existente)
+### Cambios técnicos
 
-El sheet tendrá un diseño limpio con filas verticales, cada una con el color de marca de cada servicio, igual que los cards actuales pero en formato compacto de lista dentro del modal.
+- `SettingsView` recibe un nuevo callback `onConnectStrava`
+- El row "Connected app" se convierte en botón con comportamiento condicional
+- Al no estar conectado: abre `ConnectProvidersSheet` como sheet desde Settings
+- Al estar conectado: dispara el diálogo de desconexión existente
+- `DashboardRootView` pasa el callback `onConnectStrava` a `SettingsView`
 
-## Lo que desaparece
-
-Los 3 cards individuales de Strava, COROS y Garmin del carrusel horizontal dejan de mostrarse directamente — ahora viven dentro del sheet.

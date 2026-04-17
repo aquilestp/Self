@@ -3,7 +3,9 @@ import SwiftUI
 struct SettingsView: View {
     let userProfile: UserProfile?
     let isStravaConnected: Bool
+    let isConnecting: Bool
     let onDisconnectStrava: () -> Void
+    let onConnectStrava: () -> Void
     let onSignOut: () -> Void
     var onDeleteAccount: () async -> Bool = { false }
     @Environment(\.dismiss) private var dismiss
@@ -13,6 +15,7 @@ struct SettingsView: View {
     @State private var isDeletingAccount: Bool = false
     @State private var deleteErrorMessage: String?
     @State private var showDeleteError: Bool = false
+    @State private var showConnectProvidersSheet: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -196,7 +199,13 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionLabel("EXTERNAL CONNECTION", icon: "link")
 
-            VStack(spacing: 0) {
+            Button {
+                if isStravaConnected {
+                    showDisconnectStravaConfirmation = true
+                } else {
+                    showConnectProvidersSheet = true
+                }
+            } label: {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Connected app")
@@ -210,38 +219,33 @@ struct SettingsView: View {
 
                     Spacer()
 
-                    Circle()
-                        .fill(isStravaConnected ? Color(red: 0.30, green: 0.78, blue: 0.45) : Color.white.opacity(0.20))
-                        .frame(width: 8, height: 8)
+                    if isStravaConnected {
+                        Text("Disconnect")
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundStyle(Color(red: 0.99, green: 0.32, blue: 0.14).opacity(0.80))
+                    } else {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.25))
+                    }
                 }
                 .padding(16)
-
-                if isStravaConnected {
-                    Rectangle()
-                        .fill(Color.white.opacity(0.06))
-                        .frame(height: 0.5)
-                        .padding(.leading, 16)
-
-                    Button {
-                        showDisconnectStravaConfirmation = true
-                    } label: {
-                        HStack {
-                            Text("Disconnect \(externalConnectionName)")
-                                .font(.system(size: 15, weight: .regular))
-                                .foregroundStyle(Color(red: 0.99, green: 0.32, blue: 0.14))
-                            Spacer()
-                            Image(systemName: "link.badge.plus")
-                                .font(.system(size: 14))
-                                .foregroundStyle(Color(red: 0.99, green: 0.32, blue: 0.14).opacity(0.60))
-                                .rotationEffect(.degrees(45))
-                        }
-                        .padding(16)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                }
+                .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
             .background(cardBackground)
+        }
+        .sheet(isPresented: $showConnectProvidersSheet) {
+            ConnectProvidersSheet(
+                isConnecting: isConnecting,
+                onConnectStrava: {
+                    showConnectProvidersSheet = false
+                    onConnectStrava()
+                }
+            )
+            .presentationDetents([.height(420)])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(Color(white: 0.08))
         }
     }
 
@@ -359,8 +363,10 @@ struct SettingsView: View {
     Color.black.sheet(isPresented: .constant(true)) {
         SettingsView(
             userProfile: UserProfile(id: UUID(), fullName: "Juan Pérez", email: "juan@email.com"),
-            isStravaConnected: true,
+            isStravaConnected: false,
+            isConnecting: false,
             onDisconnectStrava: {},
+            onConnectStrava: {},
             onSignOut: {}
         )
     }
