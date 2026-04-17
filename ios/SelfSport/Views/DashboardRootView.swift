@@ -606,15 +606,15 @@ struct DashboardView: View {
     private var connectStravaRail: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 14) {
+                BringActivitiesCard(
+                    onTap: { showConnectProvidersSheet = true }
+                )
+                .id(0)
+
                 CreatePostCard(
                     isLoading: stravaViewModel.isLoading,
                     onStart: onStartTemplates,
                     onNewFromPhoto: onStartFromPhoto
-                )
-                .id(0)
-
-                BringActivitiesCard(
-                    onTap: { showConnectProvidersSheet = true }
                 )
                 .id(1)
             }

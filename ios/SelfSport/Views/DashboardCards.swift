@@ -217,8 +217,8 @@ struct CreatePostCard: View {
     let onStart: () -> Void
     let onNewFromPhoto: () -> Void
 
-    private let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.603
-    private let cardHeight: CGFloat = 481
+    private let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.52
+    private let cardHeight: CGFloat = 380
     private let accent = Color(red: 0.92, green: 0.86, blue: 0.72)
 
     var body: some View {
@@ -253,23 +253,23 @@ struct CreatePostCard: View {
 
                 ZStack {
                     Circle()
-                        .fill(accent.opacity(0.10))
-                        .frame(width: 120, height: 120)
+                        .fill(accent.opacity(0.07))
+                        .frame(width: 80, height: 80)
 
                     Image(systemName: "sparkles")
-                        .font(.system(size: 46, weight: .light))
-                        .foregroundStyle(accent.opacity(0.92))
+                        .font(.system(size: 32, weight: .light))
+                        .foregroundStyle(accent.opacity(0.60))
                 }
-                .padding(.bottom, 24)
+                .padding(.bottom, 18)
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Create a post")
-                        .font(.system(size: 24, weight: .regular, design: .serif).italic())
-                        .foregroundStyle(Color.white.opacity(0.98))
+                        .font(.system(size: 20, weight: .regular, design: .serif).italic())
+                        .foregroundStyle(Color.white.opacity(0.80))
 
                     Text("Pick a workout template, drop your photo and share it.")
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundStyle(Color.white.opacity(0.48))
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundStyle(Color.white.opacity(0.36))
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.bottom, 18)
