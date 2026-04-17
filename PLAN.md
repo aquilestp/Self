@@ -1,12 +1,16 @@
-# Fix drawer widget sorting stability
+# Add "Rate the App" section in Settings
 
-## Problem
 
-The sorted widget list is recomputed on every view render. During the transition between half-open and fully-open drawer states, both drawer views exist simultaneously (opacity animation), each recalculating the sort independently — causing the visible order to jump.
+## What will change
 
-## Fix
+A new **"RATE THE APP"** section will appear in Settings, placed between the External Connection section and the Session section.
 
-- Store the sorted widget order in a single stable list that is only recalculated when the sorting criteria actually change (tab switch between Popular/Recents, or when popularity/recency data loads)
-- Both the compact drawer and the expanded drawer will read from this same stable list — no more divergence during transitions
-- The order will remain locked throughout the open/expand animation and only change intentionally when the user taps Popular or Recents tabs
+## Features
+- Tapping **"Rate on the App Store"** opens the App Store directly on the ratings & reviews page for the app
+- Uses a star icon to make the action visually clear
+- Styled consistently with the rest of the Settings cards (same dark card, same typography)
 
+## Design
+- Section label: `RATE THE APP` with a star icon, matching the existing section label style
+- Card row: label "Rate on the App Store" on the left, a star SF Symbol on the right
+- Same dark frosted card background and subtle border as all other settings rows
