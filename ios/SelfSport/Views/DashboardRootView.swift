@@ -278,6 +278,10 @@ struct DashboardRootView: View {
                             withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
                                 pendingActivity = placeholderActivity
                             }
+                        },
+                        onGoBack: {
+                            HapticService.medium.impactOccurred()
+                            stravaViewModel.resetDemoState()
                         }
                     )
                 }
@@ -341,6 +345,7 @@ struct DashboardView: View {
     let onStartTemplates: () -> Void
     let onStartFromPhoto: () -> Void
     let onGoWithoutActivity: () -> Void
+    let onGoBack: () -> Void
 
     private var activities: [ActivityHighlight] {
         stravaViewModel.activityHighlights
@@ -475,12 +480,12 @@ struct DashboardView: View {
     private var goWithoutActivityButton: some View {
         Button {
             HapticService.medium.impactOccurred()
-            onGoWithoutActivity()
+            onGoBack()
         } label: {
             HStack(spacing: 8) {
-                Image(systemName: "arrow.right")
+                Image(systemName: "chevron.left")
                     .font(.system(size: 13, weight: .bold))
-                Text("Go without a specific activity")
+                Text("Go back")
                     .font(.system(size: 15, weight: .semibold))
             }
             .foregroundStyle(Color.white.opacity(0.92))

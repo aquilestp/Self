@@ -1,26 +1,13 @@
-# Connected Apps row en Settings abre drawer de conexión o desconexión
+# Activity cards bigger + "Go back" button navigation
 
-## Qué cambia
 
-### Comportamiento del row "Connected app" en Settings
+## Changes
 
-**Sin conexión activa:**
+**Activity card sizing**
+- Height increased by 12%: 481 → ~539 pt
+- Width factor increased by 5%: 0.603 → ~0.633 of screen width
 
-- El row "Connected app" se vuelve tappable (aparece un chevron `>` a la derecha)
-- Al tocarlo, se abre el mismo drawer de "Connect a service" (Strava, COROS, Garmin)
-- Mismo flujo que el botón "See connections" del dashboard
-
-**Con conexión activa (ej. Strava):**
-
-- El row ya muestra el nombre de la app conectada en verde
-- Al tocarlo, aparece el diálogo de confirmación de desconexión que ya existe
-- El botón "Disconnect Strava" inline que hay debajo desaparece (el tap en el row ya lo cubre)
-
-### Cambios técnicos
-
-- `SettingsView` recibe un nuevo callback `onConnectStrava`
-- El row "Connected app" se convierte en botón con comportamiento condicional
-- Al no estar conectado: abre `ConnectProvidersSheet` como sheet desde Settings
-- Al estar conectado: dispara el diálogo de desconexión existente
-- `DashboardRootView` pasa el callback `onConnectStrava` a `SettingsView`
-
+**"Go back" button**
+- Copy changes from "Go without a specific activity" → **"Go back"**
+- Icon changes from `arrow.right` → `chevron.left`
+- Action resets the demo/activity state so the screen returns to showing the **"Bring your activities"** and **"Create a post"** connection cards — instead of proceeding to post creation

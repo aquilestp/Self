@@ -150,6 +150,15 @@ final class StravaViewModel {
         await pollingService.checkForNewActivities()
     }
 
+    func resetDemoState() {
+        isUsingDemoActivities = false
+        activityHighlights = []
+        activities = []
+        highlightCache = [:]
+        didCompleteFirstLoad = false
+        resetPagination()
+    }
+
     func loadDemoActivities() async {
         pollingService.stopPolling()
         isLoading = true
