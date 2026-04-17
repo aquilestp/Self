@@ -742,10 +742,10 @@ struct PhotoEditorView: View {
                 onDismiss: { showQuotaPaywall = false }
             )
         }
-        .alert("Los videos están en el gym 🏋️", isPresented: $showVideoComingSoon) {
-            Button("Ok, esperaré", role: .cancel) {}
+        .alert("Videos are hitting the gym 🏋️", isPresented: $showVideoComingSoon) {
+            Button("Got it, I'll wait", role: .cancel) {}
         } message: {
-            Text("Nuestra IA está entrenando duro para generar videos épicos tuyos. Mientras tanto, disfruta creando imágenes alucinantes. ¡Vuelve pronto!")
+            Text("Our AI is training hard to generate epic videos of your runs. In the meantime, enjoy creating stunning images. Check back soon!")
         }
         .task {
             weeklyKmData = await weeklyKmService.fetchWeeklyKm()

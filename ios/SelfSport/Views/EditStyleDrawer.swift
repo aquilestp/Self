@@ -63,7 +63,7 @@ extension PhotoEditorView {
             }
             .contentMargins(.horizontal, 0)
 
-            if hasCanvasContent && selectedEditStyle != nil {
+            if !placedWidgets.isEmpty {
                 HStack(spacing: 10) {
                     Image(systemName: "square.stack.3d.up")
                         .font(.system(size: 14, weight: .medium))
@@ -81,7 +81,7 @@ extension PhotoEditorView {
                 .background(Color.white.opacity(0.05), in: .rect(cornerRadius: 10))
                 .padding(.horizontal, 18)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
-                .animation(.easeInOut(duration: 0.25), value: hasCanvasContent)
+                .animation(.easeInOut(duration: 0.25), value: placedWidgets.isEmpty)
             }
 
             Button {
