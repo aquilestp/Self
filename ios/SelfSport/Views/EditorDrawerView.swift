@@ -129,11 +129,11 @@ extension PhotoEditorView {
         let hasText = !placedTexts.isEmpty
         return VStack(spacing: 10) {
             LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
+                columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 2),
                 spacing: 10
             ) {
                 textThumbnail(isActive: hasText)
-                ForEach(Array(types.prefix(5)), id: \.rawValue) { type in
+                ForEach(Array(types.prefix(3)), id: \.rawValue) { type in
                     widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
                 }
             }
@@ -146,7 +146,7 @@ extension PhotoEditorView {
                 .padding(.horizontal, 14)
                 .padding(.bottom, 14)
         }
-        .frame(maxHeight: 262, alignment: .top)
+        .frame(maxHeight: 320, alignment: .top)
         .clipped()
     }
 
@@ -157,7 +157,7 @@ extension PhotoEditorView {
         return ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 10) {
                 LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
+                    columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 2),
                     spacing: 10
                 ) {
                     textThumbnail(isActive: hasText)
@@ -206,7 +206,7 @@ extension PhotoEditorView {
     }
 
     func textThumbnail(isActive: Bool) -> some View {
-        let h: CGFloat = 80
+        let h: CGFloat = 106
         return Button {
             hapticLight.impactOccurred()
             withAnimation(.snappy(duration: 0.25)) {
@@ -239,7 +239,7 @@ extension PhotoEditorView {
     }
 
     func widgetThumbnail(type: StatWidgetType, isActive: Bool, large: Bool = false) -> some View {
-        let h: CGFloat = large ? 80 : 72
+        let h: CGFloat = large ? 106 : 90
         return Button {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 toggleWidget(type)
@@ -279,7 +279,7 @@ extension PhotoEditorView {
             }
             .padding(.horizontal, 8)
             .frame(maxWidth: .infinity)
-            .frame(height: 94)
+            .frame(height: 110)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(isActive ? Color.white.opacity(0.18) : Color.white.opacity(0.06))
