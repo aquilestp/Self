@@ -400,11 +400,6 @@ extension StatWidgetContentView {
             .frame(maxWidth: .infinity)
             .frame(height: 130)
 
-            Rectangle()
-                .fill(primaryColor.opacity(0.12))
-                .frame(height: 0.5)
-                .padding(.horizontal, 14)
-
             VStack(spacing: 2) {
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(dist.value)
