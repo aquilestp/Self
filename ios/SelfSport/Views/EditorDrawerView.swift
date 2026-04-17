@@ -244,6 +244,9 @@ extension PhotoEditorView {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 toggleWidget(type)
             }
+            withAnimation(.snappy(duration: 0.25)) {
+                drawerState = .collapsed
+            }
         } label: {
             VStack(spacing: 6) {
                 miniWidgetPreview(type: type)
@@ -271,6 +274,9 @@ extension PhotoEditorView {
         Button {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 toggleWidget(type)
+            }
+            withAnimation(.snappy(duration: 0.25)) {
+                drawerState = .collapsed
             }
         } label: {
             VStack(spacing: 6) {

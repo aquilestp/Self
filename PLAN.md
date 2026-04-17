@@ -1,30 +1,11 @@
-# Drawer grid: 3 columnas → 2 columnas con thumbnails proporcionales
+# Colapsar drawer al tocar cualquier widget
 
 
-## Qué cambia
+## Cambio
 
-### Grid: de 3 → 2 columnas
-- Ambos estados del drawer (abierto/compacto y expandido) pasan de 3 columnas a **2 columnas**
-- Los dos widgets que hoy abarcan las 3 columnas completas (`fullBanner` y `fullBannerBottom`) seguirán abarcando **todo el ancho** — ya funcionan así por diseño, no requieren cambio lógico
+Cada vez que tocas un widget en el drawer (ya sea para añadirlo o quitarlo del canvas), el drawer se minimiza completamente con una animación suave.
 
-### Tamaños proporcionales
-- Los thumbnails de widget pasan de **80px → 106px** de alto (mantiene la misma proporción visual al ser más anchos)
-- El thumbnail de texto "Aa" sube igual: **80px → 106px**
-- Los full-width thumbnails pasan de **94px → 110px** para mantener la jerarquía
+**Antes:** el drawer permanecía abierto después de tocar un widget.  
+**Después:** el drawer colapsa automáticamente al tocar cualquier widget del drawer.
 
-### Estado compacto (drawer abierto)
-- Actualmente muestra `text + 5 widgets` = 6 ítems en 3 cols = **2 filas**
-- Con 2 cols, 6 ítems darían 3 filas — se ajusta el número visible a `text + 3 widgets` = 4 ítems = **2 filas limpias**, manteniendo la compacidad del estado inicial
-- Se actualiza el `maxHeight` para acomodar las 2 filas más altas + los full-width
-
-### Estado expandido (drawer expandido)
-- Muestra **todos los widgets** en grid de 2 cols — sin cambio en la cantidad, solo en la distribución
-- Los full-width siguen al final del scroll, abarcando todo el ancho
-
-## Lo que NO cambia (lógica intacta)
-- Sorting por **Popular** (por popularidad → índice original como desempate)
-- Sorting por **Recents** (por fecha de uso reciente → fallback a popularidad si sin historial)
-- **Animaciones** de transición entre estados del drawer (`.snappy`, `.spring`)
-- **Drag gesture** con umbrales `.open` ↔ `.expanded` ↔ `.collapsed`
-- Pills de tabs (Popular / Recents) con sus highlights y hápticos
-- Estado activo de cada widget (`scaleEffect`, colores de fondo y borde)
+Aplica a los tres tipos de miniaturas: widgets normales, widgets de ancho completo (full banner). El texto ya tenía este comportamiento correcto.
