@@ -1,58 +1,25 @@
-# Nuevo widget "Name Stats" — nombre de actividad + indicadores
+# Ajustes visuales al widget NameStats
 
-## Diseño
+## Cambios al widget de Nombre + Indicadores
 
-Widget centrado con 3 zonas inspirado en la foto:
+### Indicadores inferiores más grandes y armónicos
 
-- **Arriba:** fecha y hora en tipografía serif pequeña (ej. "Today at 6:55 AM")
-- **Centro:** nombre de la actividad (ej. "Fondo") en serif bold muy grande — elemento hero
-- **Abajo:** fila de columnas de stats (Distancia, Pace, Tiempo, Elevación) con la etiqueta encima del valor
+- Etiquetas (Distance, Pace, Time, Elevation): de tamaño 9 → **12**, con más tracking
+- Valores: de tamaño 16 → **22**, ligeramente más peso para mejor presencia visual
+- Espaciado interno entre etiqueta y valor: de 4 → **6**
+- Espaciado superior antes de los indicadores: de 18 → **22**
 
-Color blanco por defecto. Soporte glass. Compatible con todos los palettes existentes.
+### Eliminar líneas divisoras
 
----
+- Se eliminan los `Rectangle` separadores de 0.5px entre columnas
+- Los indicadores quedan distribuidos con espacio libre (HStack con spacing natural)
 
-## Cambios
+### Fecha más grande
 
-### 1 – Nuevo tipo de widget
+- Tamaño de fuente de la fecha: de 11 → **13**
 
-- Se agrega `nameStats = "Name Stats"` al enum de tipos de widgets
-- Icono: `person.text.rectangle.fill`
-- Soporte de glass activado
+### Indicadores sin opacidad (blancos por defecto)
 
-### 2 – Nuevos campos en el widget
-
-Se agregan 5 campos al modelo de widget guardado:
-
-- `nameStatsUnitFilter` (KM / MI)
-- `nameStatsShowDistance` (on/off)
-- `nameStatsShowPace` (on/off)
-- `nameStatsShowTime` (on/off)
-- `nameStatsShowElevation` (on/off)
-
-### 3 – Vista del widget
-
-Nuevo archivo de extensión con la vista `nameStatsWidget`:
-
-- Hora en serif ligero arriba centrado
-- Nombre de actividad en serif bold grande centrado (escala automáticamente si es largo)
-- Columnas de stats debajo separadas por divisores verticales finos, cada una con etiqueta serif encima y valor serif italic abajo
-- `.conditionalGlass()` igual que los demás widgets
-
-### 4 – Panel de personalización
-
-Nueva sección en `PaletteSelectorView` visible solo cuando el widget activo es `nameStats`:
-
-- Toggle KM ↔ MI
-- Toggle visibilidad de Distance, Pace, Time, Elevation (iconos de regla, velocímetro, reloj, montaña)
-
-### 5 – Miniatura en el drawer
-
-Se agrega la preview pequeña del widget en el drawer: fecha pequeña + nombre de actividad + stats mini en serif
-
-### 6 – Integración completa
-
-- Aparece en el drawer como cualquier otro widget (popular/recents)
-- Todos los gestos, arrastre, escala, rotación funcionan igual
-- Color inicial: blanco
+- Etiquetas de indicadores: se elimina la opacidad 0.55 → **opacidad completa**
+- La fecha: **opacidad completa**
 

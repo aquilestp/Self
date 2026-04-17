@@ -81,8 +81,8 @@ extension StatWidgetContentView {
 
         return VStack(alignment: .center, spacing: 0) {
             Text(nameStatsDateTime)
-                .font(.system(size: 11, weight: .light, design: .serif))
-                .foregroundStyle(primaryColor.opacity(0.65))
+                .font(.system(size: 13, weight: .light, design: .serif))
+                .foregroundStyle(primaryColor)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 
@@ -97,30 +97,23 @@ extension StatWidgetContentView {
                 .fixedSize(horizontal: false, vertical: true)
 
             if !visibleColumns.isEmpty {
-                Spacer().frame(height: 18)
+                Spacer().frame(height: 22)
 
                 HStack(alignment: .top, spacing: 0) {
-                    ForEach(Array(visibleColumns.enumerated()), id: \.offset) { idx, col in
-                        VStack(alignment: .center, spacing: 4) {
+                    ForEach(Array(visibleColumns.enumerated()), id: \.offset) { _, col in
+                        VStack(alignment: .center, spacing: 6) {
                             Text(col.label)
-                                .font(.system(size: 9, weight: .regular, design: .serif))
-                                .tracking(0.3)
-                                .foregroundStyle(primaryColor.opacity(0.55))
+                                .font(.system(size: 12, weight: .regular, design: .serif))
+                                .tracking(0.8)
+                                .foregroundStyle(primaryColor)
                                 .lineLimit(1)
                             Text(col.value)
-                                .font(.system(size: 16, weight: .regular, design: .serif).italic())
+                                .font(.system(size: 22, weight: .light, design: .serif).italic())
                                 .foregroundStyle(primaryColor)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.6)
                         }
                         .frame(maxWidth: .infinity)
-
-                        if idx < visibleColumns.count - 1 {
-                            Rectangle()
-                                .fill(primaryColor.opacity(0.18))
-                                .frame(width: 0.5, height: 28)
-                                .padding(.top, 4)
-                        }
                     }
                 }
             }
