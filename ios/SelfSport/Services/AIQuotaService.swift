@@ -15,6 +15,7 @@ final class AIQuotaService {
     private(set) var oldestImageDate: Date? = nil
     private(set) var oldestVideoDate: Date? = nil
     private(set) var isLoading: Bool = false
+    var lastError: String? = nil
 
     var imagesRemaining: Int { max(0, Self.imageLimit - imagesUsed) }
     var videosRemaining: Int { max(0, Self.videoLimit - videosUsed) }
@@ -84,25 +85,38 @@ final class AIQuotaService {
         }
     }
 
-    func recordUsage(_ kind: AIGenerationKind) async {
+    @discardableResult
+    func recordUsage(_ kind: AIGenerationKind) async -> Bool {
+        lastError = nil
         let userId: String
         do {
             userId = try await supabase.auth.session.user.id.uuidString
         } catch {
-            print("[AIQuota] No authenticated user, cannot record \(kind.rawValue): \(error)")
-            return
+            let msg = "[AIQuota] No authenticated Supabase session — cannot record \(kind.rawValue). Error: \(error)"
+            print(msg)
+            lastError = "Not signed in to Supabase. Please sign in again."
+            return false
         }
         print("[AIQuota] Recording \(kind.rawValue) usage for user \(userId)")
         do {
             let row = AIGenerationInsertRow(userId: userId, kind: kind.rawValue)
-            try await supabase
+            let response = try await supabase
                 .from("ai_generations")
-                .insert(row)
+                .insert(row, returning: .representation)
+                .select()
                 .execute()
-            print("[AIQuota] Successfully recorded \(kind.rawValue)")
+            print("[AIQuota] Insert response status=\(response.status), data bytes=\(response.data.count)")
+            if let bodyStr = String(data: response.data, encoding: .utf8) {
+                print("[AIQuota] Insert body: \(bodyStr)")
+            }
             await refresh()
+            print("[AIQuota] After refresh: imagesUsed=\(imagesUsed), videosUsed=\(videosUsed)")
+            return true
         } catch {
-            print("[AIQuota] Failed to insert \(kind.rawValue): \(error)")
+            let msg = "[AIQuota] Failed to insert \(kind.rawValue): \(error) | localized: \(error.localizedDescription)"
+            print(msg)
+            lastError = error.localizedDescription
+            return false
         }
     }
 }
