@@ -81,7 +81,11 @@ struct StatWidgetContentView: View, Equatable {
         lhs.splitBannerUnitFilter == rhs.splitBannerUnitFilter &&
         lhs.splitBannerFontStyle == rhs.splitBannerFontStyle &&
         lhs.cityActivityUnitFilter == rhs.cityActivityUnitFilter &&
-        lhs.geocodedActivityCity == rhs.geocodedActivityCity
+        lhs.geocodedActivityCity == rhs.geocodedActivityCity &&
+        lhs.routeDistanceUnitFilter == rhs.routeDistanceUnitFilter &&
+        lhs.routeDistanceShowElevation == rhs.routeDistanceShowElevation &&
+        lhs.routeDistanceShowTime == rhs.routeDistanceShowTime &&
+        lhs.routeDistanceShowSpeed == rhs.routeDistanceShowSpeed
     }
 
     let type: StatWidgetType
@@ -132,6 +136,10 @@ struct StatWidgetContentView: View, Equatable {
     var splitBannerFontStyle: SplitBannerFontStyle = .system
     var cityActivityUnitFilter: SplitsUnitFilter = .km
     var geocodedActivityCity: String? = nil
+    var routeDistanceUnitFilter: SplitsUnitFilter = .km
+    var routeDistanceShowElevation: Bool = true
+    var routeDistanceShowTime: Bool = true
+    var routeDistanceShowSpeed: Bool = true
 
     // MARK: - Color palette (internal so extension files can access)
 
@@ -181,6 +189,7 @@ struct StatWidgetContentView: View, Equatable {
         case .ancestralMedal: ancestralMedalWidget
         case .splitBanner: splitBannerWidget
         case .cityActivity: cityActivityWidget
+        case .routeDistance: routeDistanceWidget
         }
     }
 }
@@ -355,7 +364,7 @@ extension DraggableStatWidget {
     }
 
     private var widgetContent: StatWidgetContentView {
-        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, distanceWordsFontStyle: widget.distanceWordsFontStyle, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter, splitBannerFontStyle: widget.splitBannerFontStyle, cityActivityUnitFilter: widget.cityActivityUnitFilter, geocodedActivityCity: geocodedActivityCity)
+        StatWidgetContentView(type: widget.type, activity: activity, colorStyle: widget.colorStyle, useGlassBackground: widget.useGlassBackground, weeklyKmData: weeklyKmData, lastWeekKmData: lastWeekKmData, monthlyKmData: monthlyKmData, lastMonthKmData: lastMonthKmData, activityDetail: activityDetail, isLoadingDetail: isLoadingDetail, bestEffortsFilter: widget.bestEffortsFilter, splitsFilter: widget.splitsFilter, distanceWordsFilter: widget.distanceWordsFilter, distanceWordsFontStyle: widget.distanceWordsFontStyle, fontStyle: widget.fontStyle, showTitle: widget.showTitle, showActivityName: widget.showActivityName, showDate: widget.showDate, showDistance: widget.showDistance, showPace: widget.showPace, showTime: widget.showTime, showElevation: widget.showElevation, basicUnitFilter: widget.basicUnitFilter, fullBannerUnitFilter: widget.fullBannerUnitFilter, fullBannerShowDistance: widget.fullBannerShowDistance, fullBannerShowPace: widget.fullBannerShowPace, fullBannerShowTime: widget.fullBannerShowTime, fullBannerShowElevation: widget.fullBannerShowElevation, bvtShowDate: widget.bvtShowDate, bvtShowTime: widget.bvtShowTime, bvtShowLocation: widget.bvtShowLocation, bvtShowDistance: widget.bvtShowDistance, bvtShowPace: widget.bvtShowPace, bvtShowDuration: widget.bvtShowDuration, bvtShowElevation: widget.bvtShowElevation, bvtShowCalories: widget.bvtShowCalories, bvtShowBPM: widget.bvtShowBPM, bvtUnitFilter: widget.bvtUnitFilter, bvtEffect: widget.bvtEffect, whatsappText: widget.whatsappText, notesUnitFilter: widget.notesUnitFilter, ancestralUnitFilter: widget.ancestralUnitFilter, ancestralShowPace: widget.ancestralShowPace, ancestralShowTime: widget.ancestralShowTime, splitBannerUnitFilter: widget.splitBannerUnitFilter, splitBannerFontStyle: widget.splitBannerFontStyle, cityActivityUnitFilter: widget.cityActivityUnitFilter, geocodedActivityCity: geocodedActivityCity, routeDistanceUnitFilter: widget.routeDistanceUnitFilter, routeDistanceShowElevation: widget.routeDistanceShowElevation, routeDistanceShowTime: widget.routeDistanceShowTime, routeDistanceShowSpeed: widget.routeDistanceShowSpeed)
     }
 }
 

@@ -322,6 +322,8 @@ extension PhotoEditorView {
             miniSplitBanner
         case .cityActivity:
             miniCityActivity
+        case .routeDistance:
+            miniRouteDistance
         }
     }
 
@@ -1036,6 +1038,45 @@ extension PhotoEditorView {
                 .tracking(1.0)
                 .foregroundStyle(.white)
         }
+    }
+
+    var miniRouteDistance: some View {
+        VStack(spacing: 3) {
+            ZStack {
+                if activity.linePoints.count >= 2 {
+                    RouteTraceShape(normalizedPoints: activity.linePoints)
+                        .stroke(Color.white.opacity(0.9), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
+                } else {
+                    Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
+                        .font(.system(size: 24, weight: .ultraLight))
+                        .foregroundStyle(.white.opacity(0.25))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 38)
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(activity.hasDistance ? activity.distance.components(separatedBy: " ").first ?? activity.distance : "--")
+                    .font(.system(size: 16, weight: .black, design: .default).width(.compressed))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Text("KM")
+                    .font(.system(size: 7, weight: .heavy, design: .default).width(.compressed))
+                    .foregroundStyle(.white.opacity(0.7))
+                    .offset(y: -2)
+            }
+            HStack(spacing: 6) {
+                Text(activity.elevationGain)
+                    .font(.system(size: 6, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .lineLimit(1)
+                Text(activity.duration)
+                    .font(.system(size: 6, weight: .semibold, design: .monospaced))
+                    .foregroundStyle(.white.opacity(0.65))
+                    .lineLimit(1)
+            }
+        }
+        .padding(.horizontal, 4)
     }
 
     var miniCityActivity: some View {

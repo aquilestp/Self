@@ -336,6 +336,124 @@ extension StatWidgetContentView {
         return digits.isEmpty ? "--" : digits
     }
 
+    // MARK: - routeDistanceWidget helpers
+
+    private func routeDistanceFormatted(unit: SplitsUnitFilter) -> (value: String, unit: String) {
+        guard activity.hasDistance, activity.distanceRaw > 0 else { return ("--", unit == .miles ? "MI" : "KM") }
+        let unitLabel = unit == .miles ? "MI" : "KM"
+        let value = ActivityFormatting.distanceValue(activity.distanceRaw, unit: unit, kmFormat: "%.1f", miFormat: "%.2f")
+        return (value, unitLabel)
+    }
+
+    private func routeDistanceElevation(unit: SplitsUnitFilter) -> String {
+        let digits = activity.elevationGain.components(separatedBy: CharacterSet.decimalDigits.inverted.union(CharacterSet(charactersIn: "."))).joined()
+        guard let meters = Double(digits), meters > 0 else { return "--" }
+        if unit == .miles {
+            let ft = meters * 3.28084
+            return String(format: "%.0f FT", ft)
+        }
+        return String(format: "%.0f M", meters)
+    }
+
+    private func routeDistanceSpeed(unit: SplitsUnitFilter) -> String {
+        guard activity.distanceRaw > 0, activity.movingTimeRaw > 0 else { return "--" }
+        let metersPerSec = activity.distanceRaw / Double(activity.movingTimeRaw)
+        if unit == .miles {
+            let mph = metersPerSec * 3600.0 / 1609.34
+            return String(format: "%.1f MPH", mph)
+        }
+        let kph = metersPerSec * 3.6
+        return String(format: "%.1f KPH", kph)
+    }
+
+    // MARK: - routeDistanceWidget
+
+    var routeDistanceWidget: some View {
+        let rawPoints = activity.linePoints
+        let isMiles = routeDistanceUnitFilter == .miles
+        let dist = routeDistanceFormatted(unit: routeDistanceUnitFilter)
+        let elevText = routeDistanceElevation(unit: routeDistanceUnitFilter)
+        let timeText = ActivityFormatting.durationShort(activity.movingTimeRaw)
+        let speedText = routeDistanceSpeed(unit: routeDistanceUnitFilter)
+
+        let secondaryItems: [(String, String, Bool)] = [
+            (isMiles ? "ELEV" : "ELEV", elevText, routeDistanceShowElevation),
+            ("TIME", timeText, routeDistanceShowTime),
+            (isMiles ? "MPH" : "KPH", speedText, routeDistanceShowSpeed),
+        ]
+        let visibleSecondary = secondaryItems.filter { $0.2 }
+
+        return VStack(spacing: 0) {
+            ZStack {
+                if rawPoints.count >= 2 {
+                    RouteTraceShape(normalizedPoints: rawPoints)
+                        .stroke(
+                            primaryColor.opacity(0.92),
+                            style: StrokeStyle(lineWidth: 2.8, lineCap: .round, lineJoin: .round)
+                        )
+                } else {
+                    Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
+                        .font(.system(size: 52, weight: .ultraLight))
+                        .foregroundStyle(primaryColor.opacity(0.25))
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 130)
+
+            Rectangle()
+                .fill(primaryColor.opacity(0.12))
+                .frame(height: 0.5)
+                .padding(.horizontal, 14)
+
+            VStack(spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text(dist.value)
+                        .font(.system(size: 44, weight: .black, design: .default).width(.compressed))
+                        .foregroundStyle(primaryColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                    Text(dist.unit)
+                        .font(.system(size: 20, weight: .heavy, design: .default).width(.compressed))
+                        .foregroundStyle(primaryColor.opacity(0.75))
+                        .offset(y: -4)
+                }
+                .padding(.top, 8)
+
+                if !visibleSecondary.isEmpty {
+                    HStack(spacing: 0) {
+                        ForEach(Array(visibleSecondary.enumerated()), id: \.offset) { idx, item in
+                            VStack(spacing: 2) {
+                                Text(item.0)
+                                    .font(.system(size: 7, weight: .bold))
+                                    .tracking(1.4)
+                                    .foregroundStyle(primaryColor.opacity(0.45))
+                                Text(item.1)
+                                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                                    .foregroundStyle(primaryColor.opacity(0.85))
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.6)
+                            }
+                            .frame(maxWidth: .infinity)
+                            if idx < visibleSecondary.count - 1 {
+                                Rectangle()
+                                    .fill(primaryColor.opacity(0.15))
+                                    .frame(width: 0.5, height: 22)
+                            }
+                        }
+                    }
+                    .padding(.top, 6)
+                    .padding(.bottom, 12)
+                } else {
+                    Spacer().frame(height: 12)
+                }
+            }
+            .padding(.horizontal, 14)
+        }
+        .frame(width: 200)
+        .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
+        .shadow(color: .black.opacity(0.45), radius: 8, x: 0, y: 3)
+    }
+
     // MARK: - elevationGainWidget
 
     var elevationGainWidget: some View {

@@ -29,6 +29,7 @@ struct PaletteSelectorView: View {
             splitBannerSection
             whatsappSection
             cityActivitySection
+            routeDistanceSection
         }
         .padding(.vertical, 10)
         .padding(.leading, 6)
@@ -336,6 +337,30 @@ struct PaletteSelectorView: View {
                 .spring(response: 0.35, dampingFraction: 0.7).delay(baseDelay + 0.06),
                 value: showPaletteSelector
             )
+        }
+    }
+
+    // MARK: - Route Distance
+
+    @ViewBuilder
+    private var routeDistanceSection: some View {
+        if widget?.type == .routeDistance {
+            let baseDelay = Double(paletteCount) * 0.04
+            let current = widget?.routeDistanceUnitFilter ?? .km
+            separator(delay: baseDelay + 0.04)
+            unitToggle(current: current, delay: baseDelay + 0.06) {
+                mutate { $0.routeDistanceUnitFilter = $0.routeDistanceUnitFilter == .km ? .miles : .km }
+            }
+            separator(delay: baseDelay + 0.10)
+            visToggle(icon: "mountain.2", isOn: widget?.routeDistanceShowElevation ?? true, delay: baseDelay + 0.12) {
+                mutate { $0.routeDistanceShowElevation.toggle() }
+            }
+            visToggle(icon: "clock", isOn: widget?.routeDistanceShowTime ?? true, delay: baseDelay + 0.15) {
+                mutate { $0.routeDistanceShowTime.toggle() }
+            }
+            visToggle(icon: "speedometer", isOn: widget?.routeDistanceShowSpeed ?? true, delay: baseDelay + 0.18) {
+                mutate { $0.routeDistanceShowSpeed.toggle() }
+            }
         }
     }
 
