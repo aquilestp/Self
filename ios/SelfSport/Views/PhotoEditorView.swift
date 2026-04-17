@@ -66,6 +66,7 @@ struct PhotoEditorView: View {
     @State private var isBackgroundExposed: Bool = false
     @State private var showSavedAlert: Bool = false
     @State private var showAIAnimateOptions: Bool = false
+    @State private var showVideoComingSoon: Bool = false
     @State var showEditStyleDrawer: Bool = false
     @State var selectedEditStyle: AIEditStyle? = nil
     @State private var alignmentGuideState = AlignmentGuideState()
@@ -741,6 +742,11 @@ struct PhotoEditorView: View {
                 onDismiss: { showQuotaPaywall = false }
             )
         }
+        .alert("Los videos están en el gym 🏋️", isPresented: $showVideoComingSoon) {
+            Button("Ok, esperaré", role: .cancel) {}
+        } message: {
+            Text("Nuestra IA está entrenando duro para generar videos épicos tuyos. Mientras tanto, disfruta creando imágenes alucinantes. ¡Vuelve pronto!")
+        }
         .task {
             weeklyKmData = await weeklyKmService.fetchWeeklyKm()
             lastWeekKmData = await weeklyKmService.fetchLastWeekKm()
@@ -1039,12 +1045,7 @@ struct PhotoEditorView: View {
                         }
                     }
                     Button("Generate video") {
-                        if quotaService.hasVideoQuota {
-                            startVideoGeneration()
-                        } else {
-                            quotaPaywallKind = .video
-                            showQuotaPaywall = true
-                        }
+                        showVideoComingSoon = true
                     }
                     Button("Cancel", role: .cancel) {}
                 }
