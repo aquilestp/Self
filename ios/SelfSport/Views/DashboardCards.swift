@@ -218,7 +218,7 @@ struct CreatePostCard: View {
     let onNewFromPhoto: () -> Void
 
     private let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.52
-    private let cardHeight: CGFloat = 380
+    private let cardHeight: CGFloat = 481
     private let accent = Color(red: 0.92, green: 0.86, blue: 0.72)
 
     var body: some View {
