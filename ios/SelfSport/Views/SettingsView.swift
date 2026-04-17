@@ -16,6 +16,7 @@ struct SettingsView: View {
     @State private var deleteErrorMessage: String?
     @State private var showDeleteError: Bool = false
     @State private var showConnectProvidersSheet: Bool = false
+    @State private var showSadZoneDrawer: Bool = false
 
     var body: some View {
         NavigationStack {
@@ -26,8 +27,7 @@ struct SettingsView: View {
                     stravaSection
                     rateSection
                     instagramSection
-                    sessionSection
-                    dangerZoneSection
+                    sadZoneSection
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
@@ -102,34 +102,113 @@ struct SettingsView: View {
         }
     }
 
-    private var dangerZoneSection: some View {
+    private var sadZoneSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionLabel("DANGER ZONE", icon: "exclamationmark.triangle.fill")
+            sectionLabel("SAD ZONE", icon: "cloud.rain.fill")
 
             Button {
-                showDeleteAccountConfirmation = true
+                showSadZoneDrawer = true
             } label: {
                 HStack {
-                    Text("Delete Account")
+                    Text("Sad zone")
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.50))
                     Spacer()
-                    if isDeletingAccount {
-                        ProgressView()
-                            .controlSize(.small)
-                            .tint(Color.white.opacity(0.50))
-                    } else {
-                        Image(systemName: "trash")
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color.white.opacity(0.50))
-                    }
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.25))
                 }
                 .padding(16)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .background(cardBackground)
-            .disabled(isDeletingAccount)
+        }
+        .sheet(isPresented: $showSadZoneDrawer) {
+            sadZoneDrawer
+                .presentationDetents([.height(260)])
+                .presentationDragIndicator(.visible)
+                .presentationBackground(Color(white: 0.06))
+        }
+    }
+
+    private var sadZoneDrawer: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 6) {
+                Image(systemName: "cloud.rain.fill")
+                    .font(.system(size: 22, weight: .medium))
+                    .foregroundStyle(Color.white.opacity(0.30))
+                Text("Sad zone")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color.white.opacity(0.80))
+            }
+            .padding(.top, 28)
+            .padding(.bottom, 24)
+
+            VStack(spacing: 0) {
+                Button {
+                    showSadZoneDrawer = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showSignOutConfirmation = true
+                    }
+                } label: {
+                    HStack {
+                        Text("Sign Out")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30))
+                        Spacer()
+                        Image(systemName: "arrow.right.square")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30).opacity(0.60))
+                    }
+                    .padding(16)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                Rectangle()
+                    .fill(Color.white.opacity(0.06))
+                    .frame(height: 0.5)
+                    .padding(.horizontal, 16)
+
+                Button {
+                    showSadZoneDrawer = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showDeleteAccountConfirmation = true
+                    }
+                } label: {
+                    HStack {
+                        Text("Delete Account")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundStyle(Color.white.opacity(0.40))
+                        Spacer()
+                        if isDeletingAccount {
+                            ProgressView()
+                                .controlSize(.small)
+                                .tint(Color.white.opacity(0.40))
+                        } else {
+                            Image(systemName: "trash")
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color.white.opacity(0.30))
+                        }
+                    }
+                    .padding(16)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isDeletingAccount)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.white.opacity(0.04))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.white.opacity(0.07), lineWidth: 0.5)
+                    }
+            )
+            .padding(.horizontal, 20)
+
+            Spacer()
         }
     }
 
@@ -348,30 +427,6 @@ struct SettingsView: View {
                     Image(systemName: "arrow.up.forward")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.35))
-                }
-                .padding(16)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .background(cardBackground)
-        }
-    }
-
-    private var sessionSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionLabel("SESSION", icon: "rectangle.portrait.and.arrow.right")
-
-            Button {
-                showSignOutConfirmation = true
-            } label: {
-                HStack {
-                    Text("Sign Out")
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30))
-                    Spacer()
-                    Image(systemName: "arrow.right.square")
-                        .font(.system(size: 15))
-                        .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30).opacity(0.60))
                 }
                 .padding(16)
                 .contentShape(Rectangle())
