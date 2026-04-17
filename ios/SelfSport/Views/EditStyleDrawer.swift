@@ -16,6 +16,12 @@ extension PhotoEditorView {
                     .foregroundStyle(.white.opacity(0.5))
                     .tracking(1.2)
                 Spacer()
+                AIQuotaBadge(
+                    kind: .image,
+                    used: quotaService.imagesUsed,
+                    limit: AIQuotaService.imageLimit
+                )
+                .padding(.trailing, 6)
                 Button {
                     withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
                         showEditStyleDrawer = false
@@ -67,6 +73,11 @@ extension PhotoEditorView {
 
             Button {
                 hapticMedium.impactOccurred()
+                if !quotaService.hasImageQuota {
+                    quotaPaywallKind = .image
+                    showQuotaPaywall = true
+                    return
+                }
                 startAIGeneration()
             } label: {
                 Text("Generate")

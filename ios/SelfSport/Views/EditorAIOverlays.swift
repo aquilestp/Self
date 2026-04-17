@@ -194,6 +194,8 @@ extension PhotoEditorView {
 
                 guard !Task.isCancelled else { return }
 
+                await quotaService.recordUsage(.image)
+
                 HapticService.notification.notificationOccurred(.success)
 
                 aiReviewImage = editedImage

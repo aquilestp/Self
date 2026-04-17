@@ -96,6 +96,9 @@ struct PhotoEditorView: View {
     @State private var showDiscardAlert: Bool = false
     @State var showVideoGeneration: Bool = false
     @State var videoPreviewImage: UIImage? = nil
+    @State var quotaService = AIQuotaService.shared
+    @State var showQuotaPaywall: Bool = false
+    @State var quotaPaywallKind: AIGenerationKind = .image
     @State var includeStatsOverlay: Bool = true
     @State var dynamicCityFilters: [CityFilterRow] = []
     @State var isLoadingCityFilters: Bool = false
@@ -728,6 +731,16 @@ struct PhotoEditorView: View {
             await grokService.loadPrompts()
         }
         .task {
+            await quotaService.refresh()
+        }
+        .fullScreenCover(isPresented: $showQuotaPaywall) {
+            AIQuotaPaywallView(
+                kind: quotaPaywallKind,
+                daysUntilNextSlot: quotaService.daysUntilNextSlot(for: quotaPaywallKind),
+                onDismiss: { showQuotaPaywall = false }
+            )
+        }
+        .task {
             weeklyKmData = await weeklyKmService.fetchWeeklyKm()
             lastWeekKmData = await weeklyKmService.fetchLastWeekKm()
             monthlyKmData = await monthlyKmService.fetchMonthlyKm()
@@ -1014,13 +1027,23 @@ struct PhotoEditorView: View {
                 .animation(.easeInOut(duration: 1.8), value: selfAiGlowColorIndex)
                 .confirmationDialog("Self ai", isPresented: $showAIAnimateOptions, titleVisibility: .visible) {
                     Button("Edit current image") {
-                        withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
-                            drawerState = .collapsed
-                            showEditStyleDrawer = true
+                        if quotaService.hasImageQuota {
+                            withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
+                                drawerState = .collapsed
+                                showEditStyleDrawer = true
+                            }
+                        } else {
+                            quotaPaywallKind = .image
+                            showQuotaPaywall = true
                         }
                     }
                     Button("Generate video") {
-                        startVideoGeneration()
+                        if quotaService.hasVideoQuota {
+                            startVideoGeneration()
+                        } else {
+                            quotaPaywallKind = .video
+                            showQuotaPaywall = true
+                        }
                     }
                     Button("Cancel", role: .cancel) {}
                 }

@@ -25,6 +25,8 @@ struct VideoGenerationView: View {
     @State private var playerLooper: Any? = nil
     @State private var selectedStyle: VideoStylePrompt? = nil
     @State private var isLoadingStyles: Bool = true
+    @State private var quotaService = AIQuotaService.shared
+    @State private var showQuotaPaywall: Bool = false
 
     private let videoService = GrokVideoService()
     private let glowColors: [Color] = [
@@ -71,6 +73,16 @@ struct VideoGenerationView: View {
         } message: {
             Text("Your video has been saved to the photo library.")
         }
+        .fullScreenCover(isPresented: $showQuotaPaywall) {
+            AIQuotaPaywallView(
+                kind: .video,
+                daysUntilNextSlot: quotaService.daysUntilNextSlot(for: .video),
+                onDismiss: {
+                    showQuotaPaywall = false
+                    onDiscard()
+                }
+            )
+        }
     }
 
     // MARK: - Style Selection
@@ -91,6 +103,13 @@ struct VideoGenerationView: View {
                 .padding(.leading, 20)
                 .padding(.top, 16)
                 Spacer()
+                AIQuotaBadge(
+                    kind: .video,
+                    used: quotaService.videosUsed,
+                    limit: AIQuotaService.videoLimit
+                )
+                .padding(.trailing, 20)
+                .padding(.top, 16)
             }
 
             Spacer()
@@ -391,6 +410,10 @@ struct VideoGenerationView: View {
     }
 
     private func startGeneration() {
+        if !quotaService.hasVideoQuota {
+            showQuotaPaywall = true
+            return
+        }
         let prompt = selectedStyle?.promptTemplate
 
         withAnimation(.easeInOut(duration: 0.4)) {
@@ -416,6 +439,8 @@ struct VideoGenerationView: View {
                 dotTimer?.invalidate()
                 elapsedTimer?.invalidate()
                 glowColorTimer?.invalidate()
+
+                await quotaService.recordUsage(.video)
 
                 HapticService.notification.notificationOccurred(.success)
 
