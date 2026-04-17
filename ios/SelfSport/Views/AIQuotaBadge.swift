@@ -4,37 +4,48 @@ struct AIQuotaBadge: View {
     let kind: AIGenerationKind
     let used: Int
     let limit: Int
+    var onTap: (() -> Void)? = nil
 
     private var remaining: Int { max(0, limit - used) }
-
-    private var iconName: String {
-        kind == .image ? "photo.stack" : "video"
-    }
-
-    private var label: String {
-        kind == .image ? "images" : "videos"
+    private var progress: Double {
+        guard limit > 0 else { return 0 }
+        return min(1.0, Double(used) / Double(limit))
     }
 
     private var tint: Color {
-        if remaining == 0 { return Color(red: 0.95, green: 0.35, blue: 0.35) }
-        if remaining == 1 { return Color(red: 0.95, green: 0.7, blue: 0.25) }
-        return .white.opacity(0.85)
+        if remaining == 0 { return Color(red: 0.95, green: 0.40, blue: 0.40) }
+        if remaining <= (kind == .image ? 3 : 1) { return Color(red: 0.98, green: 0.72, blue: 0.30) }
+        return .white.opacity(0.92)
     }
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: iconName)
-                .font(.system(size: 11, weight: .semibold))
-            Text("\(remaining)/\(limit) \(label)")
-                .font(.system(size: 12, weight: .semibold))
-                .monospacedDigit()
+        Button {
+            onTap?()
+        } label: {
+            HStack(spacing: 7) {
+                ZStack {
+                    Circle()
+                        .stroke(.white.opacity(0.15), lineWidth: 2)
+                        .frame(width: 16, height: 16)
+                    Circle()
+                        .trim(from: 0, to: max(0.001, 1 - progress))
+                        .stroke(tint, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                        .frame(width: 16, height: 16)
+                        .rotationEffect(.degrees(-90))
+                        .animation(.easeInOut(duration: 0.3), value: progress)
+                }
+                Text("\(remaining) of \(limit) left")
+                    .font(.system(size: 12, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(tint)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(.white.opacity(0.10), in: .capsule)
+            .overlay(
+                Capsule().stroke(.white.opacity(0.15), lineWidth: 0.5)
+            )
         }
-        .foregroundStyle(tint)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(.white.opacity(0.10), in: .capsule)
-        .overlay(
-            Capsule().stroke(.white.opacity(0.15), lineWidth: 0.5)
-        )
+        .buttonStyle(.plain)
     }
 }

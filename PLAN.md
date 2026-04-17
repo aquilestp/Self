@@ -1,104 +1,74 @@
-# Límite mensual gratis: 10 imágenes y 2 videos con Self AI
+# Comunicar claramente edición AI, cuota y renovación en el drawer
 
+## Objetivo
 
-## Qué vamos a construir
+Que al abrir el drawer de "Edit Style" el usuario entienda de inmediato tres cosas, sin saturar la pantalla:
 
-Un sistema de cuota gratuita para las generaciones con Self AI (Grok):
-- **10 imágenes** generadas al mes, gratis
-- **2 videos** generados al mes, gratis
-- Ventana móvil de **30 días** desde el primer uso del ciclo (cuando se agota la cuota, el usuario ve cuándo vuelve a tener generaciones disponibles)
-- Contador siempre visible en la UI de Self AI
-- Paywall (visual, sin pago funcional por ahora) cuando se llega al límite
+1. **Qué hace**: editar su foto con AI
+2. **Cuánto le queda**: X de 10 imágenes este ciclo
+3. **Cuándo se renueva**: 30 días después de su primera generación
 
-El scope de esta entrega es **solo la parte gratis y el bloqueo**. El paywall será una pantalla informativa con CTA de "Upgrade" desactivado / "próximamente".
+## Cambios en el drawer
 
----
+### 1. Encabezado más claro
 
-## Reglas de conteo
+- Reemplazar el título "EDIT STYLE" por un bloque más expresivo con dos líneas:
+  - Título: **"Edit with AI"** (tipografía principal, no uppercase diminuto)
+  - Subtítulo: **"Reimagine tu foto en un estilo nuevo"** (secundario, pequeño, opacidad baja)
+- Esto da contexto inmediato de que la sección usa AI, sin depender solo del botón "Self ai" de la parte superior.
 
-- Cuenta **cada generación exitosa** (imagen o video que se devuelve de Grok), sin importar si el usuario luego la descarta o la lleva al canvas.
-- No cuenta si la generación falla por error de red/servidor.
-- Imágenes y videos se contabilizan **por separado**, cada uno con su propia cuota.
+### 2. Chip de cuota mejorado (reemplaza "10/10 images")
 
----
+El chip actual es funcional pero frío. Lo convertimos en un **indicador visual con progreso** y lo hacemos **tappable** para revelar el detalle de renovación.
 
-## Dónde se guarda
+Estado visual del chip:
 
-En **Supabase**, por usuario, para que se sincronice entre dispositivos y no se pueda evadir reinstalando la app. Se crea una tabla nueva que registra cada generación con su tipo y fecha, y se calcula el uso del ciclo actual a partir de ahí.
+- Ícono de destello / sparkles
+- Texto: **"8 of 10 left"** (más humano que "8/10 images")
+- Mini barra de progreso circular o lineal sutil que acompaña el texto, coloreada según cuánto queda:
+  - Verde/blanco suave cuando quedan ≥ 4
+  - Ámbar cuando quedan 2–3
+  - Rojo suave cuando queda 1 o 0
+- Al tocar el chip → abre un **popover / mini sheet** con la explicación de renovación.
 
-El ciclo arranca con la primera generación. A los 30 días exactos desde esa primera generación, la cuota se libera.
+### 3. Popover de detalle (al tocar el chip)
 
----
+Un tooltip elegante estilo iOS (tarjeta flotante con blur y borde sutil) que muestra:
 
-## Experiencia de usuario
+- **Título**: "Tu plan gratis"
+- **Progreso visual**: barra o anillo grande mostrando "8 / 10 imágenes usadas este ciclo"
+- **Línea de renovación** (dinámica según el estado del usuario):
+  - Si ya generó al menos una: *"Tu cuota se renueva el **15 de mayo** (en 28 días)"* con ícono de calendario
+  - Si aún no ha generado ninguna: *"Tus 30 días comienzan con tu primera generación"* con ícono de chispa
+  - Si llegó al límite: *"Vuelves a tener imágenes el **15 de mayo**"* en tono ámbar/rojo
+- **Nota fina al pie**: "Cada imagen que generas se cuenta por 30 días desde su creación."
+- Botón "Got it" para cerrar.
 
-### En la pantalla de Self AI (edición de imagen y generación de video)
+### 4. Micro-texto permanente debajo del botón Generate
 
-- Aparece un **indicador compacto de cuota** arriba o cerca del botón de generar:
-  - "7 / 10 imágenes este mes" 
-  - "1 / 2 videos este mes"
-- El indicador cambia de color suave cuando queda 1 uso (tono ámbar) y a rojo cuando está en 0.
-- Si queda cuota: el botón de generar funciona normal.
-- Si **no queda cuota**: el botón se bloquea visualmente y al tocarlo abre el paywall.
+Una línea discreta justo debajo del botón "Generate" que siempre recuerda el costo de la acción:
 
-### Paywall (sin pago funcional)
+- *"Uses 1 of your 10 monthly AI images"* en opacidad baja, centrado, tamaño chico.
+- Cuando queda 1: *"Last image of the cycle — renews on May 15"* en ámbar.
+- Cuando queda 0: *"Cycle limit reached — renews on May 15"* (el botón ya muestra el paywall al tocarlo).
 
-Sheet presentado con el estilo native iOS que ya usa la app:
-- Ícono grande (sparkles / corona)
-- Título: "Llegaste a tu límite mensual"
-- Subtítulo con el detalle:  
-  *"Usaste tus 10 imágenes / 2 videos gratis de este mes."*
-- **Contador regresivo claro**:  
-  *"Tus generaciones gratuitas vuelven en X días"*  
-  (calculado desde la primera generación del ciclo + 30 días)
-- Lista de beneficios de un futuro plan Pro (placeholder visual):
-  - Generaciones ilimitadas
-  - Videos en mayor calidad
-  - Acceso anticipado a estilos nuevos
-- Botón principal **"Upgrade a Pro"** visualmente activo pero que solo muestra un toast/alert: *"Muy pronto"*.
-- Botón secundario **"Entendido"** que cierra el sheet.
+## Diseño y tono
 
-### Caso sin historial
+- Mantener la estética oscura con blur del drawer actual.
+- Tipografías: SF Pro con pesos variados (semibold para números, regular para descripción).
+- Colores semánticos para el estado: blanco translúcido → ámbar → rojo suave.
+- Animación spring al abrir/cerrar el popover; haptic ligero al tocar el chip.
+- Todo el texto en el idioma que ya usa la app (revisaré si es inglés o español y lo unificaré).
 
-Si el usuario nunca ha generado nada, el contador muestra *"10 imágenes disponibles"* y *"2 videos disponibles"* sin hablar de ciclo.
+## Estados que se cubren
 
----
+- **Usuario nuevo** (0 generaciones): muestra "10 of 10 left" y el popover dice "comienzan con tu primera generación".
+- **Usuario en uso** (1–9): muestra progreso y fecha concreta de renovación de la más vieja.
+- **Usuario en el límite** (10/10): chip en rojo, micro-texto rojo, botón Generate abre paywall como ya hace.
 
-## Lógica del ciclo de 30 días
+## Fuera de alcance
 
-- La app consulta al entrar a Self AI las generaciones del usuario en los últimos 30 días.
-- Se cuentan cuántas imágenes y cuántos videos hay en esa ventana.
-- El "reset" para cada tipo se calcula desde la **generación más antigua dentro de la ventana**: cuando esa generación cumple 30 días, libera un slot.
-- El paywall muestra el tiempo que falta para que se libere **el próximo slot** (más útil que esperar al reset total).
+- No toco el flujo de paywall ni los planes pagos.
+- No cambio la lógica de conteo ya implementada en Supabase.
+- El mismo patrón se podrá reutilizar luego en la pantalla de video sin incluirlo aquí.
 
-Ejemplo: si el usuario generó su imagen #10 hace 5 días, pero la imagen #1 del ciclo fue hace 22 días, el paywall dice: *"Tu próxima imagen gratis vuelve en 8 días"*.
-
----
-
-## Cambios en la app
-
-### Backend (Supabase)
-- Nueva tabla `ai_generations` con: usuario, tipo (image | video), fecha de creación.
-- Política RLS para que cada usuario solo lea/escriba sus propias filas.
-- Se inserta una fila cada vez que Grok devuelve una generación exitosa.
-
-### Servicios existentes
-- `GrokImageEditService` y `GrokVideoService` registrarán el uso después de una generación exitosa, y consultarán la cuota antes de iniciar una generación.
-- Si no hay cuota, lanzan un error específico `quotaExceeded` que la UI captura para abrir el paywall en vez de mostrar error genérico.
-
-### UI
-- Componente nuevo **QuotaBadge** reusable (imagen / video) visible en la pantalla de Self AI.
-- Nueva vista **AIQuotaPaywallView** (sheet) con el diseño descrito.
-- Hook en los botones de "Generar" para validar cuota antes de llamar al servicio.
-
----
-
-## Preguntas que podrían surgir (todas resueltas con defaults razonables)
-
-- El contador se actualiza al abrir la pantalla y después de cada generación.
-- No se hace refresh en background; si el usuario deja la app abierta mucho tiempo, se refresca al volver a la pantalla.
-- El paywall también es accesible desde un botón "Ver plan Pro" opcional en settings, pero eso lo dejamos para después — por ahora solo aparece al topar el límite.
-
----
-
-¿Te hace sentido así? Cuando lo apruebes, lo implemento enfocado **solo en lo gratis + el paywall visual**, sin tocar cobros ni planes pagos.

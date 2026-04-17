@@ -98,6 +98,7 @@ struct PhotoEditorView: View {
     @State var videoPreviewImage: UIImage? = nil
     @State var quotaService = AIQuotaService.shared
     @State var showQuotaPaywall: Bool = false
+    @State var showQuotaInfo: Bool = false
     @State var quotaPaywallKind: AIGenerationKind = .image
     @State var includeStatsOverlay: Bool = true
     @State var dynamicCityFilters: [CityFilterRow] = []

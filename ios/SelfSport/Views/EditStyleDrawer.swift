@@ -10,16 +10,29 @@ extension PhotoEditorView {
                 .padding(.top, 10)
                 .padding(.bottom, 8)
 
-            HStack {
-                Text("EDIT STYLE")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.5))
-                    .tracking(1.2)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.85))
+                        Text("Edit with AI")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(.white)
+                    }
+                    Text("Reimagine your photo in a new style")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
                 Spacer()
                 AIQuotaBadge(
                     kind: .image,
                     used: quotaService.imagesUsed,
-                    limit: AIQuotaService.imageLimit
+                    limit: AIQuotaService.imageLimit,
+                    onTap: {
+                        hapticLight.impactOccurred()
+                        showQuotaInfo = true
+                    }
                 )
                 .padding(.trailing, 6)
                 Button {
@@ -99,11 +112,60 @@ extension PhotoEditorView {
             .padding(.bottom, 18)
             .opacity(selectedEditStyle != nil ? 1 : 0)
             .allowsHitTesting(selectedEditStyle != nil)
+
+            if selectedEditStyle != nil {
+                Text(quotaMicroCopy)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(quotaMicroColor)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 18)
+                    .padding(.bottom, 14)
+                    .transition(.opacity)
+            }
         }
         .background(.black.opacity(0.55))
         .background(.ultraThinMaterial)
         .clipShape(.rect(topLeadingRadius: 20, topTrailingRadius: 20))
         .animation(.spring(response: 0.35, dampingFraction: 0.8), value: selectedEditStyle != nil)
+        .sheet(isPresented: $showQuotaInfo) {
+            AIQuotaInfoSheet(
+                kind: .image,
+                used: quotaService.imagesUsed,
+                limit: AIQuotaService.imageLimit,
+                nextRenewalDate: quotaService.nextSlotDate(for: .image),
+                daysUntilRenewal: quotaService.daysUntilNextSlot(for: .image),
+                onDismiss: { showQuotaInfo = false }
+            )
+        }
+    }
+
+    private var quotaMicroCopy: String {
+        let remaining = max(0, AIQuotaService.imageLimit - quotaService.imagesUsed)
+        let renewal = renewalDateShort
+        if remaining == 0 {
+            if let renewal { return "Cycle limit reached — renews on \(renewal)" }
+            return "Cycle limit reached"
+        }
+        if remaining == 1 {
+            if let renewal { return "Last image of the cycle — renews on \(renewal)" }
+            return "Last image of the cycle"
+        }
+        return "Uses 1 of your \(AIQuotaService.imageLimit) monthly AI images"
+    }
+
+    private var quotaMicroColor: Color {
+        let remaining = max(0, AIQuotaService.imageLimit - quotaService.imagesUsed)
+        if remaining == 0 { return Color(red: 0.95, green: 0.40, blue: 0.40).opacity(0.9) }
+        if remaining == 1 { return Color(red: 0.98, green: 0.72, blue: 0.30).opacity(0.95) }
+        return .white.opacity(0.4)
+    }
+
+    private var renewalDateShort: String? {
+        guard let date = quotaService.nextSlotDate(for: .image) else { return nil }
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f.string(from: date)
     }
 
     func editStyleCard(style: AIEditStyle) -> some View {
