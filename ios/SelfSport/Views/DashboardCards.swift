@@ -929,7 +929,7 @@ struct DashboardTabBar: View {
         }
         .padding(.horizontal, 24)
         .padding(.top, 9)
-        .padding(.bottom, 7)
+        .padding(.bottom, 16)
         .frame(maxWidth: .infinity)
         .background(
             Color.black.opacity(0.94)
