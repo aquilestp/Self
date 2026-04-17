@@ -373,6 +373,7 @@ struct DashboardView: View {
             .padding(.top, 18)
             .padding(.bottom, 122)
         }
+        .scrollDisabled(true)
         .background(Color.black)
         .toolbar(.hidden, for: .navigationBar)
         .task {
@@ -426,7 +427,7 @@ struct DashboardView: View {
     }
 
     private var heroTitle: String {
-        hasActivitySource ? "Choose your demo activity" : "Import your activities"
+        stravaViewModel.isConnected ? "Choose your activity" : "Choose your demo activity"
     }
 
     private var heroHeader: some View {

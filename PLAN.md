@@ -1,7 +1,18 @@
-# Ajustes al screen de demo activities
+# Activity screen: smaller real cards, no vertical scroll, dynamic title
 
+## Changes
 
-## Cambios
+**1. Reduce real activity card height by 10%**
 
-- **Título**: "Choose your activity" → "Choose your demo activity", con fuente reducida de tamaño 34 a 28
-- **Altura de los cards de demo**: reducida un 10% — de 481 a 433 puntos
+- Real activity cards (connected to Strava) go from height 539 → 485
+- Demo/compact cards remain unchanged at 433
+
+**2. Disable vertical scrolling**
+
+- The main screen will no longer scroll vertically — content stays fixed in place
+
+**3. Dynamic title based on connection status**
+
+- Connected to a provider (Strava) → title shows **"Choose your activity"**
+- No external connection (demo mode) → title shows **"Choose your demo activity"**
+
