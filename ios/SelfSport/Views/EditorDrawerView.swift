@@ -209,7 +209,7 @@ extension PhotoEditorView {
         let h: CGFloat = 106
         return Button {
             hapticLight.impactOccurred()
-            withAnimation(.snappy(duration: 0.25)) {
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.82)) {
                 drawerState = .collapsed
             }
             startNewTextEditing()
@@ -244,7 +244,7 @@ extension PhotoEditorView {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 toggleWidget(type)
             }
-            withAnimation(.snappy(duration: 0.25)) {
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.82)) {
                 drawerState = .collapsed
             }
         } label: {
@@ -275,7 +275,7 @@ extension PhotoEditorView {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 toggleWidget(type)
             }
-            withAnimation(.snappy(duration: 0.25)) {
+            withAnimation(.spring(response: 0.55, dampingFraction: 0.82)) {
                 drawerState = .collapsed
             }
         } label: {
