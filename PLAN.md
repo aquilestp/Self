@@ -1,6 +1,7 @@
-# Igualar altura de cards de actividades demo a 481
+# Ajustes al screen de demo activities
 
-**Cambio:**
 
-- En `ActivityHighlightCard`, la altura en modo compacto (usado para los cards de demo) cambia de **368 → 481** para coincidir exactamente con la altura de los cards "Bring your activities" y "Create a post".
+## Cambios
 
+- **Título**: "Choose your activity" → "Choose your demos activity", con fuente reducida de tamaño 34 a 28
+- **Altura de los cards de demo**: reducida un 10% — de 481 a 433 puntos

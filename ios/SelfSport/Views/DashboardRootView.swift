@@ -426,7 +426,7 @@ struct DashboardView: View {
     }
 
     private var heroTitle: String {
-        hasActivitySource ? "Choose your activity" : "Import your activities"
+        hasActivitySource ? "Choose your demos activity" : "Import your activities"
     }
 
     private var heroHeader: some View {
@@ -439,7 +439,7 @@ struct DashboardView: View {
 
             if hasActivitySource {
                 Text(heroTitle)
-                    .font(.system(size: 34, weight: .regular, design: .serif).italic())
+                    .font(.system(size: 28, weight: .regular, design: .serif).italic())
                     .foregroundStyle(Color(red: 0.97, green: 0.96, blue: 0.95))
                     .lineSpacing(-3)
                     .minimumScaleFactor(0.9)
