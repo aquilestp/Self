@@ -90,7 +90,7 @@ extension PhotoEditorView {
     }
 
     private func sortedWidgetTypes() -> [StatWidgetType] {
-        let all = StatWidgetType.allCases.filter { $0 != .fullBanner && $0 != .fullBannerBottom }
+        let all = StatWidgetType.allCases.filter { $0 != .fullBanner && $0 != .fullBannerBottom && $0 != .ancestralMedal }
         switch drawerTab {
         case .popular:
             return all.sorted { a, b in
