@@ -388,7 +388,7 @@ extension StatWidgetContentView {
                 if rawPoints.count >= 2 {
                     RouteTraceShape(normalizedPoints: rawPoints)
                         .stroke(
-                            primaryColor.opacity(0.92),
+                            primaryColor,
                             style: StrokeStyle(lineWidth: 2.8, lineCap: .round, lineJoin: .round)
                         )
                 } else {
@@ -409,7 +409,7 @@ extension StatWidgetContentView {
                         .minimumScaleFactor(0.5)
                     Text(dist.unit)
                         .font(.system(size: 20, weight: .heavy, design: .default).width(.compressed))
-                        .foregroundStyle(primaryColor.opacity(0.75))
+                        .foregroundStyle(primaryColor)
                         .offset(y: -4)
                 }
                 .padding(.top, 8)
@@ -421,19 +421,14 @@ extension StatWidgetContentView {
                                 Text(item.0)
                                     .font(.system(size: 7, weight: .bold))
                                     .tracking(1.4)
-                                    .foregroundStyle(primaryColor.opacity(0.45))
+                                    .foregroundStyle(primaryColor)
                                 Text(item.1)
                                     .font(.system(size: 12, weight: .semibold, design: .monospaced))
-                                    .foregroundStyle(primaryColor.opacity(0.85))
+                                    .foregroundStyle(primaryColor)
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.6)
                             }
                             .frame(maxWidth: .infinity)
-                            if idx < visibleSecondary.count - 1 {
-                                Rectangle()
-                                    .fill(primaryColor.opacity(0.15))
-                                    .frame(width: 0.5, height: 22)
-                            }
                         }
                     }
                     .padding(.top, 6)
