@@ -426,7 +426,7 @@ struct DashboardView: View {
     }
 
     private var heroTitle: String {
-        hasActivitySource ? "Choose your demos activity" : "Import your activities"
+        hasActivitySource ? "Choose your demo activity" : "Import your activities"
     }
 
     private var heroHeader: some View {
