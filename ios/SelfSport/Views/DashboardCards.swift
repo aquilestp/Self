@@ -380,7 +380,7 @@ struct BringActivitiesCard: View {
                     HStack(spacing: 8) {
                         Image(systemName: "link")
                             .font(.system(size: 13, weight: .semibold))
-                        Text("Explore options")
+                        Text("See connections")
                             .font(.system(size: 15, weight: .semibold))
                     }
                     .foregroundStyle(.black)
