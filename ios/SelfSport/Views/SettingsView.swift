@@ -25,6 +25,7 @@ struct SettingsView: View {
                     notificationsSection
                     stravaSection
                     rateSection
+                    instagramSection
                     sessionSection
                     dangerZoneSection
                 }
@@ -320,6 +321,32 @@ struct SettingsView: View {
                     Spacer()
                     Image(systemName: "star")
                         .font(.system(size: 15))
+                        .foregroundStyle(Color.white.opacity(0.35))
+                }
+                .padding(16)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .background(cardBackground)
+        }
+    }
+
+    private var instagramSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionLabel("COMMUNITY", icon: "person.2.fill")
+
+            Button {
+                if let url = URL(string: "") {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                HStack {
+                    Text("Follow on Instagram")
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundStyle(Color.white.opacity(0.80))
+                    Spacer()
+                    Image(systemName: "arrow.up.forward")
+                        .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.35))
                 }
                 .padding(16)
