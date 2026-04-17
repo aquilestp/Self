@@ -1,17 +1,12 @@
-# Move "Add Text" from floating button to the stats drawer
+# Fix drawer widget sorting stability
 
-## What changes
+## Problem
 
-### Remove the floating text button
+The sorted widget list is recomputed on every view render. During the transition between half-open and fully-open drawer states, both drawer views exist simultaneously (opacity animation), each recalculating the sort independently — causing the visible order to jump.
 
-- The circular "textformat" button that floats on the right side of the canvas is removed entirely.
+## Fix
 
-### Add a "Text" card inside the drawer
-
-- A new card labeled **"Text"** (with an "Aa" preview) is added to the stats grid in the drawer — first position, so it's always easy to find.
-- It looks and feels exactly like the other stat cards: same size, same highlight when active, same tap feedback.
-- Tapping it adds a new text element to the canvas every time (can be tapped multiple times for multiple text layers — same behavior as before).
-- The card shows as "active" (highlighted border) whenever at least one text has been placed on the canvas.
-- When tapped, the keyboard opens automatically with the style toolbar above it — same flow as before, just triggered from the drawer instead of the floating button.
-- The card appears in both the compact (peek) and expanded grid views of the drawer.
+- Store the sorted widget order in a single stable list that is only recalculated when the sorting criteria actually change (tab switch between Popular/Recents, or when popularity/recency data loads)
+- Both the compact drawer and the expanded drawer will read from this same stable list — no more divergence during transitions
+- The order will remain locked throughout the open/expand animation and only change intentionally when the user taps Popular or Recents tabs
 

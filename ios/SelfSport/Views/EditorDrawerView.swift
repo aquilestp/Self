@@ -89,7 +89,7 @@ extension PhotoEditorView {
         Set(placedWidgets.map(\.type))
     }
 
-    private func sortedWidgetTypes() -> [StatWidgetType] {
+    func sortedWidgetTypes() -> [StatWidgetType] {
         let all = StatWidgetType.allCases.filter { $0 != .fullBanner && $0 != .fullBannerBottom && $0 != .ancestralMedal }
         switch drawerTab {
         case .popular:
@@ -120,7 +120,7 @@ extension PhotoEditorView {
     }
 
     var gridStatTypes: [StatWidgetType] {
-        sortedWidgetTypes()
+        stableWidgetTypes.isEmpty ? sortedWidgetTypes() : stableWidgetTypes
     }
 
     var compactStatsList: some View {
