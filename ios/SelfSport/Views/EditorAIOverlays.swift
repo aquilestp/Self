@@ -194,7 +194,13 @@ extension PhotoEditorView {
 
                 guard !Task.isCancelled else { return }
 
-                await quotaService.recordUsage(.image)
+                let recorded = await quotaService.recordUsage(.image)
+                if !recorded {
+                    aiErrorMessage = "Quota not recorded. \(quotaService.lastDebugInfo ?? quotaService.lastError ?? "unknown")"
+                    showAIErrorAlert = true
+                } else if let info = quotaService.lastDebugInfo {
+                    print("[AIQuota-debug] \(info)")
+                }
 
                 HapticService.notification.notificationOccurred(.success)
 

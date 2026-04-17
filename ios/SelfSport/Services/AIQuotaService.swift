@@ -16,6 +16,7 @@ final class AIQuotaService {
     private(set) var oldestVideoDate: Date? = nil
     private(set) var isLoading: Bool = false
     var lastError: String? = nil
+    var lastDebugInfo: String? = nil
 
     var imagesRemaining: Int { max(0, Self.imageLimit - imagesUsed) }
     var videosRemaining: Int { max(0, Self.videoLimit - videosUsed) }
@@ -88,6 +89,7 @@ final class AIQuotaService {
     @discardableResult
     func recordUsage(_ kind: AIGenerationKind) async -> Bool {
         lastError = nil
+        lastDebugInfo = nil
         let userId: String
         do {
             userId = try await supabase.auth.session.user.id.uuidString
@@ -95,6 +97,7 @@ final class AIQuotaService {
             let msg = "[AIQuota] No authenticated Supabase session — cannot record \(kind.rawValue). Error: \(error)"
             print(msg)
             lastError = "Not signed in to Supabase. Please sign in again."
+            lastDebugInfo = "No session: \(error.localizedDescription)"
             return false
         }
         print("[AIQuota] Recording \(kind.rawValue) usage for user \(userId)")
@@ -106,9 +109,9 @@ final class AIQuotaService {
                 .select()
                 .execute()
             print("[AIQuota] Insert response status=\(response.status), data bytes=\(response.data.count)")
-            if let bodyStr = String(data: response.data, encoding: .utf8) {
-                print("[AIQuota] Insert body: \(bodyStr)")
-            }
+            let bodyStr = String(data: response.data, encoding: .utf8) ?? "<no body>"
+            print("[AIQuota] Insert body: \(bodyStr)")
+            lastDebugInfo = "OK status=\(response.status) user=\(userId.prefix(8)) body=\(bodyStr.prefix(120))"
             await refresh()
             print("[AIQuota] After refresh: imagesUsed=\(imagesUsed), videosUsed=\(videosUsed)")
             return true
@@ -116,6 +119,7 @@ final class AIQuotaService {
             let msg = "[AIQuota] Failed to insert \(kind.rawValue): \(error) | localized: \(error.localizedDescription)"
             print(msg)
             lastError = error.localizedDescription
+            lastDebugInfo = "Insert failed user=\(userId.prefix(8)) err=\(String(describing: error))"
             return false
         }
     }
