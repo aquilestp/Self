@@ -38,6 +38,7 @@ struct SettingsView: View {
                     Text("Settings")
                         .font(.system(size: 17, weight: .regular, design: .serif).italic())
                         .foregroundStyle(Color.white.opacity(0.90))
+                        .offset(y: 6)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -109,16 +110,16 @@ struct SettingsView: View {
                 HStack {
                     Text("Delete Account")
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30))
+                        .foregroundStyle(Color.white.opacity(0.50))
                     Spacer()
                     if isDeletingAccount {
                         ProgressView()
                             .controlSize(.small)
-                            .tint(Color(red: 1.0, green: 0.30, blue: 0.30))
+                            .tint(Color.white.opacity(0.50))
                     } else {
                         Image(systemName: "trash")
                             .font(.system(size: 15))
-                            .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.30).opacity(0.60))
+                            .foregroundStyle(Color.white.opacity(0.50))
                     }
                 }
                 .padding(16)
@@ -253,59 +254,49 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionLabel("NOTIFICATIONS", icon: "bell.fill")
 
-            VStack(spacing: 0) {
+            if NotificationService.shared.isAuthorized {
                 HStack {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Push Notifications")
                             .font(.system(size: 15, weight: .regular))
                             .foregroundStyle(Color.white.opacity(0.80))
-
-                        Text(NotificationService.shared.isAuthorized ? "Enabled" : "Disabled")
+                        Text("Enabled")
                             .font(.system(size: 13, weight: .regular))
-                            .foregroundStyle(NotificationService.shared.isAuthorized ? Color(red: 0.30, green: 0.78, blue: 0.45) : Color.white.opacity(0.36))
+                            .foregroundStyle(Color(red: 0.30, green: 0.78, blue: 0.45))
                     }
-
                     Spacer()
-
                     Circle()
-                        .fill(NotificationService.shared.isAuthorized ? Color(red: 0.30, green: 0.78, blue: 0.45) : Color.white.opacity(0.20))
+                        .fill(Color(red: 0.30, green: 0.78, blue: 0.45))
                         .frame(width: 8, height: 8)
                 }
                 .padding(16)
-
-                if !NotificationService.shared.isAuthorized {
-                    Rectangle()
-                        .fill(Color.white.opacity(0.06))
-                        .frame(height: 0.5)
-                        .padding(.leading, 16)
-
-                    Button {
-                        if NotificationService.shared.hasBeenPrompted {
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
-                            }
-                        } else {
-                            Task {
-                                await NotificationService.shared.requestAuthorization()
-                            }
-                        }
-                    } label: {
-                        HStack {
-                            Text(NotificationService.shared.hasBeenPrompted ? "Open Settings" : "Enable Notifications")
+                .background(cardBackground)
+            } else {
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Push Notifications")
                                 .font(.system(size: 15, weight: .regular))
                                 .foregroundStyle(Color.white.opacity(0.80))
-                            Spacer()
-                            Image(systemName: NotificationService.shared.hasBeenPrompted ? "arrow.up.forward" : "bell.badge")
-                                .font(.system(size: 14))
-                                .foregroundStyle(Color.white.opacity(0.40))
+                            Text("Tap to enable in Settings")
+                                .font(.system(size: 13, weight: .regular))
+                                .foregroundStyle(Color.white.opacity(0.36))
                         }
-                        .padding(16)
-                        .contentShape(Rectangle())
+                        Spacer()
+                        Image(systemName: "arrow.up.forward.app")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color.white.opacity(0.35))
                     }
-                    .buttonStyle(.plain)
+                    .padding(16)
+                    .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
+                .background(cardBackground)
             }
-            .background(cardBackground)
         }
         .onAppear {
             Task { await NotificationService.shared.refreshAuthorizationStatus() }
