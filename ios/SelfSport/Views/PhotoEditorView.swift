@@ -24,7 +24,7 @@ struct PhotoEditorView: View {
     @State var cityFilterIndex: Int = 0
     @State var raceFilterIndex: Int = 0
     @State var placedWidgets: [PlacedWidget] = []
-    @State private var placedTexts: [PlacedText] = []
+    @State var placedTexts: [PlacedText] = []
     @State private var editingTextId: String? = nil
     @State private var editingTextContent: String = ""
     @State private var editingTextStyle: TextStyleType = .classic
@@ -466,15 +466,6 @@ struct PhotoEditorView: View {
 
 
 
-                        if !isDraggingWidget && !isPhotoGesturing && !isTextEditing && paletteTargetWidgetId == nil && !isCapturingCanvas {
-                            addTextButton
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .trailing)
-                                .padding(.trailing, 12)
-                                .transition(.identity)
-                                .zIndex(5.5)
-                        }
-
-
                         if !isCapturingCanvas {
                             if showFilterDotsIndicator && (filterMode != .none || hasDynamicCityFilters) {
                                 filterDots
@@ -854,29 +845,6 @@ struct PhotoEditorView: View {
 
     var hasCanvasContent: Bool {
         !placedWidgets.isEmpty || !placedTexts.isEmpty || filterMode != .none
-    }
-
-    // MARK: - Add Text Button
-
-    private var addTextButton: some View {
-        Button {
-            hapticLight.impactOccurred()
-            if drawerState != .collapsed {
-                withAnimation(.snappy(duration: 0.25)) {
-                    drawerState = .collapsed
-                }
-            }
-            startNewTextEditing()
-        } label: {
-            Image(systemName: "textformat")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 40, height: 40)
-                .background(Color.black.opacity(0.45), in: Circle())
-                .overlay(Circle().stroke(Color.white.opacity(0.2), lineWidth: 0.5))
-        }
-        .buttonStyle(.plain)
-        .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 3)
     }
 
     // MARK: - Palette Selector
@@ -1259,7 +1227,7 @@ struct PhotoEditorView: View {
 
     @State private var isNewTextEditing: Bool = false
 
-    private func startNewTextEditing() {
+    func startNewTextEditing() {
         let newText = PlacedText(text: "text", position: .zero)
         placedTexts.append(newText)
         editingTextId = newText.id

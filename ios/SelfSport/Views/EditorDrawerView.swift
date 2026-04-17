@@ -126,12 +126,14 @@ extension PhotoEditorView {
     var compactStatsList: some View {
         let activeTypes = activeWidgetTypes
         let types = gridStatTypes
+        let hasText = !placedTexts.isEmpty
         return VStack(spacing: 10) {
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
                 spacing: 10
             ) {
-                ForEach(Array(types.prefix(6)), id: \.rawValue) { type in
+                textThumbnail(isActive: hasText)
+                ForEach(Array(types.prefix(5)), id: \.rawValue) { type in
                     widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
                 }
             }
@@ -151,12 +153,14 @@ extension PhotoEditorView {
     var expandedGrid: some View {
         let activeTypes = activeWidgetTypes
         let types = gridStatTypes
+        let hasText = !placedTexts.isEmpty
         return ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 10) {
                 LazyVGrid(
                     columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
                     spacing: 10
                 ) {
+                    textThumbnail(isActive: hasText)
                     ForEach(types, id: \.rawValue) { type in
                         widgetThumbnail(type: type, isActive: activeTypes.contains(type), large: true)
                     }
@@ -199,6 +203,39 @@ extension PhotoEditorView {
                     }
                 }
             }
+    }
+
+    func textThumbnail(isActive: Bool) -> some View {
+        let h: CGFloat = 80
+        return Button {
+            hapticLight.impactOccurred()
+            withAnimation(.snappy(duration: 0.25)) {
+                drawerState = .collapsed
+            }
+            startNewTextEditing()
+        } label: {
+            VStack(spacing: 4) {
+                Text("Aa")
+                    .font(.system(size: 22, weight: .bold, design: .default))
+                    .foregroundStyle(.white.opacity(0.9))
+                Text("Text")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: h)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(isActive ? Color.white.opacity(0.18) : Color.white.opacity(0.06))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(isActive ? Color.white.opacity(0.4) : Color.white.opacity(0.1), lineWidth: 0.5)
+            )
+            .clipShape(.rect(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+        .sensoryFeedback(.selection, trigger: isActive)
     }
 
     func widgetThumbnail(type: StatWidgetType, isActive: Bool, large: Bool = false) -> some View {
