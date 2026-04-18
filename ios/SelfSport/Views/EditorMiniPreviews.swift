@@ -255,23 +255,8 @@ extension PhotoEditorView {
                     .scaleEffect(x: 1.0, y: 2.5, anchor: .top)
                     .padding(.bottom, 20)
             }
-        case .movingTimeClean:
-            miniTimeArcClean(
-                value: activity.duration,
-                label: "MOVING",
-                subLabel: String(format: "%.0f%%", miniEfficiencyRatio * 100),
-                icon: "timer",
-                progress: miniEfficiencyRatio
-            )
-        case .elapsedTimeClean:
-            let paused = activity.elapsedTimeRaw - activity.movingTimeRaw
-            miniTimeArcClean(
-                value: activity.elapsedTime,
-                label: "ELAPSED",
-                subLabel: paused > 0 ? miniFormatDuration(paused) + " p" : "",
-                icon: "clock",
-                progress: 1.0
-            )
+        case .timeCombined:
+            miniTimeCombined
         case .avgHeartRate:
             let bpm = miniHeartRateBPM
             let progress = bpm > 0 ? min(1.0, max(0.15, Double(bpm - 60) / 140.0)) : 0.2
@@ -698,6 +683,53 @@ extension PhotoEditorView {
                     .tracking(0.8)
                     .foregroundStyle(.white)
             }
+        }
+    }
+
+    var miniTimeCombined: some View {
+        let ratio = miniEfficiencyRatio
+        let paused = max(0, activity.elapsedTimeRaw - activity.movingTimeRaw)
+        return VStack(spacing: 3) {
+            ZStack {
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(Color.white.opacity(0.10), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 34, height: 34)
+                Circle()
+                    .trim(from: 0, to: 0.75)
+                    .stroke(Color.white.opacity(0.45), style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 34, height: 34)
+                Circle()
+                    .trim(from: 0, to: ratio * 0.75)
+                    .stroke(Color.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 25, height: 25)
+                Image(systemName: "timer")
+                    .font(.system(size: 8, weight: .light))
+                    .foregroundStyle(.white.opacity(0.7))
+            }
+            Text(activity.duration)
+                .font(.system(size: 10, weight: .semibold, design: .serif))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            Text("MOVING")
+                .font(.system(size: 5, weight: .bold))
+                .tracking(1.0)
+                .foregroundStyle(.white)
+            Text(activity.elapsedTime)
+                .font(.system(size: 7, weight: .regular, design: .serif))
+                .foregroundStyle(.white.opacity(0.75))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+            Text(paused > 0 ? "ELAPSED · \(miniFormatDuration(paused))p" : "ELAPSED")
+                .font(.system(size: 4, weight: .bold))
+                .tracking(0.8)
+                .foregroundStyle(.white.opacity(0.55))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
         }
     }
 

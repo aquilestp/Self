@@ -133,83 +133,73 @@ extension StatWidgetContentView {
         ActivityFormatting.durationCompact(seconds)
     }
 
-    // MARK: - movingTimeCleanWidget
+    // MARK: - timeCombinedWidget
 
-    var movingTimeCleanWidget: some View {
-        VStack(spacing: 4) {
+    var timeCombinedWidget: some View {
+        let pausedSeconds = max(0, activity.elapsedTimeRaw - activity.movingTimeRaw)
+        let ratio = efficiencyRatio
+        return VStack(spacing: 6) {
             ZStack {
                 Circle()
                     .trim(from: 0, to: 0.75)
-                    .stroke(primaryColor.opacity(0.12), style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .stroke(primaryColor.opacity(0.12), style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
                     .rotationEffect(.degrees(135))
-                    .frame(width: 48, height: 48)
+                    .frame(width: 62, height: 62)
                 Circle()
-                    .trim(from: 0, to: efficiencyRatio * 0.75)
-                    .stroke(primaryColor, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .trim(from: 0, to: 0.75)
+                    .stroke(primaryColor.opacity(0.45), style: StrokeStyle(lineWidth: 3.5, lineCap: .round))
                     .rotationEffect(.degrees(135))
-                    .frame(width: 48, height: 48)
+                    .frame(width: 62, height: 62)
+                Circle()
+                    .trim(from: 0, to: 0.12)
+                    .stroke(primaryColor.opacity(0.10), style: StrokeStyle(lineWidth: 4.5, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 46, height: 46)
+                Circle()
+                    .trim(from: 0, to: ratio * 0.75)
+                    .stroke(primaryColor, style: StrokeStyle(lineWidth: 4.5, lineCap: .round))
+                    .rotationEffect(.degrees(135))
+                    .frame(width: 46, height: 46)
                     .shadow(color: primaryColor.opacity(0.4), radius: 6, x: 0, y: 2)
                 Image(systemName: "timer")
                     .font(.system(size: 14, weight: .light))
-                    .foregroundStyle(primaryColor.opacity(0.70))
+                    .foregroundStyle(primaryColor.opacity(0.75))
             }
-            Text(String(format: "%.0f%% active", efficiencyRatio * 100))
+            Text(String(format: "%.0f%% active", ratio * 100))
                 .font(.system(size: 9, weight: .semibold))
+                .tracking(0.4)
                 .foregroundStyle(primaryColor.opacity(0.60))
-            Text(activity.duration)
-                .font(.system(size: 22, weight: .regular, design: .serif))
-                .foregroundStyle(primaryColor)
-                .minimumScaleFactor(0.7)
-                .lineLimit(1)
-            Text("MOVING")
-                .font(.system(size: 8, weight: .bold))
-                .tracking(1.4)
-                .foregroundStyle(primaryColor)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
-        .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 3)
-    }
-
-    // MARK: - elapsedTimeCleanWidget
-
-    var elapsedTimeCleanWidget: some View {
-        let pausedSeconds = activity.elapsedTimeRaw - activity.movingTimeRaw
-        return VStack(spacing: 4) {
-            ZStack {
-                Circle()
-                    .trim(from: 0, to: 0.75)
-                    .stroke(primaryColor.opacity(0.12), style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                    .rotationEffect(.degrees(135))
-                    .frame(width: 48, height: 48)
-                Circle()
-                    .trim(from: 0, to: 0.75)
-                    .stroke(primaryColor.opacity(0.50), style: StrokeStyle(lineWidth: 4, lineCap: .round))
-                    .rotationEffect(.degrees(135))
-                    .frame(width: 48, height: 48)
-                    .shadow(color: primaryColor.opacity(0.3), radius: 6, x: 0, y: 2)
-                Image(systemName: "clock")
-                    .font(.system(size: 14, weight: .light))
+            VStack(spacing: 2) {
+                Text(activity.duration)
+                    .font(.system(size: 22, weight: .regular, design: .serif))
+                    .foregroundStyle(primaryColor)
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                Text("MOVING")
+                    .font(.system(size: 8, weight: .bold))
+                    .tracking(1.4)
+                    .foregroundStyle(primaryColor)
+            }
+            Rectangle()
+                .fill(primaryColor.opacity(0.18))
+                .frame(width: 40, height: 0.6)
+                .padding(.vertical, 1)
+            VStack(spacing: 2) {
+                Text(activity.elapsedTime)
+                    .font(.system(size: 14, weight: .regular, design: .serif))
+                    .foregroundStyle(primaryColor.opacity(0.75))
+                    .minimumScaleFactor(0.7)
+                    .lineLimit(1)
+                Text(pausedSeconds > 0 ? "ELAPSED · \(formatDurationCompact(pausedSeconds)) PAUSED" : "ELAPSED")
+                    .font(.system(size: 7, weight: .bold))
+                    .tracking(1.2)
                     .foregroundStyle(primaryColor.opacity(0.55))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
-            if pausedSeconds > 0 {
-                Text(formatDurationCompact(pausedSeconds) + " paused")
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundStyle(primaryColor.opacity(0.50))
-            }
-            Text(activity.elapsedTime)
-                .font(.system(size: 22, weight: .regular, design: .serif))
-                .foregroundStyle(primaryColor)
-                .minimumScaleFactor(0.7)
-                .lineLimit(1)
-            Text("ELAPSED")
-                .font(.system(size: 8, weight: .bold))
-                .tracking(1.4)
-                .foregroundStyle(primaryColor)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
         .conditionalGlass(enabled: useGlassBackground, colorStyle: colorStyle)
         .shadow(color: .black.opacity(0.5), radius: 8, x: 0, y: 3)
     }

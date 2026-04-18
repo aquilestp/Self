@@ -176,8 +176,7 @@ struct StatWidgetContentView: View, Equatable {
         case .heroStat: heroStatWidget
         case .wide: wideWidget
         case .tower: towerWidget
-        case .movingTimeClean: movingTimeCleanWidget
-        case .elapsedTimeClean: elapsedTimeCleanWidget
+        case .timeCombined: timeCombinedWidget
         case .avgHeartRate: avgHeartRateWidget
         case .hrPulseDots: hrPulseDotsWidget
         case .weeklyKm: weeklyKmWidget
