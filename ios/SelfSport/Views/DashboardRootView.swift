@@ -81,6 +81,8 @@ struct DashboardRootView: View {
     @State private var isPhotoFirstFlow: Bool = false
     @State private var photoFirstImage: UIImage?
     @State private var showTemplatePicker: Bool = false
+    @State private var showUpdateSheet: Bool = false
+    @State private var updateService = AppUpdateService.shared
 
     private var activeHighlights: [ActivityHighlight] {
         switch activeSource {
@@ -162,6 +164,8 @@ struct DashboardRootView: View {
                     if NotificationService.shared.shouldShowPermissionPrompt {
                         try? await Task.sleep(for: .seconds(1.2))
                         showNotificationPrompt = true
+                    } else {
+                        await triggerUpdateCheckIfNeeded()
                     }
                 }
             }
@@ -182,6 +186,28 @@ struct DashboardRootView: View {
             Button("OK", role: .cancel) { healthKitViewModel.errorMessage = nil }
         } message: {
             Text(healthKitViewModel.errorMessage ?? "")
+        }
+        .sheet(isPresented: $showUpdateSheet) {
+            if let config = updateService.config, config.isActive {
+                AppUpdateSheet(
+                    config: config,
+                    onLater: {
+                        updateService.dismissForToday()
+                        showUpdateSheet = false
+                    },
+                    onUpdate: {
+                        updateService.dismissForToday()
+                        showUpdateSheet = false
+                        if let url = URL(string: "https://apps.apple.com/co/app/self-share/id6762170645") {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                )
+                .presentationDetents([.large])
+                .presentationDragIndicator(.hidden)
+                .presentationBackground(Color(white: 0.06))
+                .interactiveDismissDisabled()
+            }
         }
         .sheet(isPresented: $showTemplatePicker) {
             TemplatePickerSheet(
@@ -397,6 +423,13 @@ struct DashboardRootView: View {
         if healthKitViewModel.isConnected {
             activeSource = .appleHealth
         }
+    }
+
+    private func triggerUpdateCheckIfNeeded() async {
+        await updateService.fetch()
+        guard updateService.shouldShowUpdate else { return }
+        try? await Task.sleep(for: .seconds(1.5))
+        showUpdateSheet = true
     }
 }
 
