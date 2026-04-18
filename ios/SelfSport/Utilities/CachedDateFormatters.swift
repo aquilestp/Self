@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated enum CachedDateFormatters: Sendable {
+enum CachedDateFormatters: Sendable {
     private static let utc = TimeZone(secondsFromGMT: 0)!
 
     static let bvtDate: DateFormatter = {

@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated enum DistanceToWords {
+enum DistanceToWords {
 
     static func convert(distanceMeters: Double, unit: SplitsUnitFilter) -> (numberText: String, unitText: String) {
         let value: Double

@@ -1,11 +1,11 @@
 import Foundation
 
-nonisolated enum AIGenerationKind: String, Codable, Sendable {
+enum AIGenerationKind: String, Codable, Sendable {
     case image
     case video
 }
 
-nonisolated struct AIGenerationRow: Codable, Sendable {
+struct AIGenerationRow: Codable, Sendable {
     let id: String?
     let userId: String
     let kind: String
@@ -19,7 +19,7 @@ nonisolated struct AIGenerationRow: Codable, Sendable {
     }
 }
 
-nonisolated struct AIGenerationInsertRow: Codable, Sendable {
+struct AIGenerationInsertRow: Codable, Sendable {
     let userId: String
     let kind: String
 
@@ -29,7 +29,7 @@ nonisolated struct AIGenerationInsertRow: Codable, Sendable {
     }
 }
 
-nonisolated struct AIGenerationDateRow: Codable, Sendable {
+struct AIGenerationDateRow: Codable, Sendable {
     let createdAt: String
 
     enum CodingKeys: String, CodingKey {

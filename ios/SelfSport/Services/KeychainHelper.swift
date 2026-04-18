@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-nonisolated enum KeychainHelper: Sendable {
+enum KeychainHelper: Sendable {
     static func save(_ data: Data, forKey key: String) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,

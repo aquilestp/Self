@@ -1,12 +1,12 @@
 import SwiftUI
 
-nonisolated enum FilterMode: String {
+enum FilterMode: String {
     case none
     case city
     case races
 }
 
-nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
+enum StatWidgetType: String, CaseIterable, Identifiable {
     case distance = "Distance"
     case distPace = "Dist+Pace"
     case threeStats = "3 Stats"
@@ -153,7 +153,7 @@ nonisolated enum StatWidgetType: String, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum CityFilter: Int, CaseIterable, Identifiable {
+enum CityFilter: Int, CaseIterable, Identifiable {
     case none = 0
     case skyline
     case postcard
@@ -175,7 +175,7 @@ nonisolated enum CityFilter: Int, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum RaceFilter: Int, CaseIterable, Identifiable {
+enum RaceFilter: Int, CaseIterable, Identifiable {
     case none = 0
     case bibNumber
     case finisher
@@ -197,7 +197,7 @@ nonisolated enum RaceFilter: Int, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum WidgetPalette: Int, CaseIterable, Identifiable {
+enum WidgetPalette: Int, CaseIterable, Identifiable {
     case classic = 0
     case neon
     case aesthetic
@@ -330,7 +330,7 @@ struct PlacedWidget: Identifiable {
     var nameStatsShowElevation: Bool = false
 }
 
-nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
+enum BVTEffect: Int, CaseIterable, Identifiable {
     case glow = 0
     case stroke
     case gradient
@@ -390,7 +390,7 @@ nonisolated enum BVTEffect: Int, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum SplitsUnitFilter: String, CaseIterable, Identifiable {
+enum SplitsUnitFilter: String, CaseIterable, Identifiable {
     case km = "KM"
     case miles = "MI"
 
@@ -418,7 +418,7 @@ nonisolated enum SplitsUnitFilter: String, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum BestEffortsUnitFilter: String, CaseIterable, Identifiable {
+enum BestEffortsUnitFilter: String, CaseIterable, Identifiable {
     case km = "KM"
     case miles = "MI"
     case both = "Both"
@@ -444,7 +444,7 @@ nonisolated enum BestEffortsUnitFilter: String, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
+enum WidgetFontStyle: Int, CaseIterable, Identifiable {
     case system = 0
     case righteous
     case bangers
@@ -524,7 +524,7 @@ nonisolated enum WidgetFontStyle: Int, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum SplitBannerFontStyle: Int, CaseIterable, Identifiable {
+enum SplitBannerFontStyle: Int, CaseIterable, Identifiable {
     case system = 0
     case righteous
     case bangers
@@ -599,18 +599,18 @@ nonisolated enum SplitBannerFontStyle: Int, CaseIterable, Identifiable {
     }
 }
 
-nonisolated enum DrawerState {
+enum DrawerState {
     case collapsed
     case open
     case expanded
 }
 
-nonisolated enum DrawerTab: String {
+enum DrawerTab: String {
     case popular = "Popular"
     case recents = "Recents"
 }
 
-nonisolated enum AIEditStyle: String, CaseIterable, Identifiable {
+enum AIEditStyle: String, CaseIterable, Identifiable {
     case fast = "Fast"
     case distortion = "Distortion"
     case blur = "Blur"

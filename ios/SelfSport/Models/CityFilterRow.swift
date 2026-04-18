@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct CityFilterRow: Codable, Sendable, Identifiable {
+struct CityFilterRow: Codable, Sendable, Identifiable {
     let filter_id: String
     let filter_name: String
     let overlay_url: String

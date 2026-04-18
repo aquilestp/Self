@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-nonisolated enum DashboardTab: Hashable {
+enum DashboardTab: Hashable {
     case share
     case challenges
 }
@@ -11,7 +11,7 @@ struct ProviderItem: Identifiable {
     let name: String
 }
 
-nonisolated struct ActivityHighlight: Identifiable, Sendable, Equatable {
+struct ActivityHighlight: Identifiable, Sendable, Equatable {
     let id: String
     let title: String
     let date: String
@@ -37,7 +37,7 @@ nonisolated struct ActivityHighlight: Identifiable, Sendable, Equatable {
     let movingTimeRaw: Int
     let elapsedTimeRaw: Int
 
-    nonisolated var dayTag: String? {
+    var dayTag: String? {
         guard let startDate else { return nil }
         let calendar = Calendar.current
         if calendar.isDateInToday(startDate) { return "Today" }

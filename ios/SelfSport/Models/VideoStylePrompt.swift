@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct VideoStylePrompt: Codable, Sendable, Identifiable {
+struct VideoStylePrompt: Codable, Sendable, Identifiable {
     let id: String
     let styleKey: String
     let displayName: String
@@ -9,7 +9,7 @@ nonisolated struct VideoStylePrompt: Codable, Sendable, Identifiable {
     let isActive: Bool
     let sortOrder: Int
 
-    nonisolated enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case id
         case styleKey = "style_key"
         case displayName = "display_name"

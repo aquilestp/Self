@@ -1,34 +1,34 @@
 import Foundation
 import Supabase
 
-nonisolated struct WidgetPopularityRow: Codable, Sendable {
+struct WidgetPopularityRow: Codable, Sendable {
     let widgetType: String
     let useCount: Int
 
-    nonisolated enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case widgetType = "widget_type"
         case useCount = "use_count"
     }
 }
 
-nonisolated struct UserWidgetRecentRow: Codable, Sendable {
+struct UserWidgetRecentRow: Codable, Sendable {
     let userId: String
     let widgetType: String
     let lastUsedAt: String
 
-    nonisolated enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case userId = "user_id"
         case widgetType = "widget_type"
         case lastUsedAt = "last_used_at"
     }
 }
 
-nonisolated struct UserWidgetRecentUpsert: Codable, Sendable {
+struct UserWidgetRecentUpsert: Codable, Sendable {
     let userId: String
     let widgetType: String
     let lastUsedAt: String
 
-    nonisolated enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case userId = "user_id"
         case widgetType = "widget_type"
         case lastUsedAt = "last_used_at"
