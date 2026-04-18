@@ -175,6 +175,14 @@ struct DashboardRootView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
             stravaViewModel.stopWebhookPolling()
         }
+        .alert("Apple Health", isPresented: Binding(
+            get: { healthKitViewModel.errorMessage != nil },
+            set: { if !$0 { healthKitViewModel.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { healthKitViewModel.errorMessage = nil }
+        } message: {
+            Text(healthKitViewModel.errorMessage ?? "")
+        }
         .sheet(isPresented: $showTemplatePicker) {
             TemplatePickerSheet(
                 templates: activeHighlights,
