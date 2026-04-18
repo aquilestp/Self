@@ -827,6 +827,7 @@ struct PhotoEditorView: View {
                         activityDetail = nil
                         geocodedActivityCity = nil
                         showActivitySwitcher = false
+                        drawerState = .open
                     }
                     if placedWidgets.contains(where: { $0.type.requiresDetail }) {
                         fetchActivityDetailOnDemand()
