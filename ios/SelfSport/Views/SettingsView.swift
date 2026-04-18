@@ -347,44 +347,40 @@ struct SettingsView: View {
 
     private var connectedSourceRow: some View {
         VStack(spacing: 0) {
-            HStack {
-                HStack(spacing: 10) {
-                    ZStack {
-                        Circle()
-                            .fill(sourceAccent.opacity(0.10))
-                            .frame(width: 34, height: 34)
-                        Image(systemName: sourceIcon)
-                            .font(.system(size: 14, weight: .light))
-                            .foregroundStyle(sourceAccent.opacity(0.85))
-                    }
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Connected app")
-                            .font(.system(size: 15, weight: .regular))
-                            .foregroundStyle(Color.white.opacity(0.80))
-                        Text(externalConnectionName)
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundStyle(Color(red: 0.30, green: 0.78, blue: 0.45))
-                    }
+            Button {
+                if activeSource == .appleHealth && isAppleHealthConnected {
+                    showDisconnectAppleHealthConfirmation = true
+                } else if isStravaConnected {
+                    showDisconnectStravaConfirmation = true
                 }
+            } label: {
+                HStack {
+                    HStack(spacing: 10) {
+                        ZStack {
+                            Circle()
+                                .fill(sourceAccent.opacity(0.10))
+                                .frame(width: 34, height: 34)
+                            Image(systemName: sourceIcon)
+                                .font(.system(size: 14, weight: .light))
+                                .foregroundStyle(sourceAccent.opacity(0.85))
+                        }
 
-                Spacer()
-
-                Button {
-                    if activeSource == .appleHealth && isAppleHealthConnected {
-                        showDisconnectAppleHealthConfirmation = true
-                    } else if isStravaConnected {
-                        showDisconnectStravaConfirmation = true
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Connected app")
+                                .font(.system(size: 15, weight: .regular))
+                                .foregroundStyle(Color.white.opacity(0.80))
+                            Text(externalConnectionName)
+                                .font(.system(size: 13, weight: .regular))
+                                .foregroundStyle(Color(red: 0.30, green: 0.78, blue: 0.45))
+                        }
                     }
-                } label: {
-                    Text("Disconnect")
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundStyle(sourceAccent.opacity(0.80))
+
+                    Spacer()
                 }
-                .buttonStyle(.plain)
+                .padding(16)
+                .background(cardBackground)
             }
-            .padding(16)
-            .background(cardBackground)
+            .buttonStyle(.plain)
 
             Button {
                 showConnectProvidersSheet = true
