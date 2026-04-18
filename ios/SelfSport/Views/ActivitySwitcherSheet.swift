@@ -58,11 +58,16 @@ private struct ActivitySwitcherRow: View {
 
                 Text(activity.hasDistance
                     ? "\(activity.distance)  ·  \(activity.pace)  ·  \(activity.duration)"
-                    : "\(activity.duration)  ·  \(activity.date)"
+                    : activity.duration
                 )
                 .font(.system(size: 12, weight: .regular))
                 .foregroundStyle(.white.opacity(0.44))
                 .lineLimit(1)
+
+                Text(activity.date)
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(.white.opacity(0.30))
+                    .lineLimit(1)
             }
 
             Spacer(minLength: 4)
