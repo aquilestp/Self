@@ -400,6 +400,7 @@ private struct GlassCardModifier: ViewModifier {
         } else {
             content
                 .background(.ultraThinMaterial.opacity(isAesthetic ? 0.5 : 0.7))
+                .background(Color.white.opacity(isNeon ? 0.04 : 0.14))
                 .background(accentColor.opacity(isNeon ? 0.12 : 0.06))
                 .clipShape(.rect(cornerRadius: 14))
                 .overlay(
@@ -415,9 +416,9 @@ private struct GlassCardModifier: ViewModifier {
         if isNeon {
             Color(red: 0.05, green: 0.05, blue: 0.12).opacity(0.75)
         } else if isAesthetic {
-            Color.black.opacity(0.3)
+            Color.white.opacity(0.20)
         } else {
-            Color.black.opacity(0.45)
+            Color.white.opacity(0.30)
         }
     }
 }
