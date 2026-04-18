@@ -3,19 +3,14 @@ import SwiftUI
 struct SettingsView: View {
     let userProfile: UserProfile?
     let isStravaConnected: Bool
-    let isAppleHealthConnected: Bool
-    let activeSource: ActiveSource
     let isConnecting: Bool
     let onDisconnectStrava: () -> Void
     let onConnectStrava: () -> Void
-    let onDisconnectAppleHealth: () -> Void
-    let onConnectAppleHealth: () -> Void
     let onSignOut: () -> Void
     var onDeleteAccount: () async -> Bool = { false }
     @Environment(\.dismiss) private var dismiss
     @State private var showSignOutConfirmation: Bool = false
     @State private var showDisconnectStravaConfirmation: Bool = false
-    @State private var showDisconnectAppleHealthConfirmation: Bool = false
     @State private var showDeleteAccountConfirmation: Bool = false
     @State private var isDeletingAccount: Bool = false
     @State private var deleteErrorMessage: String?
@@ -72,15 +67,6 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Your cached activities will be removed. You can reconnect anytime.")
-        }
-        .confirmationDialog("Disconnect Apple Health", isPresented: $showDisconnectAppleHealthConfirmation, titleVisibility: .visible) {
-            Button("Disconnect", role: .destructive) {
-                onDisconnectAppleHealth()
-                dismiss()
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Apple Health will no longer be your active source. Your workouts stay in Apple Health.")
         }
         .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
             Button("Sign Out", role: .destructive) {
@@ -286,13 +272,11 @@ struct SettingsView: View {
     }
 
     private var externalConnectionName: String {
-        if activeSource == .appleHealth && isAppleHealthConnected { return "Apple Health" }
-        if isStravaConnected { return "Strava" }
-        return "None"
+        isStravaConnected ? "Strava" : "None"
     }
 
     private var isAnySourceConnected: Bool {
-        isStravaConnected || isAppleHealthConnected
+        isStravaConnected
     }
 
     private var stravaSection: some View {
@@ -332,10 +316,6 @@ struct SettingsView: View {
                 onConnectStrava: {
                     showConnectProvidersSheet = false
                     onConnectStrava()
-                },
-                onConnectAppleHealth: {
-                    showConnectProvidersSheet = false
-                    onConnectAppleHealth()
                 }
             )
             .presentationDetents([.height(480)])
@@ -347,11 +327,7 @@ struct SettingsView: View {
     private var connectedSourceRow: some View {
         VStack(spacing: 0) {
             Button {
-                if activeSource == .appleHealth && isAppleHealthConnected {
-                    showDisconnectAppleHealthConfirmation = true
-                } else if isStravaConnected {
-                    showDisconnectStravaConfirmation = true
-                }
+                showDisconnectStravaConfirmation = true
             } label: {
                 HStack {
                     HStack(spacing: 10) {
@@ -410,15 +386,11 @@ struct SettingsView: View {
     }
 
     private var sourceAccent: Color {
-        if activeSource == .appleHealth && isAppleHealthConnected {
-            return Color(red: 1.0, green: 0.28, blue: 0.28)
-        }
-        return Color(red: 0.99, green: 0.32, blue: 0.14)
+        Color(red: 0.99, green: 0.32, blue: 0.14)
     }
 
     private var sourceIcon: String {
-        if activeSource == .appleHealth && isAppleHealthConnected { return "heart.fill" }
-        return "figure.run"
+        "figure.run"
     }
 
     private var notificationsSection: some View {
@@ -528,13 +500,9 @@ struct SettingsView: View {
         SettingsView(
             userProfile: UserProfile(id: UUID(), fullName: "Juan Pérez", email: "juan@email.com"),
             isStravaConnected: false,
-            isAppleHealthConnected: false,
-            activeSource: .strava,
             isConnecting: false,
             onDisconnectStrava: {},
             onConnectStrava: {},
-            onDisconnectAppleHealth: {},
-            onConnectAppleHealth: {},
             onSignOut: {}
         )
     }

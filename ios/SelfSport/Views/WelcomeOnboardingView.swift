@@ -276,13 +276,6 @@ private struct WelcomeConnectStepView: View {
                 )
 
                 WelcomeProviderPreviewRow(
-                    systemImage: "heart.fill",
-                    title: "Apple Health",
-                    subtitle: "Sync workouts from your iPhone & Apple Watch",
-                    accent: Color(red: 1.0, green: 0.28, blue: 0.28)
-                )
-
-                WelcomeProviderPreviewRow(
                     systemImage: "applewatch.side.right",
                     title: "COROS",
                     subtitle: "Sync sessions from your watch",

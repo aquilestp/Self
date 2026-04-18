@@ -408,8 +408,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SelfSport/SelfSportInfo.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Read your workouts to build shareable activity posts.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "SelfSport does not write any health data.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to show your city on your activity photos.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Select photos to create your shareable sports moments.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -449,8 +447,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = SelfSport/SelfSportInfo.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Read your workouts to build shareable activity posts.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "SelfSport does not write any health data.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to show your city on your activity photos.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Select photos to create your shareable sports moments.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
