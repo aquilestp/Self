@@ -1,18 +1,19 @@
-# Eliminar Apple Health completamente de la app
+# Fondo simple y blanco en todos los widgets del canvas
 
 
-## Cambios
+## Cambio
 
-**Archivos a eliminar:**
-- `HealthKitViewModel.swift` — lógica de conexión y carga de workouts
-- `HealthKitService.swift` — integración nativa con HealthKit
-- `HealthKitActivityType.swift` — mapeo de tipos de actividad de HealthKit
+El fondo de todos los widgets que se colocan en el canvas pasará a ser un blanco translúcido uniforme, limpio y sin bordes. El look "glass" complejo (material blur, highlight, inner glow, borde degradado) se reemplaza por un rectángulo de color blanco semi-opaco.
 
-**Archivos a modificar:**
+## Lo que cambia visualmente
 
-- **`ActiveSource.swift`** — quitar el caso `.appleHealth`, dejar solo `.strava`
-- **`DashboardRootView.swift`** — eliminar `healthKitViewModel`, simplificar todos los `switch` que tenían `.appleHealth`, quitar el alert de Apple Health, quitar `onConnectAppleHealth` / `onDisconnectAppleHealth`, quitar `connectAppleHealth()`
-- **`SettingsView.swift`** — quitar parámetros `isAppleHealthConnected`, `onDisconnectAppleHealth`, `onConnectAppleHealth`, quitar el confirmation dialog de Apple Health, simplificar `sourceAccent` y `sourceIcon`
-- **`DashboardCards.swift`** — quitar el row de "Apple Health" del `ConnectProvidersSheet`, quitar `onConnectAppleHealth`, simplificar `EmptyActivitiesCard`
-- **`WelcomeOnboardingView.swift`** — quitar el `WelcomeProviderPreviewRow` de Apple Health
-- **`project.pbxproj`** — quitar la capability `com.apple.HealthKit` y los `INFOPLIST_KEY_NSHealthUpdateUsageDescription`
+- **Fondo** → blanco con ~85% de opacidad, sin capas adicionales de color de acento
+- **Bordes** → eliminados completamente (ni borde sutil ni strokeBorder)
+- **Reflejos / inner glow** → eliminados
+- **Sombra** → se conserva una sombra suave y ligera para que el widget flote sobre la foto
+- **Esquinas redondeadas** → se mantienen igual
+
+## Lo que NO cambia
+
+- El export de la imagen final (lo que se guarda/comparte) sigue igual — solo afecta la vista del canvas en el editor
+- El tamaño, posición y todo lo demás de los widgets permanece intacto

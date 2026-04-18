@@ -398,14 +398,9 @@ private struct GlassCardModifier: ViewModifier {
                 .overlay(gradientBorder)
         } else {
             content
-                .background(AnyShapeStyle(.thinMaterial))
-                .background(Color.white.opacity(isNeon ? 0.06 : 0.10))
-                .background(accentColor.opacity(isNeon ? 0.14 : 0.04))
+                .background(Color.white.opacity(0.85))
                 .clipShape(.rect(cornerRadius: 14))
-                .overlay(specularHighlight)
-                .overlay(innerGlow)
-                .overlay(gradientBorder)
-                .shadow(color: isNeon ? accentColor.opacity(0.45) : .black.opacity(0.40), radius: 20, x: 0, y: isNeon ? 0 : 8)
+                .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 4)
         }
     }
 
