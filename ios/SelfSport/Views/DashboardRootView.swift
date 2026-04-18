@@ -74,14 +74,26 @@ struct DashboardRootView: View {
     @State private var editorPhoto: UIImage?
     @State private var showSettings: Bool = false
     @State private var stravaViewModel = StravaViewModel()
+    @State private var healthKitViewModel = HealthKitViewModel()
+    @State private var activeSource: ActiveSource = ActiveSource.current
     @State private var detailActivity: ActivityHighlight?
     @State private var showNotificationPrompt: Bool = false
     @State private var isPhotoFirstFlow: Bool = false
     @State private var photoFirstImage: UIImage?
     @State private var showTemplatePicker: Bool = false
 
+    private var activeHighlights: [ActivityHighlight] {
+        switch activeSource {
+        case .strava: return stravaViewModel.activityHighlights
+        case .appleHealth: return healthKitViewModel.activityHighlights
+        }
+    }
+
     private var hasActivitySource: Bool {
-        stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
+        switch activeSource {
+        case .strava: return stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
+        case .appleHealth: return healthKitViewModel.isConnected
+        }
     }
 
     var body: some View {
@@ -91,7 +103,7 @@ struct DashboardRootView: View {
 
             if editorActivity == nil && pendingActivity == nil {
                 VStack(spacing: 0) {
-                    if selectedTab == .share && !stravaViewModel.activityHighlights.isEmpty && stravaViewModel.isConnected {
+                    if selectedTab == .share && !activeHighlights.isEmpty && (stravaViewModel.isConnected || healthKitViewModel.isConnected) {
                         HStack(spacing: 4) {
                             Image(systemName: "hand.tap")
                                 .font(.system(size: 9, weight: .medium))
@@ -110,11 +122,14 @@ struct DashboardRootView: View {
         .sheet(item: $detailActivity) { activity in
             ActivityDetailSheet(
                 activity: activity,
-                detail: stravaViewModel.currentActivityDetail,
-                isLoading: stravaViewModel.isLoadingDetail,
-                error: stravaViewModel.detailError,
+                detail: activeSource == .strava ? stravaViewModel.currentActivityDetail : nil,
+                isLoading: activeSource == .strava ? stravaViewModel.isLoadingDetail : false,
+                error: activeSource == .strava ? stravaViewModel.detailError : nil,
                 onDelete: { activityId in
-                    await stravaViewModel.deleteActivity(activityId: activityId)
+                    if activeSource == .strava {
+                        return await stravaViewModel.deleteActivity(activityId: activityId)
+                    }
+                    return false
                 }
             )
             .presentationDetents([.fraction(0.70), .large])
@@ -162,7 +177,7 @@ struct DashboardRootView: View {
         }
         .sheet(isPresented: $showTemplatePicker) {
             TemplatePickerSheet(
-                templates: stravaViewModel.activityHighlights,
+                templates: activeHighlights,
                 onPick: { template in
                     showTemplatePicker = false
                     guard let image = photoFirstImage else { return }
@@ -183,12 +198,22 @@ struct DashboardRootView: View {
             SettingsView(
                 userProfile: authViewModel.userProfile,
                 isStravaConnected: stravaViewModel.isConnected,
+                isAppleHealthConnected: healthKitViewModel.isConnected,
+                activeSource: activeSource,
                 isConnecting: stravaViewModel.isConnecting,
                 onDisconnectStrava: {
                     stravaViewModel.disconnect()
+                    activeSource = .strava
                 },
                 onConnectStrava: {
-                    Task { await stravaViewModel.connect() }
+                    Task { await connectStrava() }
+                },
+                onDisconnectAppleHealth: {
+                    healthKitViewModel.disconnect()
+                    activeSource = .strava
+                },
+                onConnectAppleHealth: {
+                    Task { await connectAppleHealth() }
                 },
                 onSignOut: {
                     Task { await authViewModel.signOut() }
@@ -251,6 +276,8 @@ struct DashboardRootView: View {
                     DashboardView(
                         authViewModel: authViewModel,
                         stravaViewModel: stravaViewModel,
+                        healthKitViewModel: healthKitViewModel,
+                        activeSource: activeSource,
                         onSelectActivity: { activity in
                             withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
                                 pendingActivity = activity
@@ -266,7 +293,7 @@ struct DashboardRootView: View {
                         },
                         onStartFromPhoto: {
                             HapticService.medium.impactOccurred()
-                            if stravaViewModel.activityHighlights.isEmpty {
+                            if activeHighlights.isEmpty && activeSource == .strava {
                                 Task { await stravaViewModel.loadDemoActivities() }
                             }
                             withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
@@ -281,7 +308,15 @@ struct DashboardRootView: View {
                         },
                         onGoBack: {
                             HapticService.medium.impactOccurred()
-                            stravaViewModel.resetDemoState()
+                            if activeSource == .strava {
+                                stravaViewModel.resetDemoState()
+                            }
+                        },
+                        onConnectAppleHealth: {
+                            Task { await connectAppleHealth() }
+                        },
+                        onSourceChanged: { newSource in
+                            activeSource = newSource
                         }
                     )
                 }
@@ -298,7 +333,7 @@ struct DashboardRootView: View {
     }
 
     private var placeholderActivity: ActivityHighlight {
-        stravaViewModel.activityHighlights.first ?? ActivityHighlight(
+        activeHighlights.first ?? ActivityHighlight(
             id: "placeholder",
             title: "New post",
             date: "",
@@ -327,11 +362,31 @@ struct DashboardRootView: View {
     }
 
     private func presentActivityDetail(_ activity: ActivityHighlight) {
-        guard !stravaViewModel.isUsingDemoActivities,
-              let stravaId = Int(activity.id) else { return }
-        detailActivity = activity
-        Task {
-            await stravaViewModel.fetchActivityDetail(stravaId: stravaId)
+        switch activeSource {
+        case .strava:
+            guard !stravaViewModel.isUsingDemoActivities,
+                  let stravaId = Int(activity.id) else { return }
+            detailActivity = activity
+            Task {
+                await stravaViewModel.fetchActivityDetail(stravaId: stravaId)
+            }
+        case .appleHealth:
+            detailActivity = activity
+        }
+    }
+
+    private func connectStrava() async {
+        await stravaViewModel.connect()
+        if stravaViewModel.isConnected {
+            ActiveSource.current = .strava
+            activeSource = .strava
+        }
+    }
+
+    private func connectAppleHealth() async {
+        await healthKitViewModel.connect()
+        if healthKitViewModel.isConnected {
+            activeSource = .appleHealth
         }
     }
 }
@@ -339,6 +394,8 @@ struct DashboardRootView: View {
 struct DashboardView: View {
     @Bindable var authViewModel: AuthViewModel
     @Bindable var stravaViewModel: StravaViewModel
+    @Bindable var healthKitViewModel: HealthKitViewModel
+    let activeSource: ActiveSource
     let onSelectActivity: (ActivityHighlight) -> Void
     let onShowDetail: (ActivityHighlight) -> Void
     let onOpenSettings: () -> Void
@@ -346,17 +403,39 @@ struct DashboardView: View {
     let onStartFromPhoto: () -> Void
     let onGoWithoutActivity: () -> Void
     let onGoBack: () -> Void
+    let onConnectAppleHealth: () -> Void
+    let onSourceChanged: (ActiveSource) -> Void
 
     private var activities: [ActivityHighlight] {
-        stravaViewModel.activityHighlights
+        switch activeSource {
+        case .strava: return stravaViewModel.activityHighlights
+        case .appleHealth: return healthKitViewModel.activityHighlights
+        }
     }
 
     private var hasActivitySource: Bool {
-        stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
+        switch activeSource {
+        case .strava: return stravaViewModel.isConnected || stravaViewModel.isUsingDemoActivities
+        case .appleHealth: return healthKitViewModel.isConnected
+        }
     }
 
     private var isDemoOnly: Bool {
-        stravaViewModel.isUsingDemoActivities && !stravaViewModel.isConnected
+        activeSource == .strava && stravaViewModel.isUsingDemoActivities && !stravaViewModel.isConnected
+    }
+
+    private var isSourceConnected: Bool {
+        switch activeSource {
+        case .strava: return stravaViewModel.isConnected
+        case .appleHealth: return healthKitViewModel.isConnected
+        }
+    }
+
+    private var isCurrentlyLoading: Bool {
+        switch activeSource {
+        case .strava: return stravaViewModel.isLoading
+        case .appleHealth: return healthKitViewModel.isLoading
+        }
     }
 
     var body: some View {
@@ -377,20 +456,28 @@ struct DashboardView: View {
         .background(Color.black)
         .toolbar(.hidden, for: .navigationBar)
         .task {
-            if stravaViewModel.isUsingDemoActivities {
-                return
-            }
-            if authViewModel.isDemoMode {
-                await stravaViewModel.loadDemoActivities()
-            } else {
-                stravaViewModel.checkConnection()
-                if stravaViewModel.isConnected {
-                    await stravaViewModel.loadInitial()
+            switch activeSource {
+            case .strava:
+                if stravaViewModel.isUsingDemoActivities { return }
+                if authViewModel.isDemoMode {
+                    await stravaViewModel.loadDemoActivities()
+                } else {
+                    stravaViewModel.checkConnection()
+                    if stravaViewModel.isConnected {
+                        await stravaViewModel.loadInitial()
+                    }
+                }
+            case .appleHealth:
+                healthKitViewModel.checkConnection()
+                if healthKitViewModel.isConnected && healthKitViewModel.activityHighlights.isEmpty {
+                    await healthKitViewModel.loadInitial()
                 }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-            Task { await stravaViewModel.refreshTokenProactively() }
+            if activeSource == .strava {
+                Task { await stravaViewModel.refreshTokenProactively() }
+            }
         }
     }
 
@@ -407,7 +494,7 @@ struct DashboardView: View {
 
             Spacer()
 
-            if stravaViewModel.isConnected {
+            if isSourceConnected {
                 Button {
                     HapticService.heavy.impactOccurred()
                     triggerRateLimitedRefresh()
@@ -427,7 +514,8 @@ struct DashboardView: View {
     }
 
     private var heroTitle: String {
-        stravaViewModel.isConnected ? "Choose your activity" : "Choose your demo activity"
+        if isDemoOnly { return "Choose your demo activity" }
+        return "Choose your activity"
     }
 
     private var heroHeader: some View {
@@ -444,9 +532,44 @@ struct DashboardView: View {
                     .foregroundStyle(Color(red: 0.97, green: 0.96, blue: 0.95))
                     .lineSpacing(-3)
                     .minimumScaleFactor(0.9)
+
+                if isSourceConnected {
+                    sourceChip
+                }
             }
         }
         .padding(.top, 6)
+    }
+
+    private var sourceChip: some View {
+        HStack(spacing: 5) {
+            Image(systemName: activeSource == .appleHealth ? "heart.fill" : "figure.run")
+                .font(.system(size: 9, weight: .medium))
+            Text(activeSource == .appleHealth ? "Apple Health" : "Strava")
+                .font(.system(size: 10, weight: .medium))
+                .tracking(0.5)
+        }
+        .foregroundStyle(
+            activeSource == .appleHealth
+            ? Color(red: 1.0, green: 0.30, blue: 0.30).opacity(0.75)
+            : Color(red: 0.99, green: 0.32, blue: 0.14).opacity(0.75)
+        )
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            (activeSource == .appleHealth
+             ? Color(red: 1.0, green: 0.30, blue: 0.30)
+             : Color(red: 0.99, green: 0.32, blue: 0.14)).opacity(0.08),
+            in: Capsule()
+        )
+        .overlay(
+            Capsule().stroke(
+                (activeSource == .appleHealth
+                 ? Color(red: 1.0, green: 0.30, blue: 0.30)
+                 : Color(red: 0.99, green: 0.32, blue: 0.14)).opacity(0.12),
+                lineWidth: 0.5
+            )
+        )
     }
 
     @State private var visibleActivityID: String?
@@ -460,10 +583,10 @@ struct DashboardView: View {
     private var activityRail: some View {
         ZStack(alignment: .top) {
             Group {
-                if stravaViewModel.isLoading && activities.isEmpty {
+                if isCurrentlyLoading && activities.isEmpty {
                     loadingRail
                 } else if !hasActivitySource {
-                    connectStravaRail
+                    connectSourceRail
                 } else if activities.isEmpty {
                     emptyActivitiesRail
                 } else {
@@ -563,10 +686,17 @@ struct DashboardView: View {
             guard newValue != nil else { return }
             HapticService.medium.impactOccurred()
 
-            if newValue == activities.last?.id,
-               stravaViewModel.hasMoreActivities,
-               !stravaViewModel.isLoadingMore {
-                Task { await stravaViewModel.loadMore() }
+            if newValue == activities.last?.id {
+                switch activeSource {
+                case .strava:
+                    if stravaViewModel.hasMoreActivities && !stravaViewModel.isLoadingMore {
+                        Task { await stravaViewModel.loadMore() }
+                    }
+                case .appleHealth:
+                    if healthKitViewModel.hasMoreActivities && !healthKitViewModel.isLoadingMore {
+                        Task { await healthKitViewModel.loadMore() }
+                    }
+                }
             }
         }
     }
@@ -588,32 +718,36 @@ struct DashboardView: View {
 
     private func triggerRateLimitedRefresh() {
         Task {
-            if stravaViewModel.isOnCooldown {
-                withAnimation(.snappy(duration: 0.3)) { showCooldownToast = true }
-                try? await Task.sleep(for: .seconds(2))
-                withAnimation(.snappy(duration: 0.3)) { showCooldownToast = false }
-            } else {
+            switch activeSource {
+            case .strava:
+                if stravaViewModel.isOnCooldown {
+                    withAnimation(.snappy(duration: 0.3)) { showCooldownToast = true }
+                    try? await Task.sleep(for: .seconds(2))
+                    withAnimation(.snappy(duration: 0.3)) { showCooldownToast = false }
+                } else {
+                    withAnimation(.snappy(duration: 0.2)) { isRefreshing = true }
+                    await stravaViewModel.refresh()
+                    withAnimation(.snappy(duration: 0.3)) { isRefreshing = false }
+                }
+            case .appleHealth:
                 withAnimation(.snappy(duration: 0.2)) { isRefreshing = true }
-                await stravaViewModel.refresh()
+                await healthKitViewModel.refresh()
                 withAnimation(.snappy(duration: 0.3)) { isRefreshing = false }
             }
-        }
-    }
-
-    private func openDemoActivities() {
-        HapticService.heavy.impactOccurred()
-        Task {
-            await stravaViewModel.loadDemoActivities()
         }
     }
 
     private func connectStrava() {
         Task {
             await stravaViewModel.connect()
+            if stravaViewModel.isConnected {
+                ActiveSource.current = .strava
+                onSourceChanged(.strava)
+            }
         }
     }
 
-    private var connectStravaRail: some View {
+    private var connectSourceRail: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 14) {
                 BringActivitiesCard(
@@ -641,9 +775,10 @@ struct DashboardView: View {
         .sheet(isPresented: $showConnectProvidersSheet) {
             ConnectProvidersSheet(
                 isConnecting: stravaViewModel.isConnecting,
-                onConnectStrava: connectStrava
+                onConnectStrava: connectStrava,
+                onConnectAppleHealth: onConnectAppleHealth
             )
-            .presentationDetents([.height(420)])
+            .presentationDetents([.height(480)])
             .presentationDragIndicator(.visible)
             .presentationBackground(Color(white: 0.08))
         }
@@ -667,8 +802,13 @@ struct DashboardView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(alignment: .top, spacing: 14) {
                 EmptyActivitiesCard(
+                    sourceName: activeSource == .appleHealth ? "Apple Health" : "Strava",
                     onDisconnect: {
-                        stravaViewModel.disconnect()
+                        switch activeSource {
+                        case .strava: stravaViewModel.disconnect()
+                        case .appleHealth: healthKitViewModel.disconnect()
+                        }
+                        onSourceChanged(.strava)
                     }
                 )
             }

@@ -401,9 +401,11 @@ struct BringActivitiesCard: View {
 struct ConnectProvidersSheet: View {
     let isConnecting: Bool
     let onConnectStrava: () -> Void
+    let onConnectAppleHealth: () -> Void
     @Environment(\.dismiss) private var dismiss
 
     private let stravaOrange = Color(red: 0.99, green: 0.32, blue: 0.14)
+    private let healthRed = Color(red: 1.0, green: 0.28, blue: 0.28)
     private let corosRed = Color(red: 0.85, green: 0.12, blue: 0.15)
     private let garminBlue = Color(red: 0.0, green: 0.47, blue: 0.78)
 
@@ -433,6 +435,19 @@ struct ConnectProvidersSheet: View {
                     onConnect: {
                         dismiss()
                         onConnectStrava()
+                    }
+                )
+
+                providerRow(
+                    name: "Apple Health",
+                    subtitle: "Sync workouts from your iPhone and Apple Watch",
+                    systemImage: "heart.fill",
+                    accent: healthRed,
+                    isComingSoon: false,
+                    isConnecting: false,
+                    onConnect: {
+                        dismiss()
+                        onConnectAppleHealth()
                     }
                 )
 
@@ -676,6 +691,7 @@ struct LoadingActivityCard: View {
 }
 
 struct EmptyActivitiesCard: View {
+    var sourceName: String = "Strava"
     let onDisconnect: () -> Void
 
     private let cardWidth: CGFloat = (UIScreen.main.bounds.width - 40) * 0.603
@@ -709,14 +725,14 @@ struct EmptyActivitiesCard: View {
                     .foregroundStyle(Color.white.opacity(0.80))
                     .padding(.bottom, 6)
 
-                Text("Record an activity on Strava, then pull to refresh.")
+                Text(sourceName == "Apple Health" ? "Complete a workout with your Apple Watch or iPhone, then pull to refresh." : "Record an activity on Strava, then pull to refresh.")
                     .font(.system(size: 13))
                     .foregroundStyle(Color.white.opacity(0.36))
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 20)
 
                 Button(action: onDisconnect) {
-                    Text("Disconnect Strava")
+                    Text("Disconnect \(sourceName)")
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Color.white.opacity(0.50))
                 }

@@ -267,10 +267,10 @@ private struct WelcomeConnectStepView: View {
                 )
 
                 WelcomeProviderPreviewRow(
-                    systemImage: "location.north.circle",
-                    title: "Garmin",
-                    subtitle: "Bring in workouts from Garmin Connect",
-                    accent: Color.white.opacity(0.76)
+                    systemImage: "heart.fill",
+                    title: "Apple Health",
+                    subtitle: "Sync workouts from your iPhone & Apple Watch",
+                    accent: Color(red: 1.0, green: 0.28, blue: 0.28)
                 )
 
                 WelcomeProviderPreviewRow(

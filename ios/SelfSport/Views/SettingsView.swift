@@ -3,14 +3,19 @@ import SwiftUI
 struct SettingsView: View {
     let userProfile: UserProfile?
     let isStravaConnected: Bool
+    let isAppleHealthConnected: Bool
+    let activeSource: ActiveSource
     let isConnecting: Bool
     let onDisconnectStrava: () -> Void
     let onConnectStrava: () -> Void
+    let onDisconnectAppleHealth: () -> Void
+    let onConnectAppleHealth: () -> Void
     let onSignOut: () -> Void
     var onDeleteAccount: () async -> Bool = { false }
     @Environment(\.dismiss) private var dismiss
     @State private var showSignOutConfirmation: Bool = false
     @State private var showDisconnectStravaConfirmation: Bool = false
+    @State private var showDisconnectAppleHealthConfirmation: Bool = false
     @State private var showDeleteAccountConfirmation: Bool = false
     @State private var isDeletingAccount: Bool = false
     @State private var deleteErrorMessage: String?
@@ -68,6 +73,15 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Your cached activities will be removed. You can reconnect anytime.")
+        }
+        .confirmationDialog("Disconnect Apple Health", isPresented: $showDisconnectAppleHealthConfirmation, titleVisibility: .visible) {
+            Button("Disconnect", role: .destructive) {
+                onDisconnectAppleHealth()
+                dismiss()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Apple Health will no longer be your active source. Your workouts stay in Apple Health.")
         }
         .confirmationDialog("Sign Out", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
             Button("Sign Out", role: .destructive) {
@@ -273,49 +287,45 @@ struct SettingsView: View {
     }
 
     private var externalConnectionName: String {
+        if activeSource == .appleHealth && isAppleHealthConnected { return "Apple Health" }
         if isStravaConnected { return "Strava" }
         return "None"
+    }
+
+    private var isAnySourceConnected: Bool {
+        isStravaConnected || isAppleHealthConnected
     }
 
     private var stravaSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionLabel("EXTERNAL CONNECTION", icon: "link")
 
-            Button {
-                if isStravaConnected {
-                    showDisconnectStravaConfirmation = true
-                } else {
+            if isAnySourceConnected {
+                connectedSourceRow
+            } else {
+                Button {
                     showConnectProvidersSheet = true
-                }
-            } label: {
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Connected app")
-                            .font(.system(size: 15, weight: .regular))
-                            .foregroundStyle(Color.white.opacity(0.80))
-
-                        Text(externalConnectionName)
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundStyle(isStravaConnected ? Color(red: 0.30, green: 0.78, blue: 0.45) : Color.white.opacity(0.36))
-                    }
-
-                    Spacer()
-
-                    if isStravaConnected {
-                        Text("Disconnect")
-                            .font(.system(size: 13, weight: .regular))
-                            .foregroundStyle(Color(red: 0.99, green: 0.32, blue: 0.14).opacity(0.80))
-                    } else {
+                } label: {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Connected app")
+                                .font(.system(size: 15, weight: .regular))
+                                .foregroundStyle(Color.white.opacity(0.80))
+                            Text("None")
+                                .font(.system(size: 13, weight: .regular))
+                                .foregroundStyle(Color.white.opacity(0.36))
+                        }
+                        Spacer()
                         Image(systemName: "chevron.right")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(Color.white.opacity(0.25))
                     }
+                    .padding(16)
+                    .contentShape(Rectangle())
                 }
-                .padding(16)
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .background(cardBackground)
             }
-            .buttonStyle(.plain)
-            .background(cardBackground)
         }
         .sheet(isPresented: $showConnectProvidersSheet) {
             ConnectProvidersSheet(
@@ -323,12 +333,97 @@ struct SettingsView: View {
                 onConnectStrava: {
                     showConnectProvidersSheet = false
                     onConnectStrava()
+                },
+                onConnectAppleHealth: {
+                    showConnectProvidersSheet = false
+                    onConnectAppleHealth()
                 }
             )
-            .presentationDetents([.height(420)])
+            .presentationDetents([.height(480)])
             .presentationDragIndicator(.visible)
             .presentationBackground(Color(white: 0.08))
         }
+    }
+
+    private var connectedSourceRow: some View {
+        VStack(spacing: 0) {
+            HStack {
+                HStack(spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(sourceAccent.opacity(0.10))
+                            .frame(width: 34, height: 34)
+                        Image(systemName: sourceIcon)
+                            .font(.system(size: 14, weight: .light))
+                            .foregroundStyle(sourceAccent.opacity(0.85))
+                    }
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Connected app")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundStyle(Color.white.opacity(0.80))
+                        Text(externalConnectionName)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundStyle(Color(red: 0.30, green: 0.78, blue: 0.45))
+                    }
+                }
+
+                Spacer()
+
+                Button {
+                    if activeSource == .appleHealth && isAppleHealthConnected {
+                        showDisconnectAppleHealthConfirmation = true
+                    } else if isStravaConnected {
+                        showDisconnectStravaConfirmation = true
+                    }
+                } label: {
+                    Text("Disconnect")
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundStyle(sourceAccent.opacity(0.80))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(16)
+            .background(cardBackground)
+
+            Button {
+                showConnectProvidersSheet = true
+            } label: {
+                HStack {
+                    Text("Switch source")
+                        .font(.system(size: 13, weight: .regular))
+                        .foregroundStyle(Color.white.opacity(0.44))
+                    Spacer()
+                    Image(systemName: "arrow.left.arrow.right")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.white.opacity(0.25))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.white.opacity(0.02))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(Color.white.opacity(0.05), lineWidth: 0.5)
+                    }
+            )
+        }
+    }
+
+    private var sourceAccent: Color {
+        if activeSource == .appleHealth && isAppleHealthConnected {
+            return Color(red: 1.0, green: 0.28, blue: 0.28)
+        }
+        return Color(red: 0.99, green: 0.32, blue: 0.14)
+    }
+
+    private var sourceIcon: String {
+        if activeSource == .appleHealth && isAppleHealthConnected { return "heart.fill" }
+        return "figure.run"
     }
 
     private var notificationsSection: some View {
@@ -464,9 +559,13 @@ struct SettingsView: View {
         SettingsView(
             userProfile: UserProfile(id: UUID(), fullName: "Juan Pérez", email: "juan@email.com"),
             isStravaConnected: false,
+            isAppleHealthConnected: false,
+            activeSource: .strava,
             isConnecting: false,
             onDisconnectStrava: {},
             onConnectStrava: {},
+            onDisconnectAppleHealth: {},
+            onConnectAppleHealth: {},
             onSignOut: {}
         )
     }
