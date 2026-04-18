@@ -398,7 +398,7 @@ private struct GlassCardModifier: ViewModifier {
                 .overlay(gradientBorder)
         } else {
             content
-                .background(Color.white.opacity(0.85))
+                .background(Color.white.opacity(0.55))
                 .clipShape(.rect(cornerRadius: 14))
                 .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 4)
         }
