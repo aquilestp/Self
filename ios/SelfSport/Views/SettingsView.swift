@@ -325,64 +325,36 @@ struct SettingsView: View {
     }
 
     private var connectedSourceRow: some View {
-        VStack(spacing: 0) {
-            Button {
-                showDisconnectStravaConfirmation = true
-            } label: {
-                HStack {
-                    HStack(spacing: 10) {
-                        ZStack {
-                            Circle()
-                                .fill(sourceAccent.opacity(0.10))
-                                .frame(width: 34, height: 34)
-                            Image(systemName: sourceIcon)
-                                .font(.system(size: 14, weight: .light))
-                                .foregroundStyle(sourceAccent.opacity(0.85))
-                        }
-
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("Connected app")
-                                .font(.system(size: 15, weight: .regular))
-                                .foregroundStyle(Color.white.opacity(0.80))
-                            Text(externalConnectionName)
-                                .font(.system(size: 13, weight: .regular))
-                                .foregroundStyle(Color(red: 0.30, green: 0.78, blue: 0.45))
-                        }
+        Button {
+            showDisconnectStravaConfirmation = true
+        } label: {
+            HStack {
+                HStack(spacing: 10) {
+                    ZStack {
+                        Circle()
+                            .fill(sourceAccent.opacity(0.10))
+                            .frame(width: 34, height: 34)
+                        Image(systemName: sourceIcon)
+                            .font(.system(size: 14, weight: .light))
+                            .foregroundStyle(sourceAccent.opacity(0.85))
                     }
 
-                    Spacer()
-                }
-                .padding(16)
-                .background(cardBackground)
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                showConnectProvidersSheet = true
-            } label: {
-                HStack {
-                    Text("Switch source")
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundStyle(Color.white.opacity(0.44))
-                    Spacer()
-                    Image(systemName: "arrow.left.arrow.right")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(Color.white.opacity(0.25))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color.white.opacity(0.02))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .stroke(Color.white.opacity(0.05), lineWidth: 0.5)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Connected app")
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundStyle(Color.white.opacity(0.80))
+                        Text(externalConnectionName)
+                            .font(.system(size: 13, weight: .regular))
+                            .foregroundStyle(Color(red: 0.30, green: 0.78, blue: 0.45))
                     }
-            )
+                }
+
+                Spacer()
+            }
+            .padding(16)
+            .background(cardBackground)
         }
+        .buttonStyle(.plain)
     }
 
     private var sourceAccent: Color {
