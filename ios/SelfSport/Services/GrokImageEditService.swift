@@ -82,13 +82,13 @@ final class GrokImageEditService {
     }
 }
 
-nonisolated enum GrokEditError: Error, LocalizedError, Sendable {
+enum GrokEditError: Error, LocalizedError, Sendable {
     case imageConversionFailed
     case networkError
     case serverError(String)
     case invalidResponse
 
-    nonisolated var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .imageConversionFailed:
             return "Failed to process the image"

@@ -125,10 +125,10 @@ final class AIQuotaService {
     }
 }
 
-nonisolated enum AIQuotaError: Error, LocalizedError, Sendable {
+enum AIQuotaError: Error, LocalizedError, Sendable {
     case quotaExceeded(kind: AIGenerationKind)
 
-    nonisolated var errorDescription: String? {
+    var errorDescription: String? {
         switch self {
         case .quotaExceeded(let kind):
             return kind == .image ? "You reached your monthly image limit." : "You reached your monthly video limit."

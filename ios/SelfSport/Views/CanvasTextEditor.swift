@@ -108,7 +108,7 @@ struct CanvasLiveTextView: UIViewRepresentable {
             updateIntrinsicHeight(textView, maxWidth: parent.maxWidth)
         }
 
-        nonisolated func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
             if text == "\n" {
                 Task { @MainActor in
                     parent.onCommit()

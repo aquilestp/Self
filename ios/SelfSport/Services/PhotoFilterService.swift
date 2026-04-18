@@ -2,7 +2,7 @@ import UIKit
 import CoreImage
 import CoreImage.CIFilterBuiltins
 
-nonisolated enum PhotoFilterType: String, CaseIterable {
+enum PhotoFilterType: String, CaseIterable {
     case original = "ORIGINAL"
     case blackAndWhite = "B&W"
     case dramatic = "DRAMATIC"

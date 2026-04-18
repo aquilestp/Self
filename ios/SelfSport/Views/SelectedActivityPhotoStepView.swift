@@ -329,7 +329,7 @@ private struct StepProgressView: View {
     }
 }
 
-private nonisolated enum StepState {
+private enum StepState {
     case complete
     case active
     case upcoming

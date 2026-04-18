@@ -28,7 +28,7 @@ struct AncestralLaurelWreath: View {
     }
 }
 
-nonisolated struct AncestralLeafShape: Shape {
+struct AncestralLeafShape: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
         let w = rect.width
@@ -156,7 +156,7 @@ struct MedalBannerView: View {
     }
 }
 
-nonisolated struct MedalBannerShape: InsettableShape {
+struct MedalBannerShape: InsettableShape {
     var inset: CGFloat = 0
 
     func path(in rect: CGRect) -> Path {
@@ -188,7 +188,7 @@ nonisolated struct MedalBannerShape: InsettableShape {
     }
 }
 
-nonisolated struct WhatsAppBubbleShape: Shape {
+struct WhatsAppBubbleShape: Shape {
     func path(in rect: CGRect) -> Path {
         let cr: CGFloat = 16
         let tailW: CGFloat = 8

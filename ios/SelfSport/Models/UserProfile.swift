@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct UserProfile: Codable, Sendable, Identifiable {
+struct UserProfile: Codable, Sendable, Identifiable {
     let id: UUID
     var fullName: String?
     var email: String?
@@ -8,7 +8,7 @@ nonisolated struct UserProfile: Codable, Sendable, Identifiable {
     var createdAt: String?
     var lastSeenAt: String?
 
-    nonisolated enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case id
         case fullName = "full_name"
         case email

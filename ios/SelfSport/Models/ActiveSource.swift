@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated enum ActiveSource: String, Sendable {
+enum ActiveSource: String, Sendable {
     case strava
     case appleHealth
 

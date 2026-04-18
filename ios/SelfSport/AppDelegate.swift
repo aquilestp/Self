@@ -2,7 +2,7 @@ import UIKit
 import UserNotifications
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-    nonisolated func application(
+    func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
@@ -33,7 +33,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         return true
     }
 
-    nonisolated func application(
+    func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
@@ -45,7 +45,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
     }
 
-    nonisolated func application(
+    func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
