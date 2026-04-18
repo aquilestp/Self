@@ -1,52 +1,43 @@
-# Sistema de actualización controlable desde Supabase
+# Registrar último acceso del usuario (last_seen_at)
 
 
-## Qué se construirá
+## Qué se hace
 
-Un sistema de notificación de actualizaciones completamente controlable desde Supabase, que muestra un modal con las novedades de la app cuando esté marcado como activo.
-
----
-
-## Supabase — Tabla `app_updates`
-
-Se crea manualmente en el dashboard de Supabase con esta estructura:
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | int (PK) | Siempre 1 (singleton) |
-| `is_active` | boolean | ON/OFF del modal — palanca principal |
-| `title` | text | Título del modal (ej: "What's New ✨") |
-| `subtitle` | text | Subtítulo opcional (ej: "Version 2.1") |
-| `items` | text[] | Array de 1 a 4 bullets de texto |
-
-Para activarlo: cambia `is_active = true`. Para desactivarlo: `false`. Los bullets se editan directamente en el campo `items`.
+Cada vez que un usuario abre la app, se guarda automáticamente la fecha y hora exacta en la base de datos. Esto permite ver cuándo fue la última vez que cada usuario usó la app.
 
 ---
 
-## Comportamiento
+## SQL (ejecutar en Supabase)
 
-- **Cuándo aparece:** Cuando el usuario está en la pantalla de actividades y Supabase tiene `is_active = true`
-- **Si toca "Later":** No vuelve a aparecer hasta el día siguiente (guardado localmente)
-- **Si toca "Update":** Abre directamente la página de la app en el App Store
-- **Lógica inteligente:** Si el usuario ya lo vio hoy, no lo vuelve a ver aunque la DB diga activo
+```sql
+ALTER TABLE profiles
+ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ;
+```
 
----
-
-## Diseño del modal
-
-- **Fondo oscuro** igual al modal de notificaciones (`Color(white: 0.06)`)
-- **Ícono de estrella/sparkles** con animación de aparición suave
-- **Título grande** (texto de la DB)
-- **Subtítulo** secundario (texto de la DB)
-- **Bullets de texto** en un bloque limpio — entre 1 y 4 ítems, cada uno con un checkmark o punto decorativo
-- **Botón "Update Now"** — blanco sólido, full width, abre App Store
-- **Botón "Later"** — texto gris sutil debajo
+- Agrega la columna `last_seen_at` a la tabla `profiles`
+- Es nullable (`IF NOT EXISTS` es seguro si ya existe)
+- Usuarios existentes quedan con `NULL` hasta que abran la app por primera vez
 
 ---
 
-## Piezas que se crean
+## Cambios en el código Swift
 
-- **Modelo `AppUpdateConfig`** — estructura de datos que mapea la tabla de Supabase
-- **Servicio `AppUpdateService`** — consulta la tabla `app_updates` en Supabase
-- **Vista `AppUpdateSheet`** — el modal fullscreen con el diseño descrito
-- **Integración en `DashboardRootView`** — se dispara después del primer cargado de actividades, respetando la lógica de "mostrar solo una vez por día"
+**1. Modelo `UserProfile`**
+- Agrega el campo `lastSeenAt` (mapeado a `last_seen_at`)
+
+**2. `AuthViewModel`**
+- Nueva función `updateLastSeen(userId:)` que hace un `UPDATE` en `profiles` con `last_seen_at = now()`
+- Se llama en el evento `.initialSession` (cuando hay sesión activa = el usuario abrió la app)
+- También se llama en `.signedIn` (cuando el usuario acaba de iniciar sesión)
+- Los usuarios en modo Demo son ignorados
+
+---
+
+## Comportamiento esperado
+
+| Situación | ¿Se actualiza? |
+|---|---|
+| Usuario abre la app con sesión activa | ✅ Sí |
+| Usuario inicia sesión (Apple/Google/Email) | ✅ Sí |
+| Usuario usa modo Demo | ❌ No |
+| Usuario existente que aún no abre la app | `NULL` en BD |

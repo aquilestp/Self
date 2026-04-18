@@ -6,6 +6,7 @@ nonisolated struct UserProfile: Codable, Sendable, Identifiable {
     var email: String?
     var avatarUrl: String?
     var createdAt: String?
+    var lastSeenAt: String?
 
     nonisolated enum CodingKeys: String, CodingKey {
         case id
@@ -13,5 +14,6 @@ nonisolated struct UserProfile: Codable, Sendable, Identifiable {
         case email
         case avatarUrl = "avatar_url"
         case createdAt = "created_at"
+        case lastSeenAt = "last_seen_at"
     }
 }

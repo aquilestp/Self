@@ -27,6 +27,7 @@ final class AuthViewModel {
                     if let session {
                         isAuthenticated = true
                         await fetchProfile(userId: session.user.id)
+                        await updateLastSeen(userId: session.user.id)
                     } else {
                         isAuthenticated = false
                     }
@@ -35,6 +36,7 @@ final class AuthViewModel {
                     isAuthenticated = true
                     if let session {
                         await fetchProfile(userId: session.user.id)
+                        await updateLastSeen(userId: session.user.id)
                     }
 
                 case .signedOut:
@@ -224,6 +226,18 @@ final class AuthViewModel {
             userProfile = nil
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func updateLastSeen(userId: UUID) async {
+        do {
+            try await supabase
+                .from("profiles")
+                .update(["last_seen_at": "now()"])
+                .eq("id", value: userId.uuidString)
+                .execute()
+        } catch {
+            // Silently ignore — non-critical
         }
     }
 
