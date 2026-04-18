@@ -7,18 +7,16 @@ final class AppUpdateService {
     static let shared = AppUpdateService()
 
     private(set) var config: AppUpdateConfig?
-    private let dismissedKey = "app_update_dismissed_date"
+    private let dismissedKeyPrefix = "app_update_dismissed_v"
 
     var shouldShowUpdate: Bool {
         guard let config, config.isActive, !config.items.isEmpty else { return false }
-        return !wasDismissedToday
+        return !wasDismissedForThisUpdate
     }
 
-    private var wasDismissedToday: Bool {
-        guard let savedDate = UserDefaults.standard.object(forKey: dismissedKey) as? Date else {
-            return false
-        }
-        return Calendar.current.isDateInToday(savedDate)
+    private var wasDismissedForThisUpdate: Bool {
+        guard let config else { return false }
+        return UserDefaults.standard.bool(forKey: "\(dismissedKeyPrefix)\(config.id)")
     }
 
     func fetch() async {
@@ -37,6 +35,7 @@ final class AppUpdateService {
     }
 
     func dismissForToday() {
-        UserDefaults.standard.set(Date(), forKey: dismissedKey)
+        guard let config else { return }
+        UserDefaults.standard.set(true, forKey: "\(dismissedKeyPrefix)\(config.id)")
     }
 }

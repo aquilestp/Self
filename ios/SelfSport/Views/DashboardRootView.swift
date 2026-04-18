@@ -175,6 +175,11 @@ struct DashboardRootView: View {
                 stravaViewModel.startWebhookPolling()
             }
         }
+        .onChange(of: healthKitViewModel.didCompleteFirstLoad) { _, completed in
+            if completed && activeSource == .appleHealth {
+                Task { await triggerUpdateCheckIfNeeded() }
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             Task { await stravaViewModel.checkWebhookActivities() }
         }
