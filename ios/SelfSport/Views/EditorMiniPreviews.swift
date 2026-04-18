@@ -69,7 +69,7 @@ extension PhotoEditorView {
             VStack(spacing: 2) {
                 ForEach(
                     currentActivity.hasDistance
-                        ? [("Dist", currentActivity.distance), ("Pace", currentActivity.pace), ("Time", currentActivity.duration)]
+                        ? [("Distance", currentActivity.distance), ("Pace", currentActivity.pace), ("Time", currentActivity.duration)]
                         : [("Duration", currentActivity.duration), ("Activity", currentActivity.title)],
                     id: \.0
                 ) { label, value in
@@ -1127,7 +1127,7 @@ extension PhotoEditorView {
                 .minimumScaleFactor(0.55)
             if currentActivity.hasDistance {
                 HStack(spacing: 5) {
-                    miniStat(label: "Dist", value: currentActivity.distance)
+                    miniStat(label: "Distance", value: currentActivity.distance)
                     miniStat(label: "Pace", value: currentActivity.pace)
                     miniStat(label: "Time", value: currentActivity.duration)
                 }
@@ -1151,7 +1151,7 @@ extension PhotoEditorView {
                 .minimumScaleFactor(0.6)
             HStack(spacing: 5) {
                 if currentActivity.hasDistance {
-                    miniStat(label: "Dist", value: currentActivity.distance)
+                    miniStat(label: "Distance", value: currentActivity.distance)
                     miniStat(label: "Pace", value: currentActivity.pace)
                 }
                 miniStat(label: "Time", value: currentActivity.duration)

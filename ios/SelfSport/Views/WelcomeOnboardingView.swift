@@ -77,16 +77,14 @@ struct WelcomeOnboardingView: View {
                     }
                     .clipped()
 
-                    centeredProgressHeader
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                        .padding(.bottom, 98)
-                        .allowsHitTesting(false)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 .contentShape(Rectangle())
                 .gesture(swipeGesture)
 
-                Spacer(minLength: 24)
+                centeredProgressHeader
+                    .padding(.vertical, 18)
+                    .allowsHitTesting(false)
 
                 Button(action: advance) {
                     HStack(spacing: 10) {
@@ -184,19 +182,13 @@ struct WelcomeOnboardingView: View {
     }
 
     private var centeredProgressHeader: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 6) {
-                ForEach(WelcomeOnboardingStep.allCases) { step in
-                    Capsule(style: .continuous)
-                        .fill(step == currentStep ? Color.white.opacity(0.52) : Color.white.opacity(0.14))
-                        .frame(width: step == currentStep ? 24 : 8, height: 8)
-                }
+        HStack(spacing: 6) {
+            ForEach(WelcomeOnboardingStep.allCases) { step in
+                Capsule(style: .continuous)
+                    .fill(step == currentStep ? Color.white.opacity(0.52) : Color.white.opacity(0.14))
+                    .frame(width: step == currentStep ? 24 : 8, height: 8)
+                    .animation(.spring(duration: 0.38, bounce: 0.22), value: currentStep)
             }
-
-            Text("\(currentStep.rawValue + 1)/\(WelcomeOnboardingStep.allCases.count)")
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.white.opacity(0.34))
-                .monospacedDigit()
         }
         .frame(maxWidth: .infinity)
     }
