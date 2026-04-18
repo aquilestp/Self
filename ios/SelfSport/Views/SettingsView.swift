@@ -30,7 +30,6 @@ struct SettingsView: View {
                     profileSection
                     notificationsSection
                     stravaSection
-                    rateSection
                     instagramSection
                     sadZoneSection
                 }
@@ -472,32 +471,6 @@ struct SettingsView: View {
         }
         .onAppear {
             Task { await NotificationService.shared.refreshAuthorizationStatus() }
-        }
-    }
-
-    private var rateSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionLabel("RATE THE APP", icon: "star.fill")
-
-            Button {
-                if let url = URL(string: "https://apps.apple.com/app/id6744878508?action=write-review") {
-                    UIApplication.shared.open(url)
-                }
-            } label: {
-                HStack {
-                    Text("Rate on the App Store")
-                        .font(.system(size: 15, weight: .regular))
-                        .foregroundStyle(Color.white.opacity(0.80))
-                    Spacer()
-                    Image(systemName: "star")
-                        .font(.system(size: 15))
-                        .foregroundStyle(Color.white.opacity(0.35))
-                }
-                .padding(16)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .background(cardBackground)
         }
     }
 

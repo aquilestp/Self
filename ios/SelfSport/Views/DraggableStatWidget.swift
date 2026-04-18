@@ -394,32 +394,50 @@ private struct GlassCardModifier: ViewModifier {
                 .background(glassExportBackground)
                 .clipShape(.rect(cornerRadius: 14))
                 .overlay(specularHighlight)
+                .overlay(innerGlow)
                 .overlay(gradientBorder)
         } else {
             content
-                .background(isNeon ? AnyShapeStyle(.ultraThinMaterial) : AnyShapeStyle(.thinMaterial))
-                .background(Color.white.opacity(isNeon ? 0.04 : 0.08))
+                .background(AnyShapeStyle(.thinMaterial))
+                .background(Color.white.opacity(isNeon ? 0.06 : 0.10))
                 .background(accentColor.opacity(isNeon ? 0.14 : 0.04))
                 .clipShape(.rect(cornerRadius: 14))
                 .overlay(specularHighlight)
+                .overlay(innerGlow)
                 .overlay(gradientBorder)
-                .shadow(color: isNeon ? accentColor.opacity(0.40) : .black.opacity(0.38), radius: isNeon ? 18 : 22, x: 0, y: isNeon ? 0 : 9)
+                .shadow(color: isNeon ? accentColor.opacity(0.45) : .black.opacity(0.40), radius: 20, x: 0, y: isNeon ? 0 : 8)
         }
     }
 
     @ViewBuilder
     private var specularHighlight: some View {
-        let opacity: Double = isNeon ? 0.10 : (isAesthetic ? 0.20 : 0.26)
+        let opacity: Double = isNeon ? 0.12 : (isAesthetic ? 0.28 : 0.34)
         RoundedRectangle(cornerRadius: 14, style: .continuous)
             .fill(
                 LinearGradient(
                     colors: [
                         Color.white.opacity(opacity),
-                        Color.white.opacity(opacity * 0.3),
+                        Color.white.opacity(opacity * 0.22),
                         Color.clear
                     ],
                     startPoint: .top,
-                    endPoint: UnitPoint(x: 0.5, y: 0.55)
+                    endPoint: UnitPoint(x: 0.5, y: 0.48)
+                )
+            )
+            .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private var innerGlow: some View {
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(isNeon ? 0.04 : 0.08),
+                        Color.clear
+                    ],
+                    startPoint: UnitPoint(x: 0.15, y: 0.05),
+                    endPoint: UnitPoint(x: 0.85, y: 0.45)
                 )
             )
             .allowsHitTesting(false)
@@ -431,14 +449,14 @@ private struct GlassCardModifier: ViewModifier {
             .strokeBorder(
                 LinearGradient(
                     stops: [
-                        .init(color: Color.white.opacity(isNeon ? 0.50 : 0.60), location: 0.0),
-                        .init(color: accentColor.opacity(isNeon ? 0.35 : 0.18), location: 0.45),
-                        .init(color: Color.white.opacity(isNeon ? 0.15 : 0.08), location: 1.0)
+                        .init(color: Color.white.opacity(isNeon ? 0.55 : 0.72), location: 0.0),
+                        .init(color: accentColor.opacity(isNeon ? 0.30 : 0.14), location: 0.40),
+                        .init(color: Color.white.opacity(isNeon ? 0.12 : 0.05), location: 1.0)
                     ],
-                    startPoint: UnitPoint(x: 0.15, y: 0),
-                    endPoint: UnitPoint(x: 0.85, y: 1)
+                    startPoint: UnitPoint(x: 0.10, y: 0),
+                    endPoint: UnitPoint(x: 0.90, y: 1)
                 ),
-                lineWidth: 0.8
+                lineWidth: 0.9
             )
             .allowsHitTesting(false)
     }
@@ -448,11 +466,11 @@ private struct GlassCardModifier: ViewModifier {
         if isNeon {
             Color(red: 0.05, green: 0.05, blue: 0.12).opacity(0.82)
         } else if isAesthetic {
-            Color.white.opacity(0.42)
+            Color.white.opacity(0.50)
         } else {
             ZStack {
-                Color.white.opacity(0.60)
-                Color(white: 0.90).opacity(0.20)
+                Color.white.opacity(0.62)
+                Color(white: 0.88).opacity(0.22)
             }
         }
     }
