@@ -1,6 +1,6 @@
 import Foundation
 
-struct SportActivity: Identifiable, Hashable, Sendable {
+nonisolated struct SportActivity: Identifiable, Hashable, Sendable {
     let id: UUID
     let title: String
     let subtitle: String

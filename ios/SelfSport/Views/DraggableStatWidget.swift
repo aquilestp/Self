@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct SplitMix64: Sendable {
+nonisolated struct SplitMix64: Sendable {
     private var state: UInt64
     init(seed: UInt64) { state = seed }
     mutating func next() -> UInt64 {
@@ -15,7 +15,7 @@ struct SplitMix64: Sendable {
     }
 }
 
-enum ExportEnvironmentKey: EnvironmentKey {
+nonisolated enum ExportEnvironmentKey: EnvironmentKey {
     static let defaultValue: Bool = false
 }
 
@@ -26,7 +26,7 @@ extension EnvironmentValues {
     }
 }
 
-struct StatDisplayItem: Identifiable, Sendable {
+nonisolated struct StatDisplayItem: Identifiable, Sendable {
     let id: String
     let label: String
     let value: String

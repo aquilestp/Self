@@ -676,7 +676,7 @@ struct ActivityDetailSheet: View {
     }
 }
 
-private struct DetailStatItem: Identifiable {
+private nonisolated struct DetailStatItem: Identifiable {
     let id = UUID()
     let label: String
     let value: String

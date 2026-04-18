@@ -1,6 +1,6 @@
 import Foundation
 
-struct SupabaseActivityRow: Codable, Sendable {
+nonisolated struct SupabaseActivityRow: Codable, Sendable {
     let id: String?
     let userId: String
     let stravaActivityId: Int
@@ -19,7 +19,7 @@ struct SupabaseActivityRow: Codable, Sendable {
     let averageHeartrate: Double?
     let syncedByWebhook: Bool?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id
         case userId = "user_id"
         case stravaActivityId = "strava_activity_id"

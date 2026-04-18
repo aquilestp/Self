@@ -1,7 +1,7 @@
 import Foundation
 import CoreLocation
 
-enum PolylineDecoder {
+nonisolated enum PolylineDecoder {
     static func decode(_ encoded: String) -> [CLLocationCoordinate2D] {
         var coordinates: [CLLocationCoordinate2D] = []
         let bytes = Array(encoded.utf8)

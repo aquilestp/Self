@@ -1,14 +1,14 @@
 import Foundation
 import Supabase
 
-struct SupabaseStravaTokenRow: Codable, Sendable {
+nonisolated struct SupabaseStravaTokenRow: Codable, Sendable {
     let userId: String
     let stravaAthleteId: Int?
     let accessToken: String
     let refreshToken: String
     let expiresAt: Int
     let updatedAt: String?
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case userId = "user_id"
         case stravaAthleteId = "strava_athlete_id"
         case accessToken = "access_token"

@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct StravaTokenResponse: Codable, Sendable {
+nonisolated struct StravaTokenResponse: Codable, Sendable {
     let tokenType: String
     let expiresAt: Int
     let expiresIn: Int
@@ -9,7 +9,7 @@ struct StravaTokenResponse: Codable, Sendable {
     let accessToken: String
     let athlete: StravaAthlete?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case tokenType = "token_type"
         case expiresAt = "expires_at"
         case expiresIn = "expires_in"
@@ -19,14 +19,14 @@ struct StravaTokenResponse: Codable, Sendable {
     }
 }
 
-struct StravaAthlete: Codable, Sendable {
+nonisolated struct StravaAthlete: Codable, Sendable {
     let id: Int
     let firstname: String?
     let lastname: String?
     let profile: String?
 }
 
-struct StravaActivity: Codable, Sendable, Identifiable {
+nonisolated struct StravaActivity: Codable, Sendable, Identifiable {
     let id: Int
     let name: String
     let type: String
@@ -42,7 +42,7 @@ struct StravaActivity: Codable, Sendable, Identifiable {
     let hasHeartrate: Bool?
     let averageHeartrate: Double?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id, name, type, distance, map
         case sportType = "sport_type"
         case movingTime = "moving_time"
@@ -56,19 +56,19 @@ struct StravaActivity: Codable, Sendable, Identifiable {
     }
 }
 
-struct StravaMap: Codable, Sendable {
+nonisolated struct StravaMap: Codable, Sendable {
     let id: String
     let summaryPolyline: String?
     let resourceState: Int?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id
         case summaryPolyline = "summary_polyline"
         case resourceState = "resource_state"
     }
 }
 
-enum StravaActivityType {
+nonisolated enum StravaActivityType {
     static func systemImage(for type: String) -> String {
         switch type.lowercased() {
         case "run", "virtualrun": return "figure.run"

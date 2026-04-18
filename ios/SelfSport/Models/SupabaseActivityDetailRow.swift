@@ -1,13 +1,13 @@
 import Foundation
 
-struct SupabaseActivityDetailRow: Codable, Sendable {
+nonisolated struct SupabaseActivityDetailRow: Codable, Sendable {
     let id: String?
     let userId: String
     let stravaActivityId: Int
     let detailJson: String
     let fetchedAt: String?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id
         case userId = "user_id"
         case stravaActivityId = "strava_activity_id"

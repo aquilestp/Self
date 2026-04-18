@@ -12,13 +12,13 @@ class WebAuthContextProvider: NSObject, ASWebAuthenticationPresentationContextPr
     }
 }
 
-enum StravaKeys: Sendable {
+nonisolated enum StravaKeys: Sendable {
     static let accessToken = "strava_access_token"
     static let refreshToken = "strava_refresh_token"
     static let expiresAt = "strava_expires_at"
 }
 
-enum StravaError: Error, Sendable {
+nonisolated enum StravaError: Error, Sendable {
     case missingCredentials
     case invalidResponse
     case tokenExpired

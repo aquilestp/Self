@@ -1,16 +1,16 @@
 import SwiftUI
 
-struct SnapResult: Sendable {
+nonisolated struct SnapResult: Sendable {
     var adjustedOffset: CGSize
     var activeGuides: Set<GuideLineType>
 }
 
-struct RotationSnapResult: Sendable {
+nonisolated struct RotationSnapResult: Sendable {
     var snappedAngle: Angle
     var isSnapped: Bool
 }
 
-enum GuideLineType: Hashable, Sendable {
+nonisolated enum GuideLineType: Hashable, Sendable {
     case centerH
     case centerV
     case rotation
@@ -149,7 +149,7 @@ final class AlignmentGuideState {
     }
 }
 
-func rotatedBoundingBox(size: CGSize, rotation: Angle) -> CGSize {
+nonisolated func rotatedBoundingBox(size: CGSize, rotation: Angle) -> CGSize {
     let radians = abs(rotation.radians)
     let cosA = cos(radians)
     let sinA = sin(radians)

@@ -2,38 +2,38 @@ import Foundation
 import UIKit
 import Supabase
 
-struct XAIVideoStartResponse: Codable, Sendable {
+nonisolated struct XAIVideoStartResponse: Codable, Sendable {
     let requestId: String?
     let error: XAIVideoError?
 
-    struct XAIVideoError: Codable, Sendable {
+    nonisolated struct XAIVideoError: Codable, Sendable {
         let code: String?
         let message: String?
     }
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case requestId = "request_id"
         case error
     }
 }
 
-struct XAIVideoStatusResponse: Codable, Sendable {
+nonisolated struct XAIVideoStatusResponse: Codable, Sendable {
     let status: String?
     let video: XAIVideo?
     let error: XAIVideoStatusError?
 
-    struct XAIVideo: Codable, Sendable {
+    nonisolated struct XAIVideo: Codable, Sendable {
         let url: String?
         let duration: Double?
     }
 
-    struct XAIVideoStatusError: Codable, Sendable {
+    nonisolated struct XAIVideoStatusError: Codable, Sendable {
         let code: String?
         let message: String?
     }
 }
 
-enum VideoGenerationError: Error, LocalizedError, Sendable {
+nonisolated enum VideoGenerationError: Error, LocalizedError, Sendable {
     case imageConversionFailed
     case networkError
     case serverError(String)
@@ -41,7 +41,7 @@ enum VideoGenerationError: Error, LocalizedError, Sendable {
     case cancelled
     case missingAPIKey
 
-    var errorDescription: String? {
+    nonisolated var errorDescription: String? {
         switch self {
         case .imageConversionFailed:
             return "Failed to process the image"

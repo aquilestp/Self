@@ -1,7 +1,7 @@
 import HealthKit
 import SwiftUI
 
-enum HealthKitActivityType {
+nonisolated enum HealthKitActivityType {
     static func systemImage(for type: HKWorkoutActivityType) -> String {
         switch type {
         case .running: return "figure.run"

@@ -1,6 +1,6 @@
 import Foundation
 
-struct MonthlyKmData: Sendable, Equatable {
+nonisolated struct MonthlyKmData: Sendable, Equatable {
     let dailyKm: [Double]
     let totalKm: Double
     let todayIndex: Int

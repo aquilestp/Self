@@ -1,6 +1,6 @@
 import Foundation
 
-struct StravaActivityDetail: Codable, Sendable, Equatable {
+nonisolated struct StravaActivityDetail: Codable, Sendable, Equatable {
     let id: Int
     let name: String
     let description: String?
@@ -35,7 +35,7 @@ struct StravaActivityDetail: Codable, Sendable, Equatable {
     let splitsStandard: [StravaSplit]?
     let laps: [StravaLap]?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id, name, description, type, distance, calories, laps
         case sportType = "sport_type"
         case movingTime = "moving_time"
@@ -66,7 +66,7 @@ struct StravaActivityDetail: Codable, Sendable, Equatable {
     }
 }
 
-struct StravaSegmentEffort: Codable, Sendable, Identifiable, Equatable {
+nonisolated struct StravaSegmentEffort: Codable, Sendable, Identifiable, Equatable {
     let id: Int
     let name: String
     let elapsedTime: Int
@@ -80,7 +80,7 @@ struct StravaSegmentEffort: Codable, Sendable, Identifiable, Equatable {
     let achievements: [StravaAchievement]?
     let segment: StravaSegmentSummary?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id, name, distance, achievements, segment
         case elapsedTime = "elapsed_time"
         case movingTime = "moving_time"
@@ -92,7 +92,7 @@ struct StravaSegmentEffort: Codable, Sendable, Identifiable, Equatable {
     }
 }
 
-struct StravaSegmentSummary: Codable, Sendable, Equatable {
+nonisolated struct StravaSegmentSummary: Codable, Sendable, Equatable {
     let id: Int
     let name: String
     let distance: Double
@@ -102,7 +102,7 @@ struct StravaSegmentSummary: Codable, Sendable, Equatable {
     let elevationLow: Double?
     let climbCategory: Int?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id, name, distance
         case averageGrade = "average_grade"
         case maximumGrade = "maximum_grade"
@@ -112,18 +112,18 @@ struct StravaSegmentSummary: Codable, Sendable, Equatable {
     }
 }
 
-struct StravaAchievement: Codable, Sendable, Equatable {
+nonisolated struct StravaAchievement: Codable, Sendable, Equatable {
     let typeId: Int
     let type: String
     let rank: Int
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case typeId = "type_id"
         case type, rank
     }
 }
 
-struct StravaBestEffort: Codable, Sendable, Identifiable, Equatable {
+nonisolated struct StravaBestEffort: Codable, Sendable, Identifiable, Equatable {
     let id: Int
     let name: String
     let elapsedTime: Int
@@ -132,7 +132,7 @@ struct StravaBestEffort: Codable, Sendable, Identifiable, Equatable {
     let prRank: Int?
     let achievements: [StravaAchievement]?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id, name, distance, achievements
         case elapsedTime = "elapsed_time"
         case movingTime = "moving_time"
@@ -140,7 +140,7 @@ struct StravaBestEffort: Codable, Sendable, Identifiable, Equatable {
     }
 }
 
-struct StravaSplit: Codable, Sendable, Equatable {
+nonisolated struct StravaSplit: Codable, Sendable, Equatable {
     let distance: Double
     let elapsedTime: Int
     let movingTime: Int
@@ -150,7 +150,7 @@ struct StravaSplit: Codable, Sendable, Equatable {
     let paceZone: Int?
     let split: Int
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case distance, split
         case elapsedTime = "elapsed_time"
         case movingTime = "moving_time"
@@ -161,7 +161,7 @@ struct StravaSplit: Codable, Sendable, Equatable {
     }
 }
 
-struct StravaLap: Codable, Sendable, Identifiable, Equatable {
+nonisolated struct StravaLap: Codable, Sendable, Identifiable, Equatable {
     let id: Int
     let name: String
     let elapsedTime: Int
@@ -174,7 +174,7 @@ struct StravaLap: Codable, Sendable, Identifiable, Equatable {
     let maxHeartrate: Double?
     let lapIndex: Int
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id, name, distance
         case elapsedTime = "elapsed_time"
         case movingTime = "moving_time"

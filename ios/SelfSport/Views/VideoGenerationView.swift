@@ -532,7 +532,7 @@ struct VideoGenerationView: View {
     }
 }
 
-enum VideoGenPhase: Sendable {
+nonisolated enum VideoGenPhase: Sendable {
     case selectStyle
     case generating
     case done

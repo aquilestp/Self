@@ -77,11 +77,11 @@ final class HealthKitService {
     }
 }
 
-enum HealthKitError: Error, LocalizedError, Sendable {
+nonisolated enum HealthKitError: Error, LocalizedError, Sendable {
     case unavailable
     case unauthorized
 
-    var errorDescription: String? {
+    nonisolated var errorDescription: String? {
         switch self {
         case .unavailable: return "Apple Health is not available on this device."
         case .unauthorized: return "Permission to access Apple Health was denied."

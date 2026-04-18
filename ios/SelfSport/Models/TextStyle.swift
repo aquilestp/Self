@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-enum TextStyleType: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum TextStyleType: String, CaseIterable, Identifiable, Sendable {
     case classic
     case bold
     case italic

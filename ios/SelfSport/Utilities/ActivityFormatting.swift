@@ -1,6 +1,6 @@
 import Foundation
 
-enum ActivityFormatting: Sendable {
+nonisolated enum ActivityFormatting: Sendable {
     static let metersPerMile: Double = 1609.34
     static let metersPerKm: Double = 1000.0
 

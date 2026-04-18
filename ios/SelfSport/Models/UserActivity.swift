@@ -1,6 +1,6 @@
 import Foundation
 
-struct UserActivity: Codable, Sendable, Identifiable {
+nonisolated struct UserActivity: Codable, Sendable, Identifiable {
     var id: UUID?
     let userId: UUID
     let activityType: String
@@ -10,7 +10,7 @@ struct UserActivity: Codable, Sendable, Identifiable {
     let activityDate: String
     var createdAt: String?
 
-    enum CodingKeys: String, CodingKey {
+    nonisolated enum CodingKeys: String, CodingKey {
         case id
         case userId = "user_id"
         case activityType = "activity_type"
