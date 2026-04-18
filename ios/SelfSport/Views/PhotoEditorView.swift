@@ -18,6 +18,7 @@ struct PhotoEditorView: View {
 
     let activity: ActivityHighlight
     let photo: UIImage
+    let activities: [ActivityHighlight]
     let onClose: () -> Void
 
     @State var filterMode: FilterMode = .none
@@ -69,6 +70,8 @@ struct PhotoEditorView: View {
     @State private var showVideoComingSoon: Bool = false
     @State var showEditStyleDrawer: Bool = false
     @State var selectedEditStyle: AIEditStyle? = nil
+    @State private var showActivitySwitcher: Bool = false
+    @State private var _overrideActivity: ActivityHighlight? = nil
     @State private var alignmentGuideState = AlignmentGuideState()
     @State private var photoSnapAdjustment: CGSize = .zero
     @State private var cachedPhotoDisplaySize: CGSize = .zero
@@ -132,6 +135,10 @@ struct PhotoEditorView: View {
     private let detailService = SupabaseActivityDetailService()
     private let stravaService = StravaService()
     private let widgetPopularityService = WidgetPopularityService()
+
+    var currentActivity: ActivityHighlight {
+        _overrideActivity ?? activity
+    }
 
     var currentPhoto: UIImage {
         let base = aiEditedPhoto ?? photo
@@ -810,6 +817,27 @@ struct PhotoEditorView: View {
         } message: {
             Text("Your image has been saved to the photo library.")
         }
+        .sheet(isPresented: $showActivitySwitcher) {
+            ActivitySwitcherSheet(
+                activities: activities,
+                currentActivityId: currentActivity.id,
+                onPick: { picked in
+                    withAnimation(.snappy(duration: 0.2)) {
+                        _overrideActivity = picked
+                        activityDetail = nil
+                        geocodedActivityCity = nil
+                        showActivitySwitcher = false
+                    }
+                    if placedWidgets.contains(where: { $0.type.requiresDetail }) {
+                        fetchActivityDetailOnDemand()
+                    }
+                }
+            )
+            .presentationDetents([.fraction(0.58), .large])
+            .presentationDragIndicator(.visible)
+            .presentationBackground(Color(white: 0.06))
+            .presentationContentInteraction(.scrolls)
+        }
         .onDisappear {
             statTapHintTask?.cancel()
             statTapHintTask = nil
@@ -877,7 +905,7 @@ struct PhotoEditorView: View {
             let isActive = paletteTargetWidgetId == widget.id && showPaletteSelector
             DraggableStatWidget(
                 widget: $widget,
-                activity: activity,
+                activity: currentActivity,
                 canvasSize: canvasSize,
                 canvasGlobalOrigin: canvasGlobalOrigin,
                 guideState: alignmentGuideState,
@@ -1053,36 +1081,51 @@ struct PhotoEditorView: View {
 
                 Spacer(minLength: 4)
 
-                Button {
-                    if locationService.cityName != nil {
-                        return
+                if !activities.isEmpty {
+                    Button {
+                        hapticLight.impactOccurred()
+                        withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
+                            drawerState = .collapsed
+                            showEditStyleDrawer = false
+                            showActivitySwitcher = true
+                        }
+                    } label: {
+                        Image(systemName: "arrow.2.circlepath")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 36, height: 36)
+                            .background(topBarButtonBackground, in: .capsule)
+                            .overlay(Capsule().stroke(topBarStroke, lineWidth: 0.5))
                     }
+                    .buttonStyle(.plain)
+                    .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 3)
+                    .transition(.opacity.combined(with: .scale(scale: 0.8)))
+                }
+
+                Button {
+                    if locationService.cityName != nil { return }
                     locationService.requestLocationIfNeeded()
                     if locationService.permissionDenied {
                         showLocationDeniedAlert = true
                     }
                 } label: {
-                    HStack(spacing: 5) {
+                    ZStack {
                         if locationService.isLoading {
                             ProgressView()
                                 .tint(.white)
                                 .scaleEffect(0.65)
+                        } else {
+                            Image(systemName: locationService.cityName != nil ? "location.fill" : "location")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundStyle(locationService.cityName != nil ? .white : .white.opacity(0.7))
                         }
-                        Text(locationService.cityName ?? "Location")
-                            .font(.system(size: 13, weight: .semibold))
-                            .lineLimit(1)
-                            .truncationMode(.tail)
-                            .frame(maxWidth: 130, alignment: .leading)
                     }
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .frame(height: 36)
+                    .frame(width: 36, height: 36)
                     .background(topBarButtonBackground, in: .capsule)
                     .overlay(Capsule().stroke(topBarStroke, lineWidth: 0.5))
                 }
                 .buttonStyle(.plain)
                 .shadow(color: .black.opacity(0.35), radius: 8, x: 0, y: 3)
-                .fixedSize()
                 .transition(.opacity.combined(with: .scale(scale: 0.8)))
             }
         }
@@ -1343,7 +1386,7 @@ struct PhotoEditorView: View {
     }
 
     private func fetchActivityDetailOnDemand() {
-        guard let stravaId = Int(activity.id) else { return }
+        guard let stravaId = Int(currentActivity.id) else { return }
         detailFetchTask?.cancel()
         detailFetchTask = Task {
             isLoadingDetail = true

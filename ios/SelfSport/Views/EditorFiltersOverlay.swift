@@ -94,10 +94,10 @@ extension PhotoEditorView {
                     switch filter {
                     case .none: EmptyView()
                     case .skyline: CityOverlay_Skyline(size: size)
-                    case .postcard: CityOverlay_Postcard(size: size, activity: activity)
-                    case .neon: CityOverlay_Neon(size: size, activity: activity)
-                    case .stamp: CityOverlay_Stamp(size: size, activity: activity)
-                    case .gps: CityOverlay_GPS(size: size, activity: activity)
+                    case .postcard: CityOverlay_Postcard(size: size, activity: currentActivity)
+                    case .neon: CityOverlay_Neon(size: size, activity: currentActivity)
+                    case .stamp: CityOverlay_Stamp(size: size, activity: currentActivity)
+                    case .gps: CityOverlay_GPS(size: size, activity: currentActivity)
                     }
                 }
             }
@@ -107,10 +107,10 @@ extension PhotoEditorView {
                 switch filter {
                 case .none: EmptyView()
                 case .bibNumber: RaceOverlay_Bib(size: size)
-                case .finisher: RaceOverlay_Finisher(size: size, activity: activity)
-                case .medal: RaceOverlay_Medal(size: size, activity: activity)
-                case .raceRoute: RaceOverlay_Route(size: size, activity: activity)
-                case .racePoster: RaceOverlay_Poster(size: size, activity: activity)
+                case .finisher: RaceOverlay_Finisher(size: size, activity: currentActivity)
+                case .medal: RaceOverlay_Medal(size: size, activity: currentActivity)
+                case .raceRoute: RaceOverlay_Route(size: size, activity: currentActivity)
+                case .racePoster: RaceOverlay_Poster(size: size, activity: currentActivity)
                 }
             }
         }

@@ -241,6 +241,7 @@ struct DashboardRootView: View {
                 PhotoEditorView(
                     activity: editorActivity,
                     photo: editorPhoto,
+                    activities: activeHighlights,
                     onClose: {
                         withAnimation(.snappy(duration: 0.32, extraBounce: 0.02)) {
                             self.editorActivity = nil
