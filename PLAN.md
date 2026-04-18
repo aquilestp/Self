@@ -1,18 +1,23 @@
-# Fix Apple Health connect — show permission dialog & errors
+# Habilitar HealthKit capability en el proyecto
 
+## Problema
 
-## Root Cause
-When "Connect with Apple Health" is tapped, the sheet dismisses correctly — but then `connect()` runs and either:
-- **On simulator**: HealthKit is unavailable → sets `errorMessage` silently (nothing shown)
-- **On real device**: The system HealthKit permission dialog should appear, but if any error occurs it's also swallowed silently
+El entitlement `com.apple.developer.healthkit` está en el archivo de entitlements, pero el proyecto no tiene registrada la capability de HealthKit en su configuración. Esto hace que el perfil de provisioning no incluya HealthKit y la app falla en el dispositivo.
 
-`healthKitViewModel.errorMessage` is set in several places but **no alert is wired up anywhere** to actually display it to the user.
+## Solución
 
-## Fix
+Agregar la entrada `SystemCapabilities` para HealthKit en el `project.pbxproj`, dentro de los atributos del target principal. Esto le indica a Xcode que incluya HealthKit en el perfil de provisioning al compilar.
 
-**Add a `.alert` modifier in `DashboardRootView`** that watches `healthKitViewModel.errorMessage`:
-- When the error message is non-nil, show an alert with the message
-- Dismissing the alert clears the error
-- This handles: "Apple Health is not available on this device." (simulator), authorization errors, and load failures
+**Cambio específico:** En `TargetAttributes` → target `SelfSport`, agregar:
 
-That's the only change needed — the HealthKit permission flow itself is correctly implemented and will work on a real device once the error is visible.
+```
+SystemCapabilities = {
+    com.apple.HealthKit = {
+        enabled = 1;
+    };
+};
+```
+
+Esto resuelve el error "Missing com.apple.developer.healthkit entitlement" sin tocar el App Store ni hacer ningún deploy.  
+  
+Esta ok. Solo no hagas deploy de build a la appstore!! 
