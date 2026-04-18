@@ -7,22 +7,22 @@ extension PhotoEditorView {
         switch type {
         case .distance:
             VStack(alignment: .leading, spacing: 2) {
-                Text(activity.primaryLabel)
+                Text(currentActivity.primaryLabel)
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1)
                     .foregroundStyle(.white)
-                Text(activity.primaryStat)
+                Text(currentActivity.primaryStat)
                     .font(.system(size: 16, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
             }
         case .distPace:
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(activity.primaryLabelShort)
+                    Text(currentActivity.primaryLabelShort)
                         .font(.system(size: 7, weight: .regular, design: .serif))
                         .tracking(0.8)
                         .foregroundStyle(.white)
-                    Text(activity.primaryStat)
+                    Text(currentActivity.primaryStat)
                         .font(.system(size: 12, weight: .regular, design: .serif).italic())
                         .foregroundStyle(.white)
                 }
@@ -30,34 +30,34 @@ extension PhotoEditorView {
                     .fill(.white.opacity(0.15))
                     .frame(width: 0.5, height: 18)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(activity.hasDistance ? "PACE" : "TIME")
+                    Text(currentActivity.hasDistance ? "PACE" : "TIME")
                         .font(.system(size: 7, weight: .regular, design: .serif))
                         .tracking(0.8)
                         .foregroundStyle(.white)
-                    Text(activity.hasDistance ? activity.pace : activity.duration)
+                    Text(currentActivity.hasDistance ? currentActivity.pace : currentActivity.duration)
                         .font(.system(size: 12, weight: .regular, design: .serif).italic())
                         .foregroundStyle(.white)
                 }
             }
         case .threeStats:
             HStack(spacing: 6) {
-                if activity.hasDistance {
-                    miniStat(label: "DIST", value: activity.distance)
-                    miniStat(label: "PACE", value: activity.pace)
-                    miniStat(label: "TIME", value: activity.duration)
+                if currentActivity.hasDistance {
+                    miniStat(label: "DIST", value: currentActivity.distance)
+                    miniStat(label: "PACE", value: currentActivity.pace)
+                    miniStat(label: "TIME", value: currentActivity.duration)
                 } else {
-                    miniStat(label: "TIME", value: activity.duration)
-                    miniStat(label: "TYPE", value: activity.title)
+                    miniStat(label: "TIME", value: currentActivity.duration)
+                    miniStat(label: "TYPE", value: currentActivity.title)
                 }
             }
         case .titleCard:
             VStack(alignment: .leading, spacing: 2) {
-                Text(activity.title)
+                Text(currentActivity.title)
                     .font(.system(size: 8, weight: .black, design: .default).width(.expanded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .truncationMode(.tail)
-                Text("\(activity.primaryStat) · \(activity.date)")
+                Text("\(currentActivity.primaryStat) · \(currentActivity.date)")
                     .font(.system(size: 5, weight: .bold, design: .default).width(.expanded))
                     .foregroundStyle(.white.opacity(0.5))
                     .lineLimit(1)
@@ -68,9 +68,9 @@ extension PhotoEditorView {
         case .stack:
             VStack(spacing: 2) {
                 ForEach(
-                    activity.hasDistance
-                        ? [("Dist", activity.distance), ("Pace", activity.pace), ("Time", activity.duration)]
-                        : [("Duration", activity.duration), ("Activity", activity.title)],
+                    currentActivity.hasDistance
+                        ? [("Dist", currentActivity.distance), ("Pace", currentActivity.pace), ("Time", currentActivity.duration)]
+                        : [("Duration", currentActivity.duration), ("Activity", currentActivity.title)],
                     id: \.0
                 ) { label, value in
                     HStack {
@@ -89,28 +89,28 @@ extension PhotoEditorView {
             .padding(.horizontal, 6)
         case .bold:
             VStack(alignment: .leading, spacing: 0) {
-                Text(activity.title.uppercased())
+                Text(currentActivity.title.uppercased())
                     .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
                     .tracking(1.5)
                     .foregroundStyle(.white.opacity(0.5))
                     .lineLimit(1)
                     .truncationMode(.tail)
-                Text(activity.primaryStat.uppercased())
+                Text(currentActivity.primaryStat.uppercased())
                     .font(.system(size: 15, weight: .black, design: .default).width(.expanded))
                     .tracking(-1)
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                 HStack(spacing: 4) {
-                    if activity.hasDistance {
-                        Text(activity.pace)
+                    if currentActivity.hasDistance {
+                        Text(currentActivity.pace)
                             .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
                             .foregroundStyle(.white)
-                        Text(activity.duration.uppercased())
+                        Text(currentActivity.duration.uppercased())
                             .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
                             .foregroundStyle(.white)
                     } else {
-                        Text(activity.title.uppercased())
+                        Text(currentActivity.title.uppercased())
                             .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
                             .foregroundStyle(.white)
                             .lineLimit(1)
@@ -122,13 +122,13 @@ extension PhotoEditorView {
             .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
         case .impact:
             VStack(alignment: .leading, spacing: -2) {
-                Text(activity.title.uppercased())
+                Text(currentActivity.title.uppercased())
                     .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
                     .tracking(1.5)
                     .foregroundStyle(.white.opacity(0.45))
                     .lineLimit(1)
                     .truncationMode(.tail)
-                Text(activity.primaryStat.uppercased())
+                Text(currentActivity.primaryStat.uppercased())
                     .font(.system(size: 16, weight: .black, design: .default).width(.expanded))
                     .tracking(-1.5)
                     .foregroundStyle(.white)
@@ -136,18 +136,18 @@ extension PhotoEditorView {
                     .minimumScaleFactor(0.4)
                     .shadow(color: Color.white.opacity(0.5), radius: 6, x: 0, y: 0)
                 HStack(spacing: 3) {
-                    if activity.hasDistance {
-                        Text(activity.pace)
+                    if currentActivity.hasDistance {
+                        Text(currentActivity.pace)
                             .font(.system(size: 5, weight: .black, design: .default).width(.expanded))
                             .foregroundStyle(.white.opacity(0.8))
                         Rectangle()
                             .fill(Color.white.opacity(0.4))
                             .frame(width: 1, height: 6)
-                        Text(activity.duration.uppercased())
+                        Text(currentActivity.duration.uppercased())
                             .font(.system(size: 5, weight: .black, design: .default).width(.expanded))
                             .foregroundStyle(.white.opacity(0.8))
                     } else {
-                        Text(activity.title.uppercased())
+                        Text(currentActivity.title.uppercased())
                             .font(.system(size: 5, weight: .black, design: .default).width(.expanded))
                             .foregroundStyle(.white.opacity(0.8))
                             .lineLimit(1)
@@ -159,13 +159,13 @@ extension PhotoEditorView {
             .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
         case .poster:
             VStack(alignment: .leading, spacing: 0) {
-                Text(activity.title.uppercased())
+                Text(currentActivity.title.uppercased())
                     .font(.system(size: 4, weight: .heavy, design: .default).width(.expanded))
                     .tracking(1.5)
                     .foregroundStyle(.white.opacity(0.45))
                     .lineLimit(1)
                     .truncationMode(.tail)
-                Text(activity.primaryStat.uppercased())
+                Text(currentActivity.primaryStat.uppercased())
                     .font(.system(size: 16, weight: .black, design: .default).width(.expanded))
                     .tracking(-1.2)
                     .foregroundStyle(.white)
@@ -173,18 +173,18 @@ extension PhotoEditorView {
                     .minimumScaleFactor(0.3)
                     .shadow(color: .white.opacity(0.28), radius: 4, x: 0, y: 0)
                 HStack(spacing: 4) {
-                    if activity.hasDistance {
-                        Text(activity.pace)
+                    if currentActivity.hasDistance {
+                        Text(currentActivity.pace)
                             .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
                             .foregroundStyle(.white.opacity(0.88))
                         Rectangle()
                             .fill(Color.white.opacity(0.35))
                             .frame(width: 1, height: 6)
-                        Text(activity.duration.uppercased())
+                        Text(currentActivity.duration.uppercased())
                             .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
                             .foregroundStyle(.white.opacity(0.88))
                     } else {
-                        Text(activity.date.uppercased())
+                        Text(currentActivity.date.uppercased())
                             .font(.system(size: 5.5, weight: .heavy, design: .default).width(.expanded))
                             .foregroundStyle(.white.opacity(0.88))
                     }
@@ -194,8 +194,8 @@ extension PhotoEditorView {
             .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
         case .routeClean:
             ZStack {
-                if activity.linePoints.count >= 2 {
-                    RouteTraceShape(normalizedPoints: activity.linePoints)
+                if currentActivity.linePoints.count >= 2 {
+                    RouteTraceShape(normalizedPoints: currentActivity.linePoints)
                         .stroke(Color.white.opacity(0.9), style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
                 } else {
                     Image(systemName: "point.topleft.down.to.point.bottomright.curvepath.fill")
@@ -206,7 +206,7 @@ extension PhotoEditorView {
             .frame(width: 65, height: 65)
         case .heroStat:
             VStack(alignment: .leading, spacing: 2) {
-                Text(activity.primaryStat.uppercased())
+                Text(currentActivity.primaryStat.uppercased())
                     .font(.system(size: 18, weight: .black))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -214,15 +214,15 @@ extension PhotoEditorView {
                     .scaleEffect(x: 1.0, y: 2.5, anchor: .top)
                     .padding(.bottom, 20)
                 HStack(spacing: 8) {
-                    if activity.hasDistance {
-                        Text("PACE \(activity.pace)")
+                    if currentActivity.hasDistance {
+                        Text("PACE \(currentActivity.pace)")
                             .font(.system(size: 6, weight: .bold))
                             .foregroundStyle(.white)
-                        Text("TIME \(activity.duration)")
+                        Text("TIME \(currentActivity.duration)")
                             .font(.system(size: 6, weight: .bold))
                             .foregroundStyle(.white)
                     } else {
-                        Text(activity.date.uppercased())
+                        Text(currentActivity.date.uppercased())
                             .font(.system(size: 6, weight: .bold))
                             .foregroundStyle(.white.opacity(0.5))
                     }
@@ -230,11 +230,11 @@ extension PhotoEditorView {
             }
         case .wide:
             VStack(alignment: .leading, spacing: 1) {
-                Text(activity.primaryLabel)
+                Text(currentActivity.primaryLabel)
                     .font(.system(size: 5, weight: .bold, design: .default).width(.expanded))
                     .tracking(2)
                     .foregroundStyle(.white)
-                Text(activity.primaryStat.uppercased())
+                Text(currentActivity.primaryStat.uppercased())
                     .font(.system(size: 14, weight: .black, design: .default).width(.expanded))
                     .tracking(-0.5)
                     .foregroundStyle(.white)
@@ -243,11 +243,11 @@ extension PhotoEditorView {
             }
         case .tower:
             VStack(alignment: .leading, spacing: 1) {
-                Text(activity.primaryLabel)
+                Text(currentActivity.primaryLabel)
                     .font(.system(size: 5, weight: .bold, design: .default).width(.condensed))
                     .tracking(1)
                     .foregroundStyle(.white)
-                Text(activity.primaryStat.uppercased())
+                Text(currentActivity.primaryStat.uppercased())
                     .font(.system(size: 14, weight: .black, design: .default).width(.compressed))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -329,8 +329,8 @@ extension PhotoEditorView {
     }
 
     var miniEfficiencyRatio: Double {
-        guard activity.elapsedTimeRaw > 0 else { return 1.0 }
-        return min(1.0, Double(activity.movingTimeRaw) / Double(activity.elapsedTimeRaw))
+        guard currentActivity.elapsedTimeRaw > 0 else { return 1.0 }
+        return min(1.0, Double(currentActivity.movingTimeRaw) / Double(currentActivity.elapsedTimeRaw))
     }
 
     func miniFormatDuration(_ seconds: Int) -> String {
@@ -342,7 +342,7 @@ extension PhotoEditorView {
     }
 
     var miniHeartRateBPM: Int {
-        guard let hrString = activity.averageHeartrate else { return 0 }
+        guard let hrString = currentActivity.averageHeartrate else { return 0 }
         let digits = hrString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
         return Int(digits) ?? 0
     }
@@ -475,7 +475,7 @@ extension PhotoEditorView {
     }
 
     var miniElevationGain: some View {
-        let digits = activity.elevationGain.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        let digits = currentActivity.elevationGain.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
         let elev = digits.isEmpty ? "--" : digits
         return VStack(spacing: 2) {
             HStack(alignment: .firstTextBaseline, spacing: 1) {
@@ -614,7 +614,7 @@ extension PhotoEditorView {
     }
 
     var miniDistanceWords: some View {
-        let result = DistanceToWords.convert(distanceMeters: activity.distanceRaw, unit: .km)
+        let result = DistanceToWords.convert(distanceMeters: currentActivity.distanceRaw, unit: .km)
         let words = result.numberText.lowercased()
         return VStack(alignment: .leading, spacing: 1) {
             Text(words)
@@ -688,7 +688,7 @@ extension PhotoEditorView {
 
     var miniTimeCombined: some View {
         let ratio = miniEfficiencyRatio
-        let paused = max(0, activity.elapsedTimeRaw - activity.movingTimeRaw)
+        let paused = max(0, currentActivity.elapsedTimeRaw - currentActivity.movingTimeRaw)
         return VStack(spacing: 3) {
             ZStack {
                 Circle()
@@ -710,7 +710,7 @@ extension PhotoEditorView {
                     .font(.system(size: 8, weight: .light))
                     .foregroundStyle(.white.opacity(0.7))
             }
-            Text(activity.duration)
+            Text(currentActivity.duration)
                 .font(.system(size: 10, weight: .semibold, design: .serif))
                 .foregroundStyle(.white)
                 .lineLimit(1)
@@ -719,7 +719,7 @@ extension PhotoEditorView {
                 .font(.system(size: 5, weight: .bold))
                 .tracking(1.0)
                 .foregroundStyle(.white)
-            Text(activity.elapsedTime)
+            Text(currentActivity.elapsedTime)
                 .font(.system(size: 7, weight: .regular, design: .serif))
                 .foregroundStyle(.white.opacity(0.75))
                 .lineLimit(1)
@@ -774,7 +774,7 @@ extension PhotoEditorView {
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white)
-                Text(activity.duration)
+                Text(currentActivity.duration)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -786,7 +786,7 @@ extension PhotoEditorView {
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white)
-                Text(activity.distance)
+                Text(currentActivity.distance)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -798,7 +798,7 @@ extension PhotoEditorView {
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white)
-                Text(activity.pace)
+                Text(currentActivity.pace)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -810,7 +810,7 @@ extension PhotoEditorView {
                     .font(.system(size: 8, weight: .regular, design: .serif))
                     .tracking(1.2)
                     .foregroundStyle(.white)
-                Text(activity.elevationGain)
+                Text(currentActivity.elevationGain)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -824,7 +824,7 @@ extension PhotoEditorView {
     var miniFullBannerBottom: some View {
         HStack(spacing: 0) {
             VStack(spacing: 3) {
-                Text(activity.duration)
+                Text(currentActivity.duration)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -836,7 +836,7 @@ extension PhotoEditorView {
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
-                Text(activity.distance)
+                Text(currentActivity.distance)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -848,7 +848,7 @@ extension PhotoEditorView {
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
-                Text(activity.pace)
+                Text(currentActivity.pace)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -860,7 +860,7 @@ extension PhotoEditorView {
             }
             .frame(maxWidth: .infinity)
             VStack(spacing: 3) {
-                Text(activity.elevationGain)
+                Text(currentActivity.elevationGain)
                     .font(.system(size: 18, weight: .regular, design: .serif).italic())
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -941,7 +941,7 @@ extension PhotoEditorView {
                     .font(.system(size: 3, weight: .heavy, design: .serif))
                     .tracking(0.3)
                     .foregroundStyle(Color.black.opacity(0.6))
-                Text(activity.hasDistance ? ActivityFormatting.distanceValue(activity.distanceRaw, unit: .km) : "--")
+                Text(currentActivity.hasDistance ? ActivityFormatting.distanceValue(currentActivity.distanceRaw, unit: .km) : "--")
                     .font(.system(size: 14, weight: .black, design: .serif))
                     .foregroundStyle(Color.black.opacity(0.8))
                 Text("KM")
@@ -963,18 +963,18 @@ extension PhotoEditorView {
                     .font(.system(size: 5, weight: .regular))
                     .foregroundStyle(notesOrange)
                 Spacer()
-                Text(activity.hasDistance ? activity.distance : "")
+                Text(currentActivity.hasDistance ? currentActivity.distance : "")
                     .font(.system(size: 5, weight: .semibold))
                     .foregroundStyle(notesOrange)
                 Image(systemName: "figure.run")
                     .font(.system(size: 4.5, weight: .semibold))
                     .foregroundStyle(notesOrange)
             }
-            Text(activity.title)
+            Text(currentActivity.title)
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(.black)
                 .lineLimit(1)
-            Text(activity.hasDistance ? activity.pace : activity.duration)
+            Text(currentActivity.hasDistance ? currentActivity.pace : currentActivity.duration)
                 .font(.system(size: 6, weight: .regular))
                 .foregroundStyle(.gray)
                 .lineLimit(1)
@@ -995,7 +995,7 @@ extension PhotoEditorView {
                 Text("SUNDAY")
                     .font(font)
                     .foregroundStyle(.white)
-                Text(activity.date.uppercased())
+                Text(currentActivity.date.uppercased())
                     .font(font)
                     .foregroundStyle(.white)
                 Text("7:18 AM")
@@ -1004,13 +1004,13 @@ extension PhotoEditorView {
             }
             Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 1) {
-                Text(activity.distance.uppercased())
+                Text(currentActivity.distance.uppercased())
                     .font(font)
                     .foregroundStyle(.white)
-                Text(activity.pace.uppercased())
+                Text(currentActivity.pace.uppercased())
                     .font(font)
                     .foregroundStyle(.white)
-                Text(activity.duration.uppercased())
+                Text(currentActivity.duration.uppercased())
                     .font(font)
                     .foregroundStyle(.white)
             }
@@ -1020,24 +1020,24 @@ extension PhotoEditorView {
 
     var miniBlurredVerticalText: some View {
         VStack(alignment: .leading, spacing: -1) {
-            Text(activity.date.uppercased())
+            Text(currentActivity.date.uppercased())
                 .font(.system(size: 5, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
-            if activity.hasDistance {
-                Text(activity.distance.uppercased())
+            if currentActivity.hasDistance {
+                Text(currentActivity.distance.uppercased())
                     .font(.system(size: 5, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
-                Text(activity.pace.uppercased())
+                Text(currentActivity.pace.uppercased())
                     .font(.system(size: 5, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
             }
-            Text(activity.duration.uppercased())
+            Text(currentActivity.duration.uppercased())
                 .font(.system(size: 5, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
-            Text(activity.elevationGain.uppercased())
+            Text(currentActivity.elevationGain.uppercased())
                 .font(.system(size: 5, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
-            if activity.averageHeartrate != nil {
+            if currentActivity.averageHeartrate != nil {
                 Text("BPM")
                     .font(.system(size: 5, weight: .black, design: .rounded))
                     .foregroundStyle(.white.opacity(0.6))
@@ -1077,8 +1077,8 @@ extension PhotoEditorView {
     var miniRouteDistance: some View {
         VStack(spacing: 3) {
             ZStack {
-                if activity.linePoints.count >= 2 {
-                    RouteTraceShape(normalizedPoints: activity.linePoints)
+                if currentActivity.linePoints.count >= 2 {
+                    RouteTraceShape(normalizedPoints: currentActivity.linePoints)
                         .stroke(Color.white.opacity(0.9), style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round))
                 } else {
                     Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
@@ -1089,7 +1089,7 @@ extension PhotoEditorView {
             .frame(maxWidth: .infinity)
             .frame(height: 38)
             HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(activity.hasDistance ? activity.distance.components(separatedBy: " ").first ?? activity.distance : "--")
+                Text(currentActivity.hasDistance ? currentActivity.distance.components(separatedBy: " ").first ?? currentActivity.distance : "--")
                     .font(.system(size: 16, weight: .black, design: .default).width(.compressed))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -1100,11 +1100,11 @@ extension PhotoEditorView {
                     .offset(y: -2)
             }
             HStack(spacing: 6) {
-                Text(activity.elevationGain)
+                Text(currentActivity.elevationGain)
                     .font(.system(size: 6, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.65))
                     .lineLimit(1)
-                Text(activity.duration)
+                Text(currentActivity.duration)
                     .font(.system(size: 6, weight: .semibold, design: .monospaced))
                     .foregroundStyle(.white.opacity(0.65))
                     .lineLimit(1)
@@ -1119,20 +1119,20 @@ extension PhotoEditorView {
                 .font(.system(size: 5.5, weight: .light, design: .serif))
                 .foregroundStyle(.white.opacity(0.55))
                 .lineLimit(1)
-            Text(activity.activityName.isEmpty ? activity.title : activity.activityName)
+            Text(currentActivity.activityName.isEmpty ? currentActivity.title : currentActivity.activityName)
                 .font(.system(size: 14, weight: .bold, design: .serif))
                 .foregroundStyle(.white)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .minimumScaleFactor(0.55)
-            if activity.hasDistance {
+            if currentActivity.hasDistance {
                 HStack(spacing: 5) {
-                    miniStat(label: "Dist", value: activity.distance)
-                    miniStat(label: "Pace", value: activity.pace)
-                    miniStat(label: "Time", value: activity.duration)
+                    miniStat(label: "Dist", value: currentActivity.distance)
+                    miniStat(label: "Pace", value: currentActivity.pace)
+                    miniStat(label: "Time", value: currentActivity.duration)
                 }
             } else {
-                miniStat(label: "Time", value: activity.duration)
+                miniStat(label: "Time", value: currentActivity.duration)
             }
         }
         .padding(.horizontal, 4)
@@ -1144,17 +1144,17 @@ extension PhotoEditorView {
                 .font(.system(size: 6, weight: .regular, design: .serif))
                 .foregroundStyle(.white.opacity(0.5))
                 .lineLimit(1)
-            Text(activity.activityType.lowercased().contains("ride") ? "City Ride" : "City Run")
+            Text(currentActivity.activityType.lowercased().contains("ride") ? "City Ride" : "City Run")
                 .font(.system(size: 13, weight: .bold, design: .serif))
                 .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
             HStack(spacing: 5) {
-                if activity.hasDistance {
-                    miniStat(label: "Dist", value: activity.distance)
-                    miniStat(label: "Pace", value: activity.pace)
+                if currentActivity.hasDistance {
+                    miniStat(label: "Dist", value: currentActivity.distance)
+                    miniStat(label: "Pace", value: currentActivity.pace)
                 }
-                miniStat(label: "Time", value: activity.duration)
+                miniStat(label: "Time", value: currentActivity.duration)
             }
         }
     }

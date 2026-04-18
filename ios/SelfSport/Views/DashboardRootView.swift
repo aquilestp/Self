@@ -145,11 +145,13 @@ struct DashboardRootView: View {
                     Task {
                         await NotificationService.shared.requestAuthorization()
                         showNotificationPrompt = false
+                        await triggerUpdateCheckIfNeeded()
                     }
                 },
                 onSkip: {
                     NotificationService.shared.hasBeenPrompted = true
                     showNotificationPrompt = false
+                    Task { await triggerUpdateCheckIfNeeded() }
                 }
             )
             .presentationDetents([.large])
