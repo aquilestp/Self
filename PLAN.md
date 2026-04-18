@@ -1,12 +1,19 @@
-# Reabrir drawer de stats al cambiar actividad desde el canvas
-
+# Modal informativo de ciudad al tocar el ícono de location activo
 
 ## Cambio
 
-Cuando el usuario selecciona una nueva actividad desde el selector del canvas, automáticamente se reabre el drawer de stats mostrando la información actualizada de la nueva actividad.
+Cuando el usuario ya dio permiso de ubicación y la ciudad está detectada, al tocar el ícono de `location.fill` (activo) en el canvas, aparecerá un modal informativo en lugar de no hacer nada.
 
-## Comportamiento actual
-- El usuario selecciona una actividad → el sheet se cierra → el drawer queda cerrado
+## Comportamiento
 
-## Comportamiento nuevo
-- El usuario selecciona una actividad → el sheet se cierra → el drawer de stats se abre automáticamente con los datos de la nueva actividad ya actualizados
+- Si la ubicación **no está activa**: sigue pidiendo permiso (igual que hoy)
+- Si la ubicación **ya está activa** (ícono lleno): muestra un alert con:
+  - Título: **"You are in [Ciudad] 📍"**
+  - Mensaje: *"Soon you'll be able to filter activities and discover events happening in your city."*
+  - Botón: **"Got it"**
+
+## Ajuste técnico
+
+- Se agrega un nuevo estado `showCityInfoAlert`
+- El botón de location, cuando `cityName != nil`, activa ese alert en vez de ignorar el tap
+

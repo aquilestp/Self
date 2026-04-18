@@ -39,6 +39,7 @@ struct PhotoEditorView: View {
     @State var drawerDragOffset: CGFloat = 0
     @State var locationService = LocationService()
     @State private var showLocationDeniedAlert: Bool = false
+    @State private var showCityInfoAlert: Bool = false
     @State private var isDraggingWidget: Bool = false
     @State private var draggingWidgetId: String? = nil
     @State private var isOverDeleteZone: Bool = false
@@ -784,6 +785,11 @@ struct PhotoEditorView: View {
         } message: {
             Text("Install Instagram to share your photo directly to Stories.")
         }
+        .alert("You are in \(locationService.cityName ?? "") 📍", isPresented: $showCityInfoAlert) {
+            Button("Got it", role: .cancel) { }
+        } message: {
+            Text("Soon you'll be able to filter activities and discover events happening in your city.")
+        }
         .alert("Location Access Denied", isPresented: $showLocationDeniedAlert) {
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -1104,7 +1110,10 @@ struct PhotoEditorView: View {
                 }
 
                 Button {
-                    if locationService.cityName != nil { return }
+                    if locationService.cityName != nil {
+                        showCityInfoAlert = true
+                        return
+                    }
                     locationService.requestLocationIfNeeded()
                     if locationService.permissionDenied {
                         showLocationDeniedAlert = true
