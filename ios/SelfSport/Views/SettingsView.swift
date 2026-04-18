@@ -510,7 +510,7 @@ struct SettingsView: View {
             sectionLabel("COMMUNITY", icon: "person.2.fill")
 
             Button {
-                if let url = URL(string: "") {
+                if let url = URL(string: "https://www.instagram.com/selfshare__") {
                     UIApplication.shared.open(url)
                 }
             } label: {
