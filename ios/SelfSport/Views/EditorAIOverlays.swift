@@ -115,52 +115,7 @@ extension PhotoEditorView {
     }
 
     var aiGenerationOverlay: some View {
-        ZStack {
-            Color.black.opacity(0.65)
-                .ignoresSafeArea()
-
-            VStack(spacing: 24) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.white.opacity(0.15), Color.white.opacity(0.06)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 100, height: 100)
-                        .scaleEffect(aiPulseAnimation ? 1.15 : 0.85)
-                        .opacity(aiPulseAnimation ? 0.6 : 0.3)
-                        .animation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true), value: aiPulseAnimation)
-
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color.white.opacity(0.25), Color.white.opacity(0.15)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 64, height: 64)
-
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 26, weight: .medium))
-                        .foregroundStyle(.white)
-                        .symbolEffect(.pulse.wholeSymbol, options: .repeating, value: aiPulseAnimation)
-                }
-
-                VStack(spacing: 8) {
-                    Text("Applying \(aiGenerationStyle) style...")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(.white)
-
-                    Text("This may take a few seconds")
-                        .font(.system(size: 14, weight: .regular))
-                        .foregroundStyle(.white.opacity(0.5))
-                }
-            }
-        }
+        AIGenerationLoadingView(styleName: aiGenerationStyle)
     }
 
     func startAIGeneration() {
