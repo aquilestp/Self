@@ -1,21 +1,11 @@
-# Fix null "type" column error
+# SQL to adapt ai_generations table to the app
 
-## Análisis
+No Swift code changes needed. Run this SQL in Supabase → SQL Editor:
 
-**Lo que envía la app (correcto, no tocar):**
-- `user_id` → string UUID
-- `kind` → `"image"` o `"video"`
+```sql
 
-**Lo que tiene la tabla actualmente:**
-- Columna `type` (NOT NULL) — el app no envía `type`, envía `kind` → null → error
+```
 
-## Plan (solo cambios en Supabase, no en el app)
+After this the table will have exactly what the app inserts:
 
-- [ ] En Supabase → Table Editor → `ai_generations` → renombrar la columna `type` a `kind`
-
-  Esto se puede hacer con este SQL en el SQL Editor de Supabase:
-  ```sql
-  ALTER TABLE ai_generations RENAME COLUMN "type" TO kind;
-  ```
-
-Eso es todo. El app ya envía `kind` correctamente, solo la columna tiene el nombre incorrecto.
+The RLS policies you already have (2 policies) stay as-is.
