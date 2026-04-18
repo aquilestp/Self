@@ -393,32 +393,67 @@ private struct GlassCardModifier: ViewModifier {
             content
                 .background(glassExportBackground)
                 .clipShape(.rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(accentColor.opacity(isNeon ? 0.35 : 0.18), lineWidth: 0.5)
-                )
+                .overlay(specularHighlight)
+                .overlay(gradientBorder)
         } else {
             content
-                .background(.ultraThinMaterial.opacity(isAesthetic ? 0.5 : 0.7))
-                .background(Color.white.opacity(isNeon ? 0.04 : 0.14))
-                .background(accentColor.opacity(isNeon ? 0.12 : 0.06))
+                .background(isNeon ? AnyShapeStyle(.ultraThinMaterial) : AnyShapeStyle(.thinMaterial))
+                .background(Color.white.opacity(isNeon ? 0.04 : 0.08))
+                .background(accentColor.opacity(isNeon ? 0.14 : 0.04))
                 .clipShape(.rect(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(accentColor.opacity(isNeon ? 0.35 : 0.18), lineWidth: 0.5)
-                )
-                .shadow(color: isNeon ? accentColor.opacity(0.35) : .black.opacity(0.3), radius: isNeon ? 16 : 12, x: 0, y: isNeon ? 0 : 6)
+                .overlay(specularHighlight)
+                .overlay(gradientBorder)
+                .shadow(color: isNeon ? accentColor.opacity(0.40) : .black.opacity(0.38), radius: isNeon ? 18 : 22, x: 0, y: isNeon ? 0 : 9)
         }
+    }
+
+    @ViewBuilder
+    private var specularHighlight: some View {
+        let opacity: Double = isNeon ? 0.10 : (isAesthetic ? 0.20 : 0.26)
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .fill(
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(opacity),
+                        Color.white.opacity(opacity * 0.3),
+                        Color.clear
+                    ],
+                    startPoint: .top,
+                    endPoint: UnitPoint(x: 0.5, y: 0.55)
+                )
+            )
+            .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private var gradientBorder: some View {
+        RoundedRectangle(cornerRadius: 14, style: .continuous)
+            .strokeBorder(
+                LinearGradient(
+                    stops: [
+                        .init(color: Color.white.opacity(isNeon ? 0.50 : 0.60), location: 0.0),
+                        .init(color: accentColor.opacity(isNeon ? 0.35 : 0.18), location: 0.45),
+                        .init(color: Color.white.opacity(isNeon ? 0.15 : 0.08), location: 1.0)
+                    ],
+                    startPoint: UnitPoint(x: 0.15, y: 0),
+                    endPoint: UnitPoint(x: 0.85, y: 1)
+                ),
+                lineWidth: 0.8
+            )
+            .allowsHitTesting(false)
     }
 
     @ViewBuilder
     private var glassExportBackground: some View {
         if isNeon {
-            Color(red: 0.05, green: 0.05, blue: 0.12).opacity(0.75)
+            Color(red: 0.05, green: 0.05, blue: 0.12).opacity(0.82)
         } else if isAesthetic {
-            Color.white.opacity(0.20)
+            Color.white.opacity(0.42)
         } else {
-            Color.white.opacity(0.30)
+            ZStack {
+                Color.white.opacity(0.60)
+                Color(white: 0.90).opacity(0.20)
+            }
         }
     }
 }
