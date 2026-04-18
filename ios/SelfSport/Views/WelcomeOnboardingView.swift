@@ -35,6 +35,7 @@ struct WelcomeOnboardingView: View {
     let onComplete: () -> Void
 
     @State private var currentStep: WelcomeOnboardingStep = .intro
+    @State private var dragOffset: CGFloat = 0
 
     var body: some View {
         ZStack {
@@ -63,27 +64,27 @@ struct WelcomeOnboardingView: View {
                 Spacer(minLength: 28)
 
                 ZStack {
+                    GeometryReader { geo in
+                        HStack(spacing: 0) {
+                            WelcomeIntroStepView()
+                                .frame(width: geo.size.width, height: geo.size.height)
+                            WelcomeCanvasStepView()
+                                .frame(width: geo.size.width, height: geo.size.height)
+                            WelcomeShareStepView()
+                                .frame(width: geo.size.width, height: geo.size.height)
+                        }
+                        .offset(x: pageOffset(screenWidth: geo.size.width))
+                    }
+                    .clipped()
+
                     centeredProgressHeader
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                         .padding(.bottom, 98)
-
-                    if currentStep == .intro {
-                        WelcomeIntroStepView()
-                            .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
-                    }
-
-                    if currentStep == .canvas {
-                        WelcomeCanvasStepView()
-                            .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
-                    }
-
-                    if currentStep == .share {
-                        WelcomeShareStepView()
-                            .transition(.asymmetric(insertion: .opacity.combined(with: .scale(scale: 0.98)), removal: .opacity))
-                    }
+                        .allowsHitTesting(false)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .animation(.snappy(duration: 0.42, extraBounce: 0.02), value: currentStep)
+                .contentShape(Rectangle())
+                .gesture(swipeGesture)
 
                 Spacer(minLength: 24)
 
@@ -110,11 +111,13 @@ struct WelcomeOnboardingView: View {
             }
             .padding(.horizontal, 24)
             .padding(.bottom, 22)
-            .contentShape(Rectangle())
-            .simultaneousGesture(stepSwipeGesture)
         }
         .background(.black)
         .ignoresSafeArea()
+    }
+
+    private func pageOffset(screenWidth: CGFloat) -> CGFloat {
+        -CGFloat(currentStep.rawValue) * screenWidth + dragOffset
     }
 
     private var onboardingBackground: some View {
@@ -143,6 +146,43 @@ struct WelcomeOnboardingView: View {
             }
     }
 
+    private var swipeGesture: some Gesture {
+        DragGesture(minimumDistance: 10)
+            .onChanged { value in
+                guard abs(value.translation.width) > abs(value.translation.height) * 0.7 else { return }
+                let translation = value.translation.width
+                let isAtStart = currentStep == .intro && translation > 0
+                let isAtEnd = currentStep == .share && translation < 0
+                if isAtStart || isAtEnd {
+                    dragOffset = translation * 0.15
+                } else {
+                    dragOffset = translation
+                }
+            }
+            .onEnded { value in
+                let translation = value.translation.width
+                let predicted = value.predictedEndTranslation.width
+                let shouldAdvance = translation < -80 || (translation < -20 && predicted < -150)
+                let shouldRetreat = translation > 80 || (translation > 20 && predicted > 150)
+
+                if shouldAdvance, let next = WelcomeOnboardingStep(rawValue: currentStep.rawValue + 1) {
+                    withAnimation(.spring(duration: 0.38, bounce: 0.22)) {
+                        currentStep = next
+                        dragOffset = 0
+                    }
+                } else if shouldRetreat, let prev = WelcomeOnboardingStep(rawValue: currentStep.rawValue - 1) {
+                    withAnimation(.spring(duration: 0.38, bounce: 0.22)) {
+                        currentStep = prev
+                        dragOffset = 0
+                    }
+                } else {
+                    withAnimation(.spring(duration: 0.35, bounce: 0.3)) {
+                        dragOffset = 0
+                    }
+                }
+            }
+    }
+
     private var centeredProgressHeader: some View {
         VStack(spacing: 10) {
             HStack(spacing: 6) {
@@ -161,42 +201,19 @@ struct WelcomeOnboardingView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private var stepSwipeGesture: some Gesture {
-        DragGesture(minimumDistance: 24)
-            .onEnded { value in
-                handleSwipe(value)
-            }
-    }
-
-    private func handleSwipe(_ value: DragGesture.Value) {
-        let horizontalTranslation = value.translation.width
-        let verticalTranslation = value.translation.height
-
-        guard abs(horizontalTranslation) > abs(verticalTranslation), abs(horizontalTranslation) > 64 else {
-            return
-        }
-
-        if horizontalTranslation < 0 {
-            advance()
-        } else {
-            retreat()
-        }
-    }
-
     private func retreat() {
-        guard let previousStep = WelcomeOnboardingStep(rawValue: currentStep.rawValue - 1) else {
-            return
-        }
-
-        withAnimation(.snappy(duration: 0.42, extraBounce: 0.02)) {
+        guard let previousStep = WelcomeOnboardingStep(rawValue: currentStep.rawValue - 1) else { return }
+        withAnimation(.spring(duration: 0.38, bounce: 0.22)) {
             currentStep = previousStep
+            dragOffset = 0
         }
     }
 
     private func advance() {
         if let nextStep = WelcomeOnboardingStep(rawValue: currentStep.rawValue + 1) {
-            withAnimation(.snappy(duration: 0.42, extraBounce: 0.02)) {
+            withAnimation(.spring(duration: 0.38, bounce: 0.22)) {
                 currentStep = nextStep
+                dragOffset = 0
             }
         } else {
             onComplete()
