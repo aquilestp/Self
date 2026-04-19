@@ -216,10 +216,10 @@ extension PhotoEditorView {
         } label: {
             VStack(spacing: 4) {
                 Text("Aa")
-                    .font(.system(size: 22, weight: .bold, design: .default))
+                    .font(.system(size: 34, weight: .bold, design: .default))
                     .foregroundStyle(.white.opacity(0.9))
                 Text("Text")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white.opacity(0.55))
             }
             .frame(maxWidth: .infinity)
@@ -248,10 +248,12 @@ extension PhotoEditorView {
                 drawerState = .collapsed
             }
         } label: {
-            VStack(spacing: 6) {
+            ZStack {
                 miniWidgetPreview(type: type)
-                    .frame(maxWidth: .infinity)
+                    .scaleEffect(1.55)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 8)
             .frame(maxWidth: large ? .infinity : nil)
             .frame(width: large ? nil : 119, height: h)
@@ -279,10 +281,12 @@ extension PhotoEditorView {
                 drawerState = .collapsed
             }
         } label: {
-            VStack(spacing: 6) {
+            ZStack {
                 miniWidgetPreview(type: type)
-                    .frame(maxWidth: .infinity)
+                    .scaleEffect(1.55)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding(.horizontal, 8)
             .frame(maxWidth: .infinity)
             .frame(height: 110)
