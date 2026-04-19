@@ -4,8 +4,7 @@ extension PhotoEditorView {
 
     var expandedDrawer: some View {
         GeometryReader { geo in
-            let isExpanded = drawerState == .expanded
-            let drawerHeight = isExpanded ? geo.size.height * 0.75 : 0
+            let drawerHeight = geo.size.height * 0.88
 
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
@@ -21,26 +20,14 @@ extension PhotoEditorView {
                         .padding(.top, 6)
                         .padding(.bottom, 10)
 
-                    if isExpanded {
-                        expandedGrid
-                            .transition(.opacity)
-                    } else {
-                        compactStatsList
-                            .transition(.opacity)
-                    }
+                    expandedGrid
+                        .transition(.opacity)
                 }
-                .frame(height: isExpanded ? drawerHeight : nil)
+                .frame(height: drawerHeight)
                 .background(.black.opacity(0.55))
                 .background(.ultraThinMaterial)
                 .clipShape(.rect(topLeadingRadius: 20, topTrailingRadius: 20))
                 .contentShape(.rect(topLeadingRadius: 20, topTrailingRadius: 20))
-                .onTapGesture {
-                    if drawerState == .open {
-                        withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
-                            drawerState = .expanded
-                        }
-                    }
-                }
                 .offset(y: drawerDragOffset)
                 .gesture(drawerDragGesture)
             }
@@ -179,27 +166,15 @@ extension PhotoEditorView {
         DragGesture(minimumDistance: 12)
             .onChanged { value in
                 let translation = value.translation.height
-                if drawerState == .open {
-                    drawerDragOffset = translation < 0 ? translation * 0.5 : translation
-                } else if drawerState == .expanded {
-                    drawerDragOffset = translation > 0 ? translation * 0.5 : 0
-                }
+                drawerDragOffset = translation > 0 ? translation : translation * 0.25
             }
             .onEnded { value in
                 let translation = value.translation.height
                 let velocity = value.predictedEndTranslation.height
                 withAnimation(.spring(response: 0.38, dampingFraction: 0.82)) {
                     drawerDragOffset = 0
-                    if drawerState == .open {
-                        if translation < -50 || velocity < -200 {
-                            drawerState = .expanded
-                        } else if translation > 60 || velocity > 300 {
-                            drawerState = .collapsed
-                        }
-                    } else if drawerState == .expanded {
-                        if translation > 50 || velocity > 200 {
-                            drawerState = .open
-                        }
+                    if translation > 80 || velocity > 300 {
+                        drawerState = .collapsed
                     }
                 }
             }

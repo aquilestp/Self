@@ -1,27 +1,12 @@
-# Arreglar widgets del drawer que se salen de los cards
+# Unificar el drawer en un solo estado abierto, más alto
 
-## Problema
+Ahora mismo el drawer de widgets tiene tres estados (cerrado, medio, expandido) y el más alto llega al 75% de la pantalla. Voy a dejar solo dos estados: cerrado y abierto, donde "abierto" es aún más alto que el máximo actual.
 
-En el drawer de widgets, varios cards muestran su contenido desbordado por fuera de los bordes del card: los horizontales (Morning Run, 9.1 KM, DIST/PACE, títulos grandes, nine point one, banners) se salen por la derecha y/o izquierda; otros como "notes/orning Run" quedan cortados horrible.
+**Cambios**
 
-La causa: el contenido se agranda con un factor de escala grande dentro de un card de ancho fijo, pero la escala en SwiftUI no reduce el tamaño de layout — el contenido se dibuja por fuera del card y no se recorta correctamente.
+- Eliminar el estado intermedio del drawer: al tocar o arrastrar hacia arriba, pasa directo a un único estado abierto.
+- Subir la altura máxima del drawer abierto (de ~75% a ~88% de la pantalla) para que se sienta más presente y quepan más widgets visibles de una.
+- Mostrar siempre la grilla completa con scroll (ya no hay vista compacta intermedia).
+- Ajustar el gesto de arrastre: arrastrar hacia abajo lo cierra; ya no hay paso intermedio.
+- Mantener intacto el orden de los widgets, el fondo translúcido y los tamaños de cada card que ya quedaron bien.
 
-## Qué voy a corregir
-
-- **Recortar correctamente cada card del drawer** para que nada se salga del borde, sin importar qué widget sea.
-- **Ajustar el tamaño del contenido de cada widget** para que quepa dentro del card de forma proporcional y quede centrado, ocupando aprox el 60–75% del card como ya habíamos definido.
-- **Revisar uno a uno los widgets problemáticos**:
-  - Morning Run / Title card (texto ancho expandido)
-  - 9.1 KM gigante (bold / impact / poster / wide / tower / heroStat)
-  - DIST · PACE horizontal
-  - nine point one (distanceWords)
-  - Full banner (4 stats horizontales)
-  - notesScreenshot (la captura blanca que se sale)
-  - whatsappMessage (burbuja que se corta)
-  - Splits fastest / splits bars / splits table (filas con tiempos que se cortan)
-- **Mantener el sorting actual** (popular/recents) sin tocarlo.
-- **Mantener fondo translúcido oscuro** y estilo visual ya acordado.
-
-## Resultado esperado
-
-Todos los cards del drawer (tanto en vista pequeña como expandida) muestran su contenido **completo, centrado y contenido dentro del card**, sin desbordes, sin cortes feos, con tamaño consistente y legible.
