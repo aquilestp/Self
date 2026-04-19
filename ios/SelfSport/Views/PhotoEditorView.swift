@@ -128,6 +128,7 @@ struct PhotoEditorView: View {
     @State var drawerTab: DrawerTab = .popular
     @State var widgetPopularityMap: [String: Int] = [:]
     @State var userRecentsMap: [String: Date] = [:]
+    @State var cachedSortedWidgetTypes: [StatWidgetType] = []
     private let photoFilterService = PhotoFilterService()
     let grokService = GrokImageEditService()
     let cityFilterService = CityFilterService()
@@ -766,6 +767,16 @@ struct PhotoEditorView: View {
             async let rec = widgetPopularityService.fetchUserRecents()
             widgetPopularityMap = await pop
             userRecentsMap = await rec
+            cachedSortedWidgetTypes = sortedWidgetTypes()
+        }
+        .onChange(of: drawerTab) { _, _ in
+            cachedSortedWidgetTypes = sortedWidgetTypes()
+        }
+        .onChange(of: widgetPopularityMap) { _, _ in
+            cachedSortedWidgetTypes = sortedWidgetTypes()
+        }
+        .onChange(of: userRecentsMap) { _, _ in
+            cachedSortedWidgetTypes = sortedWidgetTypes()
         }
         .onChange(of: aiEditedPhoto) { _, _ in
             filteredPhotoCache.removeAll()

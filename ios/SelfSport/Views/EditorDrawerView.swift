@@ -120,7 +120,7 @@ extension PhotoEditorView {
     }
 
     var gridStatTypes: [StatWidgetType] {
-        sortedWidgetTypes()
+        cachedSortedWidgetTypes.isEmpty ? sortedWidgetTypes() : cachedSortedWidgetTypes
     }
 
     var compactStatsList: some View {
