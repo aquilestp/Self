@@ -240,6 +240,9 @@ extension PhotoEditorView {
 
     func widgetThumbnail(type: StatWidgetType, isActive: Bool, large: Bool = false) -> some View {
         let h: CGFloat = large ? 106 : 90
+        let scale: CGFloat = 1.45
+        let hPad: CGFloat = 10
+        let vPad: CGFloat = 8
         return Button {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 toggleWidget(type)
@@ -248,13 +251,17 @@ extension PhotoEditorView {
                 drawerState = .collapsed
             }
         } label: {
-            ZStack {
-                miniWidgetPreview(type: type)
-                    .scaleEffect(1.55)
-                    .fixedSize(horizontal: false, vertical: true)
+            GeometryReader { geo in
+                let innerW = max(0, geo.size.width - hPad * 2)
+                let innerH = max(0, geo.size.height - vPad * 2)
+                ZStack {
+                    miniWidgetPreview(type: type)
+                        .frame(width: innerW / scale, height: innerH / scale)
+                        .scaleEffect(scale)
+                        .frame(width: innerW, height: innerH)
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, 8)
             .frame(maxWidth: large ? .infinity : nil)
             .frame(width: large ? nil : 119, height: h)
             .background(
@@ -273,7 +280,10 @@ extension PhotoEditorView {
     }
 
     func fullWidthThumbnail(type: StatWidgetType, isActive: Bool) -> some View {
-        Button {
+        let scale: CGFloat = 1.45
+        let hPad: CGFloat = 14
+        let vPad: CGFloat = 10
+        return Button {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 toggleWidget(type)
             }
@@ -281,13 +291,17 @@ extension PhotoEditorView {
                 drawerState = .collapsed
             }
         } label: {
-            ZStack {
-                miniWidgetPreview(type: type)
-                    .scaleEffect(1.55)
-                    .fixedSize(horizontal: false, vertical: true)
+            GeometryReader { geo in
+                let innerW = max(0, geo.size.width - hPad * 2)
+                let innerH = max(0, geo.size.height - vPad * 2)
+                ZStack {
+                    miniWidgetPreview(type: type)
+                        .frame(width: innerW / scale, height: innerH / scale)
+                        .scaleEffect(scale)
+                        .frame(width: innerW, height: innerH)
+                }
+                .frame(width: geo.size.width, height: geo.size.height)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.horizontal, 8)
             .frame(maxWidth: .infinity)
             .frame(height: 110)
             .background(

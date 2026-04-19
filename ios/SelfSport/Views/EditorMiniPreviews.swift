@@ -63,8 +63,8 @@ extension PhotoEditorView {
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
-            .padding(.leading, 5)
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
         case .stack:
             VStack(spacing: 2) {
                 ForEach(
@@ -118,8 +118,8 @@ extension PhotoEditorView {
                     }
                 }
             }
-            .padding(.leading, 5)
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
         case .impact:
             VStack(alignment: .leading, spacing: -2) {
                 Text(currentActivity.title.uppercased())
@@ -155,8 +155,8 @@ extension PhotoEditorView {
                     }
                 }
             }
-            .padding(.leading, 5)
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
         case .poster:
             VStack(alignment: .leading, spacing: 0) {
                 Text(currentActivity.title.uppercased())
@@ -190,8 +190,8 @@ extension PhotoEditorView {
                     }
                 }
             }
-            .padding(.leading, 5)
-            .scaleEffect(x: 1.5, y: 1.0, anchor: .leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 4)
         case .routeClean:
             ZStack {
                 if currentActivity.linePoints.count >= 2 {
