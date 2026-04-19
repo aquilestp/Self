@@ -218,7 +218,7 @@ private struct WelcomeIntroStepView: View {
         VStack(alignment: .leading, spacing: 12) {
             Spacer(minLength: 0)
 
-            Text("Your were never meant to stay hidden")
+            Text("You were never meant to stay hidden")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(.white.opacity(0.64))
                 .fixedSize(horizontal: false, vertical: true)
